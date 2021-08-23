@@ -1,0 +1,84 @@
+.header {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  height: 100vh; }
+
+.perfil {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  width: calc(100% - 100px);
+  height: calc(100%);
+  margin: 0px auto; }
+
+.img--perfil {
+  height: 150px;
+  border-radius: 50%;
+  background-color: red; }
+
+.presentation--perfil {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center; }
+
+.greetings--perfil {
+  font-weight: 300;
+  font-size: 1rem;
+  margin: 10px 0px; }
+  .greetings--perfil > span {
+    font-size: 1.1rem;
+    font-weight: 400; }
+
+.emoji--perfil {
+  width: 20px;
+  height: 20px; }
+
+.presentationText--perfil {
+  text-align: center;
+  font-weight: 300; }
+  .presentationText--perfil > span {
+    font-weight: 700;
+    font-size: 1.6rem; }
+
+.skill--perfil {
+  font-size: 5rem;
+  font-weight: 100; }
+
+.networks {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  background-color: aquamarine;
+  padding: 10px 0px; }
+
+.icon-networks {
+  width: 60px;
+  height: 60px;
+  background-color: transparent;
+  border-radius: 50%; }
+  .icon-networks:hover {
+    background-color: white;
+    transition-property: all;
+    transition-duration: 0.2s;
+    transition-timing-function: ease-in; }
+
+.icon--networks {
+  width: 60px;
+  height: 60px;
+  background-color: transparent;
+  border-radius: 50%; }
+
+.main {
+  height: 100vh; }
+
+* {
+  background-color: #efefef;
+  font-family: "Poppins", sans-serif;
+  padding: 0;
+  margin: 0; }

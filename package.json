@@ -6,14 +6,17 @@
   "scripts": {
     "start": "next start",
     "dev": "next dev",
-    "build": "next build"
+    "build": "next build",
+    "sass": "node-sass --watch ./assets/styles/scss/ -o ./assets/styles/css/"
   },
   "keywords": [],
   "author": "Alex Largo <alexlar163@gmail.com>",
   "license": "MIT",
   "dependencies": {
     "next": "^11.1.0",
+    "next-images": "^1.8.1",
     "react": "^17.0.2",
-    "react-dom": "^17.0.2"
+    "react-dom": "^17.0.2",
+    "typed.js": "^2.0.12"
   }
 }
