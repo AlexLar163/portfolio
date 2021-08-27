@@ -1,0 +1,12 @@
+@import "./utilities/variables";
+@import "./utilities/mixins";
+
+@import "./views/header";
+@import "./views/index";
+@import "./views/menuscroll";
+* {
+  background-color: #efefef;
+  font-family: "Poppins", sans-serif;
+  padding: 0;
+  margin: 0;
+}
