@@ -13,6 +13,7 @@
   "author": "Alex Largo <alexlar163@gmail.com>",
   "license": "MIT",
   "dependencies": {
+    "gsap": "^3.7.1",
     "next": "^11.1.0",
     "next-images": "^1.8.1",
     "react": "^17.0.2",

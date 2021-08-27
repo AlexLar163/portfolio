@@ -48,7 +48,7 @@ const Header = () => {
           alt="Mi foto"
         />
         <div className="presentation--perfil">
-          <h1 className="greetings--perfil">
+          <h1 className="greetings--perfil" >
             ¡HOLA! Soy <span>Alex Largo</span>.
             <img className="emoji--perfil" src={nerdEmoji} alt="nerd.png" />
           </h1>
@@ -58,7 +58,7 @@ const Header = () => {
         <span className="skill--perfil">
           <MyTyped />
         </span>
-        <button style={{ padding: '10px' }}>Contactame</button>
+        <button style={{ padding: '10px' }} onDragEnter={() => console.log('aaaaaaa')}>Contactame</button>
       </div>
       <nav className="networks">
         <a className="icon--networks" target='_blank' href="https://www.linkedin.com/in/alex-largo-05324a1a2/">

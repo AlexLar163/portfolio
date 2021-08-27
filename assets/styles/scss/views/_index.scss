@@ -1,3 +1,22 @@
 .main {
-  height: 100vh;
+  // height: 100vh;
+  margin: 20px 40px;
+
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  grid-template-rows: auto;
+
+  justify-items: center;
+  align-items: center;
+  gap: 10px 0px;
+}
+.icon--main {
+  width: 100px;
+  height: 100px;
+  object-fit: contain;
+  background-color: #ececec;
+  padding: 5px;
+
+  border-radius: 20px;
+  border: 1px solid aquamarine;
 }
