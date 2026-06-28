@@ -6,8 +6,8 @@ import { useEffect, useState, type ReactNode } from "react";
  * Renders ONLY the active interface (not both), keeping the DOM light and
  * stopping the 8-bit game work when the editorial skin is shown.
  *
- * The 8-bit layout is the SSR default (so crawlers index the content once);
- * the editorial layout is passed as a prop and mounted client-side when chosen.
+ * The editorial layout is the SSR default; the 8-bit layout is mounted when the
+ * visitor opts into it via the switch (cookie `ui=pixel`).
  */
 export function InterfaceGate({
   initialMode,
@@ -25,9 +25,9 @@ export function InterfaceGate({
   useEffect(() => {
     const read = () =>
       setMode(
-        document.documentElement.dataset.ui === "editorial"
-          ? "editorial"
-          : "pixel",
+        document.documentElement.dataset.ui === "pixel"
+          ? "pixel"
+          : "editorial",
       );
     window.addEventListener("uichange", read);
     return () => window.removeEventListener("uichange", read);

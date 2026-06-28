@@ -22,7 +22,7 @@ export default async function Home({
 
   const cookieStore = await cookies();
   const initialMode =
-    cookieStore.get("ui")?.value === "editorial" ? "editorial" : "pixel";
+    cookieStore.get("ui")?.value === "pixel" ? "pixel" : "editorial";
 
   return (
     <main>

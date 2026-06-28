@@ -97,7 +97,7 @@ export default async function LocaleLayout({
 
   const cookieStore = await cookies();
   const ui =
-    cookieStore.get("ui")?.value === "editorial" ? "editorial" : "pixel";
+    cookieStore.get("ui")?.value === "pixel" ? "pixel" : "editorial";
 
   const jsonLd = {
     "@context": "https://schema.org",
