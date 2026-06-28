@@ -1,0 +1,731 @@
+/* ============================================================
+   UI SWITCH + EDITORIAL ("kraft normal") INTERFACE
+   Same data as the 8-bit interface, a clean editorial skin.
+   ============================================================ */
+
+/* Keep the page background paper-coloured in editorial mode. */
+html[data-ui="editorial"] body {
+  background: #ece7dd;
+}
+
+.ed-uiswitch {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  background: #b5481f;
+  color: #fff;
+  border: 2px solid #2c2113;
+  border-radius: 6px;
+  padding: 8px 13px;
+  cursor: pointer;
+  white-space: nowrap;
+  box-shadow: 0 2px 0 rgba(44, 33, 19, 0.25);
+}
+.ed-uiswitch:hover {
+  background: #15130e;
+}
+
+/* ---------------- Editorial skin ---------------- */
+.ed {
+  --bg: #ece7dd;
+  --ink: #15130e;
+  --soft: #5b554a;
+  --accent: #b5481f;
+  --card: #f5f1e8;
+  --border: #2c2113;
+  background: var(--bg);
+  background-image: radial-gradient(#15130e14 1px, transparent 1.4px);
+  background-size: 16px 16px;
+  color: var(--ink);
+  font-family: "Helvetica Neue", Arial, system-ui, sans-serif;
+  font-size: 17px;
+  line-height: 1.6;
+  min-height: 100vh;
+  image-rendering: auto;
+}
+.ed .ed-wrap,
+.ed > * {
+  max-width: 980px;
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 24px;
+  padding-right: 24px;
+}
+.ed a {
+  color: inherit;
+}
+
+/* nav */
+.ed-nav {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  flex-wrap: wrap;
+  padding-top: 22px;
+  padding-bottom: 18px;
+  border-bottom: 2px solid var(--border);
+}
+.ed-logo {
+  font-family: Georgia, "Times New Roman", serif;
+  font-weight: 800;
+  font-size: 22px;
+  letter-spacing: -0.02em;
+}
+.ed-nav nav {
+  display: flex;
+  gap: 22px;
+  margin-left: auto;
+  flex-wrap: wrap;
+}
+.ed-nav nav a {
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 15px;
+  color: var(--ink);
+  position: relative;
+}
+.ed-nav nav a::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: -4px;
+  width: 100%;
+  height: 2px;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: right;
+  transition: transform 0.3s;
+}
+.ed-nav nav a:hover::after {
+  transform: scaleX(1);
+  transform-origin: left;
+}
+.ed-controls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+/* hero */
+.ed-hero {
+  padding-top: clamp(40px, 8vw, 80px);
+  padding-bottom: clamp(30px, 6vw, 56px);
+}
+.ed-role {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-size: 14px;
+  color: var(--accent);
+  margin: 0 0 14px;
+}
+.ed-hero h1 {
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: clamp(46px, 11vw, 96px);
+  line-height: 0.95;
+  letter-spacing: -0.03em;
+  margin: 0;
+}
+.ed-lead {
+  max-width: 560px;
+  font-size: 18px;
+  color: var(--soft);
+  margin: 22px 0 26px;
+}
+.ed-cta {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.ed-btn {
+  display: inline-block;
+  font-weight: 700;
+  text-decoration: none;
+  font-size: 15px;
+  padding: 12px 22px;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  background: var(--card);
+  color: var(--ink);
+  cursor: pointer;
+  transition: transform 0.12s, background 0.12s;
+}
+.ed-btn:hover {
+  transform: translateY(-2px);
+}
+.ed-btn-solid {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+.ed-core {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 28px;
+}
+.ed-core span {
+  border: 2px solid var(--border);
+  border-radius: 999px;
+  padding: 5px 14px;
+  font-size: 13px;
+  font-weight: 600;
+}
+.ed-available {
+  margin-top: 22px;
+  font-size: 14px;
+  font-weight: 600;
+}
+.ed-available::first-letter {
+  color: #1ea83c;
+}
+
+/* sections */
+.ed-section {
+  padding-top: clamp(40px, 7vw, 64px);
+  padding-bottom: 8px;
+  border-top: 2px solid var(--border);
+}
+.ed-section h2 {
+  font-family: Georgia, serif;
+  font-size: clamp(28px, 5vw, 40px);
+  margin: 0 0 28px;
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+}
+.ed-section h2 span {
+  font-size: 16px;
+  color: var(--accent);
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-weight: 700;
+}
+.ed-group {
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--accent);
+  margin: 28px 0 14px;
+}
+
+/* skills */
+/* masonry-style columns: cards flow and pack tightly top-to-bottom instead of
+   aligning to grid rows (which left big empty gaps under the shorter cards) */
+.ed-skills {
+  columns: 3 230px;
+  column-gap: 16px;
+}
+.ed-skillcard {
+  break-inside: avoid;
+  -webkit-column-break-inside: avoid;
+  margin: 0 0 16px;
+  border: 2px solid var(--border);
+  border-radius: 10px;
+  background: var(--card);
+  padding: 18px;
+}
+.ed-skillcard h4 {
+  margin: 0 0 12px;
+  font-size: 15px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--accent);
+}
+.ed-skillcard span {
+  display: inline-block;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 4px 10px;
+  margin: 0 5px 6px 0;
+  font-size: 13px;
+}
+
+/* projects */
+.ed-projects {
+  display: grid;
+  gap: 18px;
+}
+.ed-project {
+  border: 2px solid var(--border);
+  border-radius: 12px;
+  background: var(--card);
+  padding: 24px;
+}
+.ed-project header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 14px;
+}
+.ed-project h3 {
+  font-family: Georgia, serif;
+  font-size: 26px;
+  margin: 0;
+  color: var(--accent);
+}
+.ed-project header span {
+  font-size: 14px;
+  color: var(--soft);
+  font-weight: 600;
+}
+.ed-case {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+  gap: 16px;
+  margin: 16px 0;
+}
+.ed-case b {
+  display: block;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--accent);
+  margin-bottom: 5px;
+}
+.ed-case p {
+  margin: 0;
+  font-size: 15px;
+  color: var(--soft);
+}
+.ed-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 14px 0;
+}
+.ed-tags span {
+  background: var(--ink);
+  color: var(--card);
+  font-size: 12px;
+  font-weight: 700;
+  padding: 4px 9px;
+  border-radius: 5px;
+}
+.ed-links {
+  display: flex;
+  gap: 18px;
+}
+.ed-links a {
+  font-weight: 700;
+  text-decoration: none;
+  color: var(--accent);
+  font-size: 15px;
+}
+
+/* experience */
+.ed-timeline {
+  border-left: 3px solid var(--border);
+  padding-left: 26px;
+}
+.ed-exp {
+  position: relative;
+  padding-bottom: 26px;
+}
+.ed-exp::before {
+  content: "";
+  position: absolute;
+  left: -34px;
+  top: 6px;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--accent);
+  border: 3px solid var(--bg);
+}
+.ed-period {
+  font-size: 13px;
+  font-weight: 700;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+.ed-exp h4 {
+  font-family: Georgia, serif;
+  font-size: 21px;
+  margin: 4px 0 2px;
+}
+.ed-company {
+  font-weight: 600;
+  font-size: 14px;
+}
+.ed-exp p {
+  font-size: 15px;
+  color: var(--soft);
+  margin: 6px 0 0;
+  max-width: 680px;
+}
+
+/* github */
+.ed-ghstats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  align-items: center;
+  margin-top: 18px;
+}
+.ed-ghstats span {
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 14px;
+}
+.ed-ghstats b {
+  color: var(--accent);
+  margin-left: 6px;
+}
+
+/* contact */
+.ed-contact {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 30px;
+  align-items: start;
+}
+.ed-contact h3 {
+  font-family: Georgia, serif;
+  font-size: 30px;
+  margin: 0 0 10px;
+}
+.ed-channels a {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  padding: 13px 16px;
+  margin-bottom: 12px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 14px;
+}
+.ed-channels a:hover {
+  background: var(--accent);
+  color: #fff;
+}
+.ed-form {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.ed-form label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  font-weight: 700;
+  text-transform: uppercase;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+}
+.ed-form input,
+.ed-form textarea {
+  border: 2px solid var(--border);
+  border-radius: 8px;
+  padding: 12px;
+  font: inherit;
+  font-size: 16px;
+  background: var(--card);
+  color: var(--ink);
+}
+.ed-msg {
+  font-size: 14px;
+  font-weight: 700;
+}
+.ed-msg.ok {
+  color: #1ea83c;
+}
+.ed-msg.err {
+  color: var(--accent);
+}
+
+/* footer */
+.ed-foot {
+  margin-top: 40px;
+  padding-top: 24px;
+  padding-bottom: 40px;
+  border-top: 2px solid var(--border);
+  text-align: center;
+  font-size: 14px;
+  color: var(--soft);
+}
+
+/* ---- refinements & missing styles ---- */
+
+/* Language buttons inside the editorial nav (override the pixel .icon-btn) */
+.ed-controls .icon-btn {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  background: var(--card);
+  color: var(--ink);
+  border: 2px solid var(--border);
+  border-radius: 6px;
+  padding: 7px 11px;
+  text-transform: uppercase;
+}
+.ed-controls .icon-btn[aria-pressed="true"] {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+.ed-controls .lang-switch {
+  display: inline-flex;
+  gap: 6px;
+}
+
+/* Buttons get a soft shadow + clearer hover */
+.ed-btn {
+  box-shadow: 0 2px 0 rgba(44, 33, 19, 0.18);
+}
+.ed-btn:hover {
+  box-shadow: 0 5px 14px -6px rgba(44, 33, 19, 0.5);
+}
+
+/* Cards: subtle lift + shadow */
+.ed-skillcard,
+.ed-project {
+  transition: transform 0.18s, box-shadow 0.18s;
+}
+.ed-skillcard:hover,
+.ed-project:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 26px -16px rgba(44, 33, 19, 0.55);
+}
+.ed-skillcard span {
+  transition: background 0.12s, color 0.12s;
+}
+.ed-skillcard span:hover {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+/* Proper "available" status dot (replaces the ::first-letter hack) */
+.ed-available {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  color: var(--soft);
+}
+.ed-available::before {
+  content: "";
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #1ea83c;
+  box-shadow: 0 0 0 4px rgba(30, 168, 60, 0.18);
+}
+
+/* Section heading gets a small accent rule under the title */
+.ed-section h2 {
+  position: relative;
+}
+
+/* The GitHub calendar sits nicely on the paper */
+.ed .ghcal {
+  margin-top: 4px;
+}
+
+/* Project tag pills a touch rounder */
+.ed-tags span {
+  border-radius: 6px;
+}
+
+/* Contact form button full width */
+.ed-form .ed-btn {
+  width: 100%;
+  margin-top: 4px;
+}
+
+/* Nicer focus states for accessibility */
+.ed a:focus-visible,
+.ed button:focus-visible,
+.ed input:focus-visible,
+.ed textarea:focus-visible {
+  outline: 3px solid var(--accent);
+  outline-offset: 2px;
+}
+
+@media (max-width: 640px) {
+  .ed {
+    font-size: 16px;
+  }
+  .ed-contact {
+    grid-template-columns: 1fr;
+  }
+  .ed-nav {
+    gap: 12px;
+  }
+  .ed-nav nav {
+    margin-left: 0;
+    width: 100%;
+    order: 3;
+    gap: 16px;
+  }
+  .ed-section h2 {
+    font-size: 26px;
+  }
+}
+
+/* ============================================================
+   EDITORIAL ANIMATIONS
+   ============================================================ */
+
+/* animated print grain — fixed to the viewport, jitters via background-position
+   (never translates the box, so it can't create horizontal overflow) */
+.ed-grain {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0;
+  z-index: 5;
+  pointer-events: none;
+  opacity: 0.04;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 160px 160px;
+  animation: ed-grain 0.8s steps(4) infinite;
+}
+@keyframes ed-grain {
+  0% {
+    background-position: 0 0;
+  }
+  25% {
+    background-position: -8px 6px;
+  }
+  50% {
+    background-position: 6px -8px;
+  }
+  75% {
+    background-position: -6px -6px;
+  }
+  100% {
+    background-position: 8px 8px;
+  }
+}
+
+/* hero entrance (staggered, plays on load) */
+.ed-hero > * {
+  animation: ed-rise 0.8s cubic-bezier(0.2, 0.7, 0.2, 1) backwards;
+}
+.ed-hero .ed-role {
+  animation-delay: 0.05s;
+}
+.ed-hero h1 {
+  animation-delay: 0.13s;
+}
+.ed-hero .ed-lead {
+  animation-delay: 0.24s;
+}
+.ed-hero .ed-cta {
+  animation-delay: 0.34s;
+}
+.ed-hero .ed-core {
+  animation-delay: 0.42s;
+}
+.ed-hero .ed-available {
+  animation-delay: 0.5s;
+}
+@keyframes ed-rise {
+  from {
+    opacity: 0;
+    transform: translateY(26px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* scroll reveals (only active once JS marks the root) */
+.ed-reveal-on .ed-section > h2,
+.ed-reveal-on .ed-group,
+.ed-reveal-on .ed-skillcard,
+.ed-reveal-on .ed-project,
+.ed-reveal-on .ed-exp,
+.ed-reveal-on .ghcal,
+.ed-reveal-on .ed-ghstats,
+.ed-reveal-on .ed-contact > div {
+  opacity: 0;
+  transform: translateY(26px);
+  transition:
+    opacity 0.7s cubic-bezier(0.2, 0.7, 0.2, 1),
+    transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1);
+}
+/* the ".in" reveal must out-specify every hidden selector above. Two of them
+   (.ed-section > h2 and .ed-contact > div) carry a type selector — specificity
+   (0,2,1) — which would otherwise keep them stuck at opacity:0 even after .in
+   is added. Match those explicitly so headings and the contact channels show. */
+.ed-reveal-on .in,
+.ed-reveal-on .ed-section > h2.in,
+.ed-reveal-on .ed-contact > div.in {
+  opacity: 1;
+  transform: none;
+}
+
+/* stagger cards within a grid */
+.ed-reveal-on .ed-skillcard:nth-child(2),
+.ed-reveal-on .ed-project:nth-child(2) {
+  transition-delay: 0.08s;
+}
+.ed-reveal-on .ed-skillcard:nth-child(3),
+.ed-reveal-on .ed-project:nth-child(3) {
+  transition-delay: 0.16s;
+}
+.ed-reveal-on .ed-skillcard:nth-child(4) {
+  transition-delay: 0.24s;
+}
+.ed-reveal-on .ed-skillcard:nth-child(5) {
+  transition-delay: 0.32s;
+}
+.ed-reveal-on .ed-skillcard:nth-child(6) {
+  transition-delay: 0.4s;
+}
+
+/* ============================================================
+   PRINT / PDF EXPORT
+   A portfolio is often saved as PDF, so the static render must show
+   everything: the scroll-reveal must never leave content hidden, the
+   real colours must print, and the animated grain must go.
+   ============================================================ */
+@media print {
+  /* force every scroll-reveal target fully visible (no opacity:0 ghosts) */
+  .ed-reveal-on .ed-section > h2,
+  .ed-reveal-on .ed-group,
+  .ed-reveal-on .ed-skillcard,
+  .ed-reveal-on .ed-project,
+  .ed-reveal-on .ed-exp,
+  .ed-reveal-on .ghcal,
+  .ed-reveal-on .ed-ghstats,
+  .ed-reveal-on .ed-contact > div {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+
+  /* print the true colours — GitHub calendar cells, accents, chips */
+  .ed,
+  .ed * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* drop the animated grain overlay */
+  .ed-grain {
+    display: none !important;
+  }
+
+  /* hide controls that do nothing on paper */
+  .ed-controls,
+  .ed-uiswitch {
+    display: none !important;
+  }
+
+  /* keep cards from splitting across pages */
+  .ed-skillcard,
+  .ed-project,
+  .ed-exp {
+    break-inside: avoid;
+  }
+}

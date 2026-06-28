@@ -1,0 +1,115 @@
+{
+  "meta": {
+    "title": "Alex Largo — Fullstack Developer",
+    "description": "Portfolio 8-bit de Alex Largo, desarrollador Fullstack. React, NestJS, AWS, Next.js. Carta de presentación interactiva."
+  },
+  "ui": {
+    "switch": "Cambiar interfaz",
+    "toggle": "🎮 ⇄ 📄",
+    "toEditorial": "Vista normal",
+    "toPixel": "Modo 8-bit"
+  },
+  "editorial": {
+    "about": "Sobre mí",
+    "skills": "Skills & herramientas",
+    "projects": "Proyectos",
+    "experience": "Experiencia",
+    "github": "GitHub",
+    "contact": "Contacto",
+    "viewProjects": "Ver proyectos",
+    "downloadCv": "Descargar CV",
+    "personal": "Proyectos personales",
+    "work": "Trabajos & casos",
+    "available": "Disponible para nuevos proyectos",
+    "contactTitle": "¿Tienes un proyecto?",
+    "contactLead": "Escríbeme y te respondo en menos de 24h.",
+    "viewProfile": "Ver perfil de GitHub"
+  },
+  "hud": {
+    "about": "ABOUT",
+    "skills": "SKILLS",
+    "quests": "QUESTS",
+    "levels": "LEVELS",
+    "talk": "TALK",
+    "online": "ONLINE",
+    "sound": "SONIDO",
+    "lang": "IDIOMA"
+  },
+  "hero": {
+    "newGame": "★ NEW GAME ★",
+    "viewQuests": "▶ VER QUESTS",
+    "cv": "CV",
+    "github": "GITHUB",
+    "insertCoin": "INSERT COIN — ¡HABLEMOS!",
+    "xp": "XP · FULLSTACK"
+  },
+  "sections": {
+    "inventory": "INVENTORY",
+    "inventorySub": "TODAS LAS HERRAMIENTAS",
+    "quests": "QUESTS",
+    "questsSub": "CASOS DE ESTUDIO",
+    "questsPersonal": "🎮 Proyectos personales",
+    "questsWork": "💼 Trabajos & casos",
+    "levels": "LEVEL_LOG",
+    "levelsSub": "TRAYECTORIA",
+    "map": "WORLD_MAP",
+    "dialogue": "DIALOGUE",
+    "dialogueSub": "CONTACTO"
+  },
+  "quest": {
+    "problem": "Boss",
+    "solution": "Skill",
+    "result": "Loot",
+    "demo": "DEMO",
+    "code": "CÓDIGO",
+    "featured": "★ Destacado"
+  },
+  "map": {
+    "viewProfile": "VER PERFIL →",
+    "repos": "REPOS",
+    "years": "XP/AÑOS",
+    "top": "TOP"
+  },
+  "contact": {
+    "player": "▶ PLAYER 1 dice:",
+    "intro": "\"¿Tienes una quest para mí? Respondo en <24h.\"",
+    "writeMessage": "▶ ESCRIBE TU MENSAJE:",
+    "name": "NOMBRE",
+    "email": "EMAIL",
+    "message": "MENSAJE",
+    "send": "► ENVIAR",
+    "sending": "ENVIANDO...",
+    "success": "¡MENSAJE ENVIADO! Te respondo pronto.",
+    "error": "ERROR AL ENVIAR. Escríbeme por email.",
+    "namePlaceholder": "Tu nombre",
+    "emailPlaceholder": "tu@email.com",
+    "messagePlaceholder": "Cuéntame tu proyecto..."
+  },
+  "arcade": {
+    "coins": "MONEDAS",
+    "spend": "GASTAR",
+    "spent": "¡Monedas gastadas! 🎉",
+    "noCoins": "Junta monedas para gastarlas 🪙",
+    "sConfetti": "🎉 Confeti",
+    "sFireworks": "🎆 Fuegos",
+    "sDog": "🐕 Soltar perrito",
+    "sParty": "🥳 Fiesta total",
+    "konamiHint": "¿Conoces el código Konami? Pruébalo aquí 👾",
+    "konamiUnlocked": "¡CÓDIGO KONAMI! Jauría de perritos desbloqueada 🐕",
+    "achievement": "LOGRO DESBLOQUEADO",
+    "konamiTitle": "¡CÓDIGO KONAMI!",
+    "reward": "+25 monedas 🪙",
+    "cooldown": "⏳ Recarga: faltan {s}s",
+    "cooldownNote": "Se recarga cada 20s",
+    "minigame": "MINI-JUEGO: pulsa ESPACIO para saltar",
+    "play": "JUGAR",
+    "score": "PUNTOS",
+    "best": "RÉCORD",
+    "gameOver": "GAME OVER"
+  },
+  "footer": {
+    "thanks": "★ THANKS FOR PLAYING ★",
+    "rights": "© 2026 Alex Largo · Fullstack Developer",
+    "built": "Hecho con Next.js, TypeScript y mucho pixel"
+  }
+}

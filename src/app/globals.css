@@ -1,0 +1,1688 @@
+@import "tailwindcss";
+
+/* ============================================================
+   8-BIT KRAFT DESIGN SYSTEM
+   Tokens first — restyle the whole site by editing these.
+   ============================================================ */
+:root {
+  --bg: #d8c4a0;
+  --bg2: #cbb488;
+  --panel: #e9dcc0;
+  --ink: #2e2114;
+  --soft: #6b573a;
+  --accent: #c0392b;
+  --accent2: #2e7d32;
+  --gold: #d98a00;
+
+  --font-pixel: "Press Start 2P", monospace;
+  --font-body: "Press Start 2P", monospace; /* overridden below */
+
+  --maxw: 1040px;
+}
+
+/* Register the palette tokens as animatable colours so day/night
+   transitions interpolate smoothly across every element, not just <body>. */
+@property --bg {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #d8c4a0;
+}
+@property --bg2 {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #cbb488;
+}
+@property --panel {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #e9dcc0;
+}
+@property --ink {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #2e2114;
+}
+@property --soft {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #6b573a;
+}
+@property --accent {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #c0392b;
+}
+@property --accent2 {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #2e7d32;
+}
+@property --gold {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: #d98a00;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-ink: var(--ink);
+  --color-accent: var(--accent);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-pixel-body), monospace;
+  font-size: clamp(19px, 2.7vw, 24px);
+  line-height: 1.45;
+  image-rendering: pixelated;
+  overflow-x: hidden;
+  transition:
+    --bg 1.2s ease,
+    --bg2 1.2s ease,
+    --panel 1.2s ease,
+    --ink 1.2s ease,
+    --soft 1.2s ease,
+    --accent 1.2s ease,
+    --accent2 1.2s ease,
+    --gold 1.2s ease;
+}
+
+/* Day / night background driven by a data attribute on <body>. */
+body[data-phase="day"] {
+  --bg: #d8c4a0;
+  --bg2: #cbb488;
+  --panel: #e9dcc0;
+  --ink: #2e2114;
+  --soft: #6b573a;
+  --accent: #c0392b;
+  --accent2: #2e7d32;
+  --gold: #d98a00;
+}
+body[data-phase="dusk"] {
+  --bg: #c68d63;
+  --bg2: #b2764f;
+  --panel: #e0bb92;
+  --ink: #3a2519;
+  --soft: #6c4c37;
+  --accent: #c0392b;
+  --accent2: #b5651d;
+  --gold: #e88f0a;
+}
+body[data-phase="night"] {
+  --bg: #1f2138;
+  --bg2: #191a2e;
+  --panel: #2b2d4a;
+  --ink: #eef0ff;
+  --soft: #aab0d8;
+  --accent: #ff5a6e;
+  --accent2: #5bd0a0;
+  --gold: #ffd166;
+}
+
+.pixel {
+  font-family: var(--font-pixel), monospace;
+}
+
+.wrap {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 0 clamp(14px, 4vw, 28px);
+}
+
+/* ---------------- CRT overlay ---------------- */
+.crt {
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  pointer-events: none;
+}
+.crt::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0 2px,
+    rgba(0, 0, 0, 0.08) 2px 4px
+  );
+}
+.crt::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  box-shadow: inset 0 0 170px rgba(0, 0, 0, 0.28);
+}
+.scan {
+  position: fixed;
+  left: 0;
+  right: 0;
+  height: 120px;
+  z-index: 41;
+  pointer-events: none;
+  background: linear-gradient(transparent, rgba(255, 255, 255, 0.18), transparent);
+  animation: scan 6s linear infinite;
+}
+@keyframes scan {
+  0% {
+    top: -120px;
+  }
+  100% {
+    top: 100%;
+  }
+}
+
+/* ---------------- Panels & buttons ---------------- */
+.box {
+  background: var(--panel);
+  border: 4px solid var(--ink);
+  box-shadow: 0 0 0 4px var(--bg), 8px 8px 0 0 var(--ink);
+  position: relative;
+}
+.box.acc {
+  box-shadow: 0 0 0 4px var(--bg), 8px 8px 0 0 var(--accent);
+}
+
+.pixel-btn {
+  font-family: var(--font-pixel), monospace;
+  font-size: clamp(9px, 1.8vw, 11px);
+  text-decoration: none;
+  text-transform: uppercase;
+  padding: 13px 16px;
+  background: var(--panel);
+  color: var(--ink);
+  border: 4px solid var(--ink);
+  box-shadow: 5px 5px 0 var(--ink);
+  cursor: pointer;
+  display: inline-block;
+  transition: transform 0.08s, box-shadow 0.08s;
+}
+.pixel-btn:hover,
+.pixel-btn:focus-visible {
+  transform: translate(2px, 2px);
+  box-shadow: 2px 2px 0 var(--ink);
+  outline: none;
+}
+.pixel-btn.go {
+  background: var(--accent);
+  color: #fff;
+}
+
+.label {
+  font-family: var(--font-pixel), monospace;
+  font-size: clamp(10px, 2vw, 12px);
+  color: var(--bg);
+  background: var(--ink);
+  display: inline-block;
+  padding: 9px 13px;
+}
+
+.sec-title {
+  font-family: var(--font-pixel), monospace;
+  font-size: clamp(16px, 3.6vw, 21px);
+  margin: 0 0 8px;
+}
+.sec-title .a {
+  color: var(--accent);
+}
+
+.section {
+  padding: clamp(34px, 6vw, 48px) 0;
+  position: relative;
+  z-index: 2;
+}
+
+/* ---------------- HUD ---------------- */
+.hud {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  padding: 14px 0;
+  border-bottom: 4px solid var(--ink);
+  position: relative;
+  z-index: 30;
+}
+.hud .logo {
+  font-family: var(--font-pixel), monospace;
+  font-size: clamp(11px, 2.4vw, 13px);
+}
+.hud nav {
+  display: flex;
+  gap: clamp(8px, 2vw, 14px);
+  flex-wrap: wrap;
+}
+.hud nav a {
+  font-family: var(--font-pixel), monospace;
+  font-size: clamp(8px, 1.6vw, 10px);
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+  transition: color 0.12s;
+}
+.hud nav a::before {
+  content: "▸ ";
+  color: var(--accent);
+}
+.hud nav a:hover,
+.hud nav a:focus-visible {
+  color: var(--accent);
+  text-decoration-color: var(--ink);
+}
+.hud-right {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  /* shared control height keeps every chip on one baseline */
+  --ctrl-h: 30px;
+}
+.online {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  height: var(--ctrl-h);
+  font-family: var(--font-pixel), monospace;
+  font-size: 10px;
+  letter-spacing: 0.5px;
+}
+.online i {
+  color: var(--accent2);
+  font-style: normal;
+  font-size: 13px;
+  line-height: 1;
+  animation: blink 1.2s steps(1) infinite;
+}
+
+/* small icon buttons (sound, lang) */
+.icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  height: var(--ctrl-h);
+  min-width: var(--ctrl-h);
+  font-family: var(--font-pixel), monospace;
+  font-size: 9px;
+  line-height: 1;
+  background: var(--panel);
+  color: var(--ink);
+  border: 3px solid var(--ink);
+  padding: 0 8px;
+  cursor: pointer;
+  text-transform: uppercase;
+}
+.icon-btn[aria-pressed="true"] {
+  background: var(--accent);
+  color: #fff;
+}
+
+/* ES/EN segmented group — buttons share one border, no double seam */
+.lang-switch {
+  display: inline-flex;
+  align-items: center;
+}
+.lang-switch .icon-btn + .icon-btn {
+  margin-left: -3px;
+}
+
+/* interface switch — prominent + pulsing so it's clearly discoverable */
+.ui-switch {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  height: var(--ctrl-h);
+  font-family: var(--font-pixel), monospace;
+  font-size: 8px;
+  line-height: 1;
+  background: var(--gold);
+  color: var(--ink);
+  border: 3px solid var(--ink);
+  padding: 0 10px;
+  cursor: pointer;
+  text-transform: uppercase;
+  white-space: nowrap;
+  animation: uiPulse 1.8s ease-in-out infinite;
+}
+.ui-switch:hover,
+.ui-switch:focus-visible {
+  background: var(--accent);
+  color: #fff;
+  outline: none;
+}
+@keyframes uiPulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--gold) 85%, transparent);
+  }
+  60% {
+    box-shadow: 0 0 0 6px transparent;
+  }
+}
+
+/* ---------------- Hero ---------------- */
+.hero {
+  text-align: center;
+  padding: clamp(34px, 6vw, 54px) 0 clamp(28px, 5vw, 42px);
+  position: relative;
+  z-index: 2;
+}
+.hero h1 {
+  font-family: var(--font-pixel), monospace;
+  font-size: clamp(26px, 8vw, 44px);
+  line-height: 1.25;
+  margin: 16px 0 6px;
+  color: var(--accent);
+  text-shadow: 4px 4px 0 var(--ink);
+}
+.hero .htitle {
+  font-family: var(--font-pixel), monospace;
+  font-size: clamp(11px, 3vw, 15px);
+  margin-bottom: 18px;
+}
+.hero .pre {
+  font-family: var(--font-pixel), monospace;
+  font-size: clamp(8px, 2vw, 10px);
+  color: var(--soft);
+  animation: blink 1.4s steps(1) infinite;
+}
+.hero .hsub {
+  max-width: 560px;
+  margin: 0 auto 22px;
+  color: var(--soft);
+  padding: 0 8px;
+}
+.hero .cta {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.coin-line {
+  margin-top: 18px;
+  font-family: var(--font-pixel), monospace;
+  font-size: clamp(9px, 2vw, 11px);
+  color: var(--accent);
+  animation: blink 1.1s steps(1) infinite;
+}
+
+/* avatar pixel art */
+.avatar {
+  width: clamp(110px, 26vw, 150px);
+  aspect-ratio: 1;
+  margin: 0 auto 4px;
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  grid-template-rows: repeat(12, 1fr);
+  image-rendering: pixelated;
+  animation: idle 2.2s ease-in-out infinite, glow 2.6s ease-in-out infinite;
+}
+.avatar i {
+  display: block;
+}
+.avatar-shadow {
+  width: clamp(64px, 16vw, 86px);
+  height: 12px;
+  margin: 0 auto 14px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.25);
+  animation: shadowPulse 2.2s ease-in-out infinite;
+}
+
+/* XP bar */
+.xp {
+  max-width: 330px;
+  margin: 16px auto 0;
+}
+.xp .lab {
+  font-family: var(--font-pixel), monospace;
+  font-size: 8px;
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+.xp .track {
+  height: 18px;
+  border: 3px solid var(--ink);
+  background: var(--bg2);
+  padding: 2px;
+  box-shadow: 3px 3px 0 var(--ink);
+}
+.xp .track i {
+  display: block;
+  height: 100%;
+  width: 0;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--accent2) 0 8px,
+    var(--gold) 8px 12px
+  );
+  animation: xpFill 1.8s 0.4s ease forwards;
+}
+
+/* ---------------- Inventory (skills) ---------------- */
+.inv {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 18px;
+  margin-top: 18px;
+}
+.slot {
+  padding: 16px;
+}
+.slot h3 {
+  font-family: var(--font-pixel), monospace;
+  font-size: 10px;
+  color: var(--accent);
+  margin: 0 0 12px;
+}
+.slot span {
+  display: inline-block;
+  border: 3px solid var(--ink);
+  background: var(--bg);
+  padding: 6px 10px;
+  margin: 0 5px 7px 0;
+  font-size: clamp(16px, 2vw, 19px);
+  transition: 0.08s;
+}
+.slot span::before {
+  content: "▪ ";
+  color: var(--accent2);
+}
+.slot span:hover {
+  background: var(--accent);
+  color: #fff;
+  transform: translate(-1px, -1px);
+}
+
+/* ---------------- Quests (projects) ---------------- */
+.quest-group {
+  font-family: var(--font-pixel), monospace;
+  font-size: clamp(11px, 2.4vw, 13px);
+  color: var(--accent);
+  margin: 30px 0 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.quest-group::after {
+  content: "";
+  flex: 1;
+  height: 3px;
+  background: var(--border);
+}
+.quests {
+  display: grid;
+  gap: 22px;
+  margin-top: 14px;
+}
+.quest {
+  overflow: hidden;
+}
+.quest .qh {
+  background: var(--ink);
+  color: var(--bg);
+  font-family: var(--font-pixel), monospace;
+  font-size: clamp(8px, 1.8vw, 10px);
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+}
+.quest .qb {
+  padding: 18px;
+}
+.quest h3 {
+  font-family: var(--font-pixel), monospace;
+  font-size: clamp(12px, 2.8vw, 15px);
+  margin: 0 0 12px;
+  color: var(--accent);
+}
+.quest .case {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+  margin-bottom: 12px;
+}
+.quest .case b {
+  font-family: var(--font-pixel), monospace;
+  font-size: 10px;
+  color: var(--accent2);
+  display: block;
+  margin-bottom: 7px;
+}
+.quest .st {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-bottom: 12px;
+}
+.quest .st span {
+  background: var(--accent);
+  color: #fff;
+  font-size: 14px;
+  padding: 3px 8px;
+}
+.quest .lk {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.quest:hover {
+  transform: translate(-2px, -2px);
+  transition: 0.1s;
+}
+
+/* ---------------- Levels (experience) ---------------- */
+.levels {
+  margin-top: 18px;
+  display: grid;
+  gap: 12px;
+}
+.level {
+  padding: 14px 18px;
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  flex-wrap: nowrap;
+}
+.level > div {
+  flex: 1;
+  min-width: 0;
+}
+.level .badge {
+  flex: 0 0 auto;
+  width: 58px;
+  text-align: center;
+  font-family: var(--font-pixel), monospace;
+  font-size: 9px;
+  background: var(--accent);
+  color: #fff;
+  padding: 8px 6px;
+  white-space: nowrap;
+}
+.level h4 {
+  font-family: var(--font-pixel), monospace;
+  font-size: clamp(12px, 2.4vw, 14px);
+  margin: 0 0 5px;
+}
+.level .co {
+  color: var(--accent);
+}
+.level p {
+  margin: 4px 0 0;
+  color: var(--soft);
+}
+
+/* ---------------- World map (github) ---------------- */
+.map {
+  display: grid;
+  grid-template-columns: 1fr 1.4fr;
+  gap: 22px;
+  align-items: center;
+  margin-top: 18px;
+}
+.mapgrid {
+  display: grid;
+  grid-template-columns: repeat(22, 1fr);
+  gap: 3px;
+  padding: 16px;
+}
+.mapgrid i {
+  aspect-ratio: 1;
+  background: color-mix(
+    in srgb,
+    var(--accent2) calc(14% + var(--l, 0) * 86%),
+    var(--bg)
+  );
+}
+.mapgrid i.tw {
+  animation: twinkle 2.6s ease-in-out infinite;
+}
+.stat {
+  font-size: clamp(18px, 2.2vw, 22px);
+  display: flex;
+  justify-content: space-between;
+  border-bottom: 3px dotted var(--soft);
+  padding: 9px 0;
+}
+.stat b {
+  font-family: var(--font-pixel), monospace;
+  font-size: 13px;
+  color: var(--accent);
+}
+
+/* ---------------- GitHub contribution calendar ---------------- */
+.ghcal {
+  --cell: 13px;
+  --gap: 3px;
+  /* Fixed GitHub-dark palette: authentic AND kept OFF the day/night
+     transition, so changing theme doesn't repaint 371 cells every frame. */
+  border: 3px solid #2e2114;
+  border-radius: 4px;
+  background: #0d1117;
+  box-shadow: 6px 6px 0 #2e2114;
+  padding: 14px 16px;
+}
+.ghcal-head {
+  font-size: 15px;
+  color: #8b949e;
+  margin-bottom: 12px;
+}
+.ghcal-body {
+  display: flex;
+  gap: 6px;
+}
+.ghcal-days {
+  display: grid;
+  grid-template-rows: repeat(7, var(--cell));
+  gap: var(--gap);
+  margin-top: 19px; /* clears the months row so rows align with the grid */
+  font-size: 11px;
+  color: #8b949e;
+}
+.ghcal-days span {
+  line-height: var(--cell);
+}
+.ghcal-cols {
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  justify-content: flex-end; /* keep the most recent weeks on narrow screens */
+}
+.ghcal-stack {
+  width: max-content;
+}
+.ghcal-months {
+  display: grid;
+  grid-template-columns: repeat(53, var(--cell));
+  column-gap: var(--gap);
+  height: 15px;
+  margin-bottom: 4px;
+  font-size: 11px;
+  color: #8b949e;
+}
+.ghcal-months span {
+  white-space: nowrap;
+}
+.ghcal-grid {
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-rows: repeat(7, var(--cell));
+  grid-auto-columns: var(--cell);
+  gap: var(--gap);
+}
+.ghcal-grid i {
+  width: var(--cell);
+  height: var(--cell);
+  border-radius: 2px;
+  /* faint outline so every cell reads as part of the grid (fixed colour) */
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+.ghcal .lvl0 {
+  background: #161b22;
+}
+.ghcal .lvl1 {
+  background: #9be9a8;
+}
+.ghcal .lvl2 {
+  background: #40c463;
+}
+.ghcal .lvl3 {
+  background: #30a14e;
+}
+.ghcal .lvl4 {
+  background: #216e39;
+}
+.ghcal .lvlx {
+  background: transparent;
+  box-shadow: none;
+}
+.ghcal-legend {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  margin-top: 10px;
+  font-size: 11px;
+  color: var(--soft);
+}
+.ghcal-legend i {
+  width: var(--cell);
+  height: var(--cell);
+  border-radius: 2px;
+}
+
+.ghstats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  align-items: center;
+  margin-top: 16px;
+}
+.ghchip {
+  border: 3px solid var(--border);
+  border-radius: 4px;
+  padding: 9px 13px;
+  font-size: 15px;
+}
+.ghchip b {
+  font-family: var(--font-pixel), monospace;
+  font-size: 12px;
+  color: var(--accent);
+  margin-left: 6px;
+}
+
+/* ---------------- Dialogue (contact) ---------------- */
+.dialogue {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 22px;
+  margin-top: 18px;
+}
+.dialog {
+  padding: 22px;
+}
+.dialog .who {
+  font-family: var(--font-pixel), monospace;
+  font-size: 10px;
+  color: var(--accent);
+  margin-bottom: 12px;
+}
+.chan a {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  border: 3px solid var(--ink);
+  padding: 12px 15px;
+  margin-bottom: 10px;
+  text-decoration: none;
+  color: var(--ink);
+  font-size: 19px;
+}
+.chan a:hover {
+  background: var(--accent);
+  color: #fff;
+}
+.chan a b {
+  font-family: var(--font-pixel), monospace;
+  font-size: 9px;
+}
+.field {
+  margin-bottom: 12px;
+}
+.field label {
+  font-family: var(--font-pixel), monospace;
+  font-size: 8px;
+  display: block;
+  margin-bottom: 6px;
+}
+.field input,
+.field textarea {
+  width: 100%;
+  font-family: var(--font-pixel-body), monospace;
+  font-size: 21px;
+  background: var(--bg);
+  color: var(--ink);
+  border: 3px solid var(--ink);
+  padding: 8px;
+}
+.form-msg {
+  font-family: var(--font-pixel), monospace;
+  font-size: 9px;
+  margin-top: 10px;
+  line-height: 1.6;
+}
+.form-msg.ok {
+  color: var(--accent2);
+}
+.form-msg.err {
+  color: var(--accent);
+}
+
+/* ---------------- Footer ---------------- */
+footer.foot {
+  text-align: center;
+  padding: 28px 0;
+  font-family: var(--font-pixel), monospace;
+  font-size: clamp(9px, 2vw, 11px);
+  color: var(--soft);
+  position: relative;
+  z-index: 2;
+  border-top: 4px solid var(--ink);
+}
+footer.foot .a {
+  color: var(--accent);
+}
+footer.foot small {
+  display: block;
+  margin-top: 10px;
+  font-family: var(--font-pixel-body), monospace;
+  font-size: 15px;
+}
+
+/* ============================================================
+   Keyframes
+   ============================================================ */
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+}
+@keyframes idle {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-7px);
+  }
+}
+@keyframes glow {
+  0%,
+  100% {
+    filter: drop-shadow(0 4px 0 rgba(0, 0, 0, 0.15));
+  }
+  50% {
+    filter: drop-shadow(0 0 12px rgba(192, 57, 43, 0.5));
+  }
+}
+@keyframes shadowPulse {
+  0%,
+  100% {
+    transform: scaleX(1);
+    opacity: 0.3;
+  }
+  50% {
+    transform: scaleX(0.78);
+    opacity: 0.18;
+  }
+}
+@keyframes xpFill {
+  to {
+    width: 92%;
+  }
+}
+@keyframes twinkle {
+  0%,
+  100% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(2);
+  }
+}
+
+@media (max-width: 720px) {
+  .map,
+  .dialogue {
+    grid-template-columns: 1fr;
+  }
+  .mapgrid {
+    grid-template-columns: repeat(16, 1fr);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
+
+/* ============================================================
+   ARCADE LAYER — dog, coins, konami, minigame
+   ============================================================ */
+.dog-run {
+  position: fixed;
+  left: -160px;
+  bottom: 0;
+  /* above the bottom HUD floats so the dog is never hidden behind them */
+  z-index: 47;
+  pointer-events: none;
+  animation: foxcross var(--dur, 7s) linear infinite;
+}
+.dog-run.once {
+  animation-iteration-count: 1;
+}
+.dog {
+  display: block;
+  /* Fixed size so the 48px sprite frames step on exact pixel boundaries
+     (percentage stepping was landing mid-frame and looked choppy). */
+  width: 84px;
+  height: 84px;
+  image-rendering: pixelated;
+  background: url(/sprites/Walk.png) 0 0 / 504px 84px no-repeat;
+  animation: dogrun 0.5s steps(6) infinite;
+  filter: sepia(0.5) saturate(1.5) hue-rotate(-16deg) brightness(0.95);
+}
+@keyframes dogrun {
+  from {
+    background-position-x: 0;
+  }
+  to {
+    background-position-x: -504px;
+  }
+}
+@keyframes foxcross {
+  to {
+    transform: translateX(calc(100vw + 260px));
+  }
+}
+.puff {
+  position: absolute;
+  bottom: 6px;
+  left: 4px;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: rgba(60, 40, 20, 0.18);
+  animation: puff 0.42s ease-out infinite;
+}
+@keyframes puff {
+  0% {
+    transform: scale(0.4);
+    opacity: 0.4;
+  }
+  100% {
+    transform: scale(1.7) translateX(-14px);
+    opacity: 0;
+  }
+}
+
+/* coins — live in the document so they scroll with the page */
+main {
+  position: relative;
+}
+.coin-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 20;
+  overflow: hidden;
+}
+.coin-c {
+  position: absolute;
+  pointer-events: auto;
+  z-index: 21;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: var(--gold);
+  border: 3px solid var(--ink);
+  box-shadow: 3px 3px 0 var(--ink);
+  cursor: pointer;
+  animation: coinSpin 1.1s linear infinite;
+}
+@keyframes coinSpin {
+  0% {
+    transform: scaleX(1);
+  }
+  50% {
+    transform: scaleX(0.15);
+  }
+  100% {
+    transform: scaleX(1);
+  }
+}
+.coin-c.collected {
+  animation: coinPop 0.3s ease forwards;
+  pointer-events: none;
+}
+@keyframes coinPop {
+  to {
+    transform: translateY(-30px) scale(1.6);
+    opacity: 0;
+  }
+}
+.coin-hud {
+  position: fixed;
+  top: 60px;
+  left: 14px;
+  z-index: 45;
+  font-family: var(--font-pixel), monospace;
+  font-size: 10px;
+  background: var(--ink);
+  color: var(--gold);
+  border: 3px solid var(--gold);
+  padding: 8px 10px;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+.coin-hud .dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--gold);
+  border: 2px solid #fff;
+  animation: coinSpin 1.1s linear infinite;
+}
+
+/* konami hint + dpad */
+.konami-hint {
+  position: fixed;
+  bottom: 14px;
+  right: 14px;
+  z-index: 45;
+  max-width: 230px;
+  font-family: var(--font-pixel-body), monospace;
+  font-size: 15px;
+  background: var(--ink);
+  color: var(--bg);
+  border: 3px solid var(--accent);
+  padding: 10px 12px;
+}
+.konami-hint .seq {
+  font-family: var(--font-pixel), monospace;
+  font-size: 9px;
+  color: var(--gold);
+  display: block;
+  margin-top: 6px;
+  letter-spacing: 2px;
+}
+.konami-hint .hint-note {
+  display: block;
+  margin-top: 8px;
+  font-family: var(--font-pixel-body), monospace;
+  font-size: 13px;
+  color: var(--soft);
+}
+.konami-hint .close {
+  position: absolute;
+  top: -10px;
+  right: -10px;
+  background: var(--accent);
+  color: #fff;
+  border: 2px solid var(--bg);
+  width: 22px;
+  height: 22px;
+  cursor: pointer;
+  font-family: var(--font-pixel), monospace;
+  font-size: 8px;
+}
+.dpad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  margin-top: 10px;
+  width: 130px;
+}
+.dpad button {
+  font-family: var(--font-pixel), monospace;
+  font-size: 10px;
+  background: var(--accent);
+  color: #fff;
+  border: 2px solid var(--bg);
+  padding: 7px 0;
+  cursor: pointer;
+}
+.dpad .ab {
+  display: flex;
+  gap: 4px;
+  grid-column: 1 / 4;
+}
+.dpad .ab button {
+  flex: 1;
+}
+.konami-fab {
+  position: fixed;
+  bottom: 14px;
+  right: 14px;
+  z-index: 45;
+  width: 46px;
+  height: 46px;
+  font-size: 22px;
+  line-height: 1;
+  background: var(--ink);
+  color: #fff;
+  border: 3px solid var(--accent);
+  cursor: pointer;
+  animation: fabPulse 2.2s ease-in-out infinite;
+}
+@keyframes fabPulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 color-mix(in srgb, var(--accent) 70%, transparent);
+  }
+  50% {
+    box-shadow: 0 0 0 6px transparent;
+  }
+}
+
+/* arcade toast */
+.arcade-toast {
+  position: fixed;
+  top: 60px;
+  right: -380px;
+  z-index: 50;
+  background: var(--ink);
+  color: #fff;
+  border: 3px solid var(--gold);
+  padding: 12px 16px;
+  font-family: var(--font-pixel), monospace;
+  font-size: 9px;
+  line-height: 1.5;
+  transition: right 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+  box-shadow: 5px 5px 0 rgba(0, 0, 0, 0.4);
+  max-width: 280px;
+}
+.arcade-toast.show {
+  right: 16px;
+}
+.arcade-toast b {
+  color: var(--gold);
+  display: block;
+  margin-bottom: 5px;
+}
+
+/* konami achievement banner */
+.konami-banner {
+  position: fixed;
+  inset: 0;
+  z-index: 70;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+  animation: bannerFade 3.6s ease forwards;
+}
+.konami-banner .card {
+  background: var(--ink);
+  border: 4px solid var(--gold);
+  box-shadow: 0 0 0 4px var(--bg), 12px 12px 0 rgba(0, 0, 0, 0.45);
+  padding: 26px clamp(24px, 6vw, 44px);
+  text-align: center;
+  animation: bannerPop 0.5s cubic-bezier(0.2, 1.5, 0.4, 1);
+}
+.konami-banner .trophy {
+  font-size: 46px;
+  animation: trophyBounce 0.6s ease-in-out infinite alternate;
+}
+.konami-banner h3 {
+  font-family: var(--font-pixel), monospace;
+  font-size: 11px;
+  color: var(--gold);
+  letter-spacing: 0.08em;
+  margin: 8px 0 0;
+}
+.konami-banner .big {
+  font-family: var(--font-pixel), monospace;
+  font-size: clamp(16px, 5vw, 22px);
+  color: #fff;
+  margin: 14px 0;
+  text-shadow: 3px 3px 0 var(--accent);
+}
+.konami-banner .reward {
+  font-family: var(--font-pixel), monospace;
+  font-size: 13px;
+  color: var(--accent2);
+}
+@keyframes bannerPop {
+  from {
+    transform: scale(0.5) rotate(-3deg);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1) rotate(0);
+    opacity: 1;
+  }
+}
+@keyframes bannerFade {
+  0%,
+  85% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+@keyframes trophyBounce {
+  to {
+    transform: translateY(-8px);
+  }
+}
+
+/* minigame */
+.mg-launch {
+  position: fixed;
+  bottom: 14px;
+  left: 14px;
+  z-index: 45;
+}
+.mg-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: rgba(0, 0, 0, 0.72);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+.mg-box {
+  background: var(--panel);
+  border: 4px solid var(--ink);
+  box-shadow: 0 0 0 4px var(--bg), 10px 10px 0 var(--ink);
+  width: min(640px, 96vw);
+  padding: 16px;
+}
+.mg-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-family: var(--font-pixel), monospace;
+  font-size: 10px;
+  margin-bottom: 10px;
+}
+.mg-stage {
+  position: relative;
+  height: 172px;
+  background: linear-gradient(var(--bg), var(--bg2));
+  border: 3px solid var(--ink);
+  overflow: hidden;
+  cursor: pointer;
+  touch-action: none;
+}
+.mg-ground {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 28px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--bg2) 0 14px,
+    var(--soft) 14px 16px
+  );
+  border-top: 3px solid var(--ink);
+}
+.mg-dog {
+  position: absolute;
+  left: 44px;
+  width: 48px;
+  height: 48px;
+  image-rendering: pixelated;
+  background: url(/sprites/Walk.png) 0 0 / 288px 48px no-repeat;
+  animation: dogrun-sm 0.32s steps(6) infinite;
+  z-index: 2;
+}
+@keyframes dogrun-sm {
+  from {
+    background-position-x: 0;
+  }
+  to {
+    background-position-x: -288px;
+  }
+}
+.mg-obstacles {
+  position: absolute;
+  inset: 0;
+}
+.mg-obstacle {
+  position: absolute;
+  bottom: 28px;
+  width: 20px;
+  height: 32px;
+  background: var(--accent2);
+  border: 2px solid var(--ink);
+  box-shadow: inset -3px 0 0 rgba(0, 0, 0, 0.25);
+}
+.mg-obstacle::before {
+  content: "";
+  position: absolute;
+  top: 6px;
+  left: -6px;
+  width: 6px;
+  height: 8px;
+  background: var(--accent2);
+  border: 2px solid var(--ink);
+}
+.mg-cloud {
+  position: absolute;
+  height: 10px;
+  width: 26px;
+  background: var(--panel);
+  border-radius: 8px;
+  opacity: 0.7;
+  box-shadow: 12px 4px 0 var(--panel);
+}
+.mg-cloud.c1 {
+  top: 24px;
+  animation: mgcloud 9s linear infinite;
+}
+.mg-cloud.c2 {
+  top: 52px;
+  animation: mgcloud 13s linear infinite;
+  animation-delay: -4s;
+}
+@keyframes mgcloud {
+  from {
+    left: 110%;
+  }
+  to {
+    left: -40px;
+  }
+}
+.mg-start {
+  position: absolute;
+  inset: 0 0 28px 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-family: var(--font-pixel), monospace;
+  font-size: 22px;
+  color: var(--accent);
+  z-index: 3;
+}
+.mg-start small {
+  font-size: 9px;
+  color: var(--ink);
+}
+.mg-dogpick {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 8px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.mg-swatch {
+  font-size: 18px;
+  width: 38px;
+  height: 34px;
+  border: 3px solid var(--ink);
+  background: var(--bg);
+  cursor: pointer;
+  filter: none;
+}
+.mg-swatch.on {
+  background: var(--accent);
+  box-shadow: 0 0 0 2px var(--gold);
+}
+.mg-msg {
+  text-align: center;
+  font-family: var(--font-pixel), monospace;
+  font-size: 10px;
+  margin-top: 10px;
+  line-height: 1.6;
+}
+
+@media (max-width: 640px) {
+  /* Leave room at the very bottom so the fixed widgets (coins, play,
+     konami) never cover the last section (contact form + footer). */
+  main {
+    padding-bottom: 104px;
+  }
+  /* Bushes only along the bottom margin, not over the content. */
+  .bush {
+    display: none;
+  }
+  /* Smaller contribution cells; older weeks clip off the left. */
+  .ghcal {
+    --cell: 10px;
+    --gap: 2px;
+  }
+  .ghcal-days {
+    margin-top: 17px;
+  }
+
+  /* Header → stacked & centred so the nav isn't cramped */
+  .hud {
+    flex-direction: column;
+    align-items: center;
+    gap: 9px;
+    padding: 12px 0;
+  }
+  .hud .logo {
+    font-size: 14px;
+  }
+  .hud nav {
+    justify-content: center;
+    gap: 13px;
+  }
+  .hud nav a {
+    font-size: 10px;
+  }
+  .hud-right {
+    gap: 10px;
+  }
+
+  /* Coin counter → small flush pill, bottom-centre */
+  .coin-hud {
+    top: auto;
+    bottom: 8px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 8px;
+    padding: 5px 8px;
+    gap: 6px;
+  }
+  .coin-hud .dot {
+    width: 10px;
+    height: 10px;
+  }
+  .coin-spend {
+    font-size: 7px;
+    padding: 4px 6px;
+  }
+  /* hide the words on mobile → "🟡 1 🎉" pill, tiny footprint */
+  .coin-label,
+  .spend-label {
+    display: none;
+  }
+  /* higher specificity so it beats the base rule and opens UPWARD */
+  .coin-hud .spend-menu {
+    top: auto;
+    bottom: calc(100% + 6px);
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  .spend-menu button {
+    font-size: 8px;
+    padding: 6px 8px;
+  }
+
+  /* Play button small, bottom-left corner */
+  .mg-launch {
+    bottom: 8px;
+    left: 8px;
+    font-size: 7px;
+    padding: 7px 9px;
+  }
+
+  /* Konami FAB small, bottom-right corner */
+  .konami-fab {
+    bottom: 8px;
+    right: 8px;
+    width: 38px;
+    height: 38px;
+    font-size: 17px;
+  }
+  .konami-hint {
+    font-size: 13px;
+    max-width: 210px;
+    bottom: 54px;
+    right: 8px;
+  }
+  .dpad {
+    width: 118px;
+  }
+
+  /* Smaller dog so it doesn't dominate the small screen */
+  .dog {
+    transform: scale(0.56);
+    transform-origin: bottom left;
+  }
+
+  .arcade-toast {
+    font-size: 8px;
+    top: 10px;
+  }
+}
+
+/* ---- ambient clouds (drift behind the content) ---- */
+.cloud-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.cloud {
+  position: absolute;
+  left: -200px;
+  height: 22px;
+  background: var(--panel);
+  border-radius: 14px;
+  opacity: 0.5;
+  box-shadow: 24px 9px 0 var(--panel), -20px 9px 0 var(--panel);
+  animation: cloud-drift linear infinite;
+}
+@keyframes cloud-drift {
+  to {
+    transform: translateX(calc(100vw + 280px));
+  }
+}
+
+/* ---- spend coins: confetti ---- */
+.coin-spend {
+  font-family: var(--font-pixel), monospace;
+  font-size: 9px;
+  background: var(--gold);
+  color: var(--ink);
+  border: 2px solid var(--ink);
+  padding: 5px 7px;
+  margin-left: 4px;
+  cursor: pointer;
+  text-transform: uppercase;
+}
+.coin-spend:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.confetti-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 55;
+  pointer-events: none;
+  overflow: hidden;
+}
+.confetti {
+  position: absolute;
+  top: -24px;
+  width: 10px;
+  height: 14px;
+  animation: confetti-fall linear forwards;
+}
+@keyframes confetti-fall {
+  to {
+    transform: translate(var(--dx, 0), 106vh) rotate(900deg);
+  }
+}
+
+/* ---- ground bushes where the dogs run ---- */
+.bush {
+  position: fixed;
+  bottom: 0;
+  z-index: 33;
+  pointer-events: none;
+  width: 46px;
+  height: 16px;
+  background: var(--accent2);
+  border: 3px solid var(--ink);
+  border-bottom: 0;
+  transform-origin: bottom center;
+}
+.bush::before,
+.bush::after {
+  content: "";
+  position: absolute;
+  bottom: calc(100% - 3px);
+  background: var(--accent2);
+  border: 3px solid var(--ink);
+  border-bottom: 0;
+}
+.bush::before {
+  left: 4px;
+  width: 14px;
+  height: 9px;
+}
+.bush::after {
+  right: 6px;
+  width: 20px;
+  height: 13px;
+}
+
+/* ---- fireworks ---- */
+.firework {
+  position: fixed;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 55;
+  animation: fw 0.9s ease-out forwards;
+}
+@keyframes fw {
+  from {
+    transform: translate(0, 0);
+    opacity: 1;
+  }
+  to {
+    transform: translate(var(--fx, 0), var(--fy, 0));
+    opacity: 0;
+  }
+}
+
+/* ---- spend menu ---- */
+.coin-hud {
+  flex-wrap: wrap;
+  position: fixed;
+}
+.spend-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: var(--ink);
+  border: 3px solid var(--gold);
+  padding: 6px;
+  z-index: 46;
+}
+.spend-menu button {
+  font-family: var(--font-pixel), monospace;
+  font-size: 9px;
+  text-transform: uppercase;
+  background: var(--panel);
+  color: var(--ink);
+  border: 2px solid var(--ink);
+  padding: 7px 9px;
+  cursor: pointer;
+  white-space: nowrap;
+  text-align: left;
+}
+.spend-menu button:hover:not(:disabled) {
+  background: var(--gold);
+}
+.spend-menu button:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
