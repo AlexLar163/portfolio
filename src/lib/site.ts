@@ -3,5 +3,6 @@
  * custom domain; falls back to the current Vercel production alias.
  */
 export const SITE_URL = (
-  process.env.NEXT_PUBLIC_SITE_URL || "https://porfolio-sigma-eight-23.vercel.app"
+  process.env.NEXT_PUBLIC_SITE_URL ||
+  "https://portfolio-rose-psi-8qtm646lcc.vercel.app"
 ).replace(/\/$/, "");
