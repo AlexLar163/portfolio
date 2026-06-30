@@ -23,7 +23,7 @@ export function EditorialApp() {
   const projectCard = (p: Project) => (
     <article key={p.id} className="ed-project">
       <header>
-        <h3>{p.title}</h3>
+        <h3>{t(p.title, locale)}</h3>
         <span>{p.year}</span>
       </header>
       <div className="ed-case">

@@ -26,7 +26,7 @@ export interface SkillCategory {
 
 export interface Project {
   id: string;
-  title: string;
+  title: Localized;
   /** Groups the project under "Personal projects" or "Work". */
   category: "personal" | "work";
   /** Quest type shown in the header, e.g. "Main Quest". */

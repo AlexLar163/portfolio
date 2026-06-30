@@ -18,7 +18,7 @@ export function Quests() {
         <span>{p.year}</span>
       </div>
       <div className="qb">
-        <h3>{p.title}</h3>
+        <h3>{t(p.title, locale)}</h3>
         <div className="case">
           <div>
             <b>{tq("problem")}</b>

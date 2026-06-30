@@ -1,8 +1,8 @@
 /**
- * Canonical site URL. Override with NEXT_PUBLIC_SITE_URL when you wire up a
- * custom domain; falls back to the current Vercel production alias.
+ * Canonical site URL. Override with NEXT_PUBLIC_SITE_URL if it ever changes;
+ * falls back to the custom domain so canonical, sitemap and OG tags are right.
  */
 export const SITE_URL = (
   process.env.NEXT_PUBLIC_SITE_URL ||
-  "https://portfolio-rose-psi-8qtm646lcc.vercel.app"
+  "https://alexlargo.tech"
 ).replace(/\/$/, "");

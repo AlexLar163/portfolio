@@ -7,7 +7,7 @@ import type { Project } from "./types";
 export const projects: Project[] = [
   {
     id: "finansfit",
-    title: "FinansFit",
+    title: { es: "FinansFit", en: "FinansFit" },
     category: "personal",
     kind: { es: "Proyecto personal", en: "Personal project" },
     year: "2026",
@@ -37,7 +37,7 @@ export const projects: Project[] = [
   },
   {
     id: "portfolio",
-    title: "Portfolio 8-bit",
+    title: { es: "Portfolio 8-bit", en: "8-bit Portfolio" },
     category: "personal",
     kind: { es: "Proyecto personal", en: "Personal project" },
     year: "2026",
@@ -68,7 +68,7 @@ export const projects: Project[] = [
   },
   {
     id: "inventory-ai",
-    title: "Gestión de Inventarios con IA",
+    title: { es: "Gestión de Inventarios con IA", en: "AI Inventory Management" },
     category: "work",
     kind: { es: "Main Quest", en: "Main Quest" },
     year: "2023",
@@ -90,7 +90,7 @@ export const projects: Project[] = [
   },
   {
     id: "trompo",
-    title: "Trompo Mobiliario Infantil",
+    title: { es: "Trompo Mobiliario Infantil", en: "Trompo Kids Furniture" },
     category: "work",
     kind: { es: "Side Quest", en: "Side Quest" },
     year: "2022",
@@ -111,7 +111,7 @@ export const projects: Project[] = [
   },
   {
     id: "evaluar",
-    title: "Plataforma Evaluar",
+    title: { es: "Plataforma Evaluar", en: "Evaluar Platform" },
     category: "work",
     kind: { es: "Raid", en: "Raid" },
     year: "2022–24",
