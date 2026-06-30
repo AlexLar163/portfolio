@@ -27,10 +27,10 @@
   },
   "hud": {
     "about": "ABOUT",
-    "skills": "SKILLS",
+    "skills": "INVENTORY",
     "quests": "QUESTS",
-    "levels": "LEVELS",
-    "talk": "TALK",
+    "levels": "LEVEL_LOG",
+    "talk": "DIALOGUE",
     "online": "ONLINE",
     "sound": "SOUND",
     "lang": "LANG"

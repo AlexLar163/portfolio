@@ -1089,11 +1089,12 @@ main {
 }
 .konami-hint .seq {
   font-family: var(--font-pixel), monospace;
-  font-size: 9px;
+  font-size: 16px;
+  line-height: 1.4;
   color: var(--gold);
   display: block;
-  margin-top: 6px;
-  letter-spacing: 2px;
+  margin-top: 8px;
+  letter-spacing: 1px;
 }
 .konami-hint .hint-note {
   display: block;
