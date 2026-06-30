@@ -23,16 +23,6 @@ export const experience: ExperienceItem[] = [
     },
   },
   {
-    id: "thesis",
-    role: { es: "Fullstack · Tesis", en: "Fullstack · Thesis" },
-    company: "Inventarios IA",
-    period: { es: "May 2023 — Nov 2023", en: "May 2023 — Nov 2023" },
-    description: {
-      es: "App de inventarios con IA: NestJS + MongoDB, Flutter, dashboard Next.js y CI/CD con Docker, DigitalOcean y GitHub Actions.",
-      en: "AI inventory app: NestJS + MongoDB, Flutter, Next.js dashboard and CI/CD with Docker, DigitalOcean and GitHub Actions.",
-    },
-  },
-  {
     id: "evaluar-fe",
     role: { es: "Frontend Developer", en: "Frontend Developer" },
     company: "Evaluar",

@@ -67,30 +67,8 @@ export const projects: Project[] = [
     },
   },
   {
-    id: "inventory-ai",
-    title: { es: "Gestión de Inventarios con IA", en: "AI Inventory Management" },
-    category: "work",
-    kind: { es: "Main Quest", en: "Main Quest" },
-    year: "2023",
-    featured: true,
-    problem: {
-      es: "Pymes sin control de stock ni previsión de demanda.",
-      en: "SMEs with no stock control or demand forecasting.",
-    },
-    solution: {
-      es: "App fullstack con análisis por IA, dashboard predictivo y app móvil.",
-      en: "Fullstack app with AI analytics, a predictive dashboard and a mobile app.",
-    },
-    result: {
-      es: "Despliegue automatizado con CI/CD y reposición basada en datos.",
-      en: "Automated CI/CD deployment and data-driven restocking.",
-    },
-    tech: ["NestJS", "MongoDB", "Flutter", "Next.js", "Docker", "GitHub Actions"],
-    links: { demo: "#", repo: "https://github.com/AlexLar163" },
-  },
-  {
     id: "trompo",
-    title: { es: "Trompo Mobiliario Infantil", en: "Trompo Kids Furniture" },
+    title: { es: "Trompo Mobiliario Infantil", en: "Trompo Mobiliario Infantil" },
     category: "work",
     kind: { es: "Side Quest", en: "Side Quest" },
     year: "2022",
