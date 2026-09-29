@@ -1,0 +1,603 @@
+{
+  "3destiny": {
+    "portada": {
+      "src": "/media/3destiny/portada.webp",
+      "w": 1600,
+      "h": 900,
+      "from": "workana-set/3destiny-portada.jpg",
+      "webpQ": 80,
+      "kb": 45,
+      "avif": "/media/3destiny/portada.avif",
+      "avifKb": 30
+    },
+    "galeria-01": {
+      "src": "/media/3destiny/galeria-01.webp",
+      "w": 1600,
+      "h": 900,
+      "from": "workana-set/3destiny-galeria-02.jpg",
+      "webpQ": 80,
+      "kb": 100
+    },
+    "galeria-02": {
+      "src": "/media/3destiny/galeria-02.webp",
+      "w": 1600,
+      "h": 900,
+      "from": "workana-set/3destiny-galeria-03.jpg",
+      "webpQ": 80,
+      "kb": 105
+    },
+    "galeria-03": {
+      "src": "/media/3destiny/galeria-03.webp",
+      "w": 1600,
+      "h": 900,
+      "from": "workana-set/3destiny-galeria-04.jpg",
+      "webpQ": 80,
+      "kb": 82
+    },
+    "recorrido": {
+      "mp4": "/media/3destiny/recorrido.mp4",
+      "webm": "/media/3destiny/recorrido.webm",
+      "poster": "/media/3destiny/portada.webp",
+      "w": 640,
+      "h": 360,
+      "seconds": 8,
+      "mp4Kb": 358,
+      "webmKb": 236,
+      "from": "workana-set/3destiny-portada.gif"
+    }
+  },
+  "orthodent": {
+    "portada": {
+      "src": "/media/orthodent/portada.webp",
+      "w": 1600,
+      "h": 900,
+      "from": "clientes/orthodent/portada.png",
+      "webpQ": 80,
+      "kb": 48,
+      "avif": "/media/orthodent/portada.avif",
+      "avifKb": 27
+    },
+    "galeria-01": {
+      "src": "/media/orthodent/galeria-01.webp",
+      "w": 1600,
+      "h": 900,
+      "from": "clientes/orthodent/galeria-01.png",
+      "webpQ": 80,
+      "kb": 89
+    },
+    "galeria-02": {
+      "src": "/media/orthodent/galeria-02.webp",
+      "w": 1600,
+      "h": 900,
+      "from": "clientes/orthodent/galeria-02.png",
+      "webpQ": 80,
+      "kb": 73
+    },
+    "galeria-03": {
+      "src": "/media/orthodent/galeria-03.webp",
+      "w": 1600,
+      "h": 900,
+      "from": "clientes/orthodent/galeria-03.png",
+      "webpQ": 80,
+      "kb": 84
+    },
+    "movil": {
+      "src": "/media/orthodent/movil.webp",
+      "w": 480,
+      "h": 1039,
+      "from": "clientes/orthodent/movil.png",
+      "webpQ": 80,
+      "kb": 44
+    }
+  },
+  "argentina-local-expert": {
+    "portada": {
+      "src": "/media/argentina-local-expert/portada.webp",
+      "w": 1600,
+      "h": 900,
+      "from": "clientes/argentina-local-expert/portada.png",
+      "webpQ": 80,
+      "kb": 38,
+      "avif": "/media/argentina-local-expert/portada.avif",
+      "avifKb": 20
+    },
+    "galeria-01": {
+      "src": "/media/argentina-local-expert/galeria-01.webp",
+      "w": 1600,
+      "h": 900,
+      "from": "clientes/argentina-local-expert/galeria-01.png",
+      "webpQ": 80,
+      "kb": 50
+    },
+    "galeria-02": {
+      "src": "/media/argentina-local-expert/galeria-02.webp",
+      "w": 1600,
+      "h": 900,
+      "from": "clientes/argentina-local-expert/galeria-02.png",
+      "webpQ": 80,
+      "kb": 45
+    },
+    "galeria-03": {
+      "src": "/media/argentina-local-expert/galeria-03.webp",
+      "w": 1600,
+      "h": 900,
+      "from": "clientes/argentina-local-expert/galeria-03.png",
+      "webpQ": 80,
+      "kb": 46
+    },
+    "movil": {
+      "src": "/media/argentina-local-expert/movil.webp",
+      "w": 480,
+      "h": 1039,
+      "from": "clientes/argentina-local-expert/movil.png",
+      "webpQ": 80,
+      "kb": 26
+    }
+  },
+  "diamante": {
+    "portada": {
+      "src": "/media/diamante/portada.webp",
+      "w": 1600,
+      "h": 900,
+      "from": "clientes/diamante/portada.png",
+      "webpQ": 80,
+      "kb": 48,
+      "avif": "/media/diamante/portada.avif",
+      "avifKb": 26
+    },
+    "movil": {
+      "src": "/media/diamante/movil.webp",
+      "w": 480,
+      "h": 1039,
+      "from": "clientes/diamante/movil.png",
+      "webpQ": 80,
+      "kb": 40
+    }
+  },
+  "turnia": {
+    "landing-portada": {
+      "src": "/media/turnia/landing-portada.webp",
+      "w": 1440,
+      "h": 810,
+      "from": "turnia/hub-01-heroe.jpg",
+      "webpQ": 80,
+      "kb": 60,
+      "avif": "/media/turnia/landing-portada.avif",
+      "avifKb": 42
+    },
+    "app-portada": {
+      "src": "/media/turnia/app-portada.webp",
+      "w": 1440,
+      "h": 900,
+      "from": "turnia/app-app-agenda-1440-oscuro.jpg",
+      "webpQ": 80,
+      "kb": 30,
+      "avif": "/media/turnia/app-portada.avif",
+      "avifKb": 23
+    },
+    "app-movil": {
+      "src": "/media/turnia/app-movil.webp",
+      "w": 390,
+      "h": 844,
+      "from": "turnia/app-movil-agenda-390.jpg",
+      "webpQ": 80,
+      "kb": 10
+    },
+    "bot-portada": {
+      "src": "/media/turnia/bot-portada.webp",
+      "w": 1440,
+      "h": 900,
+      "from": "turnia/bot-panel.jpg",
+      "webpQ": 80,
+      "kb": 43,
+      "avif": "/media/turnia/bot-portada.avif",
+      "avifKb": 30
+    },
+    "bot-movil": {
+      "src": "/media/turnia/bot-movil.webp",
+      "w": 406,
+      "h": 842,
+      "from": "turnia/bot-landing.jpg",
+      "webpQ": 80,
+      "kb": 21
+    },
+    "recorrido": {
+      "mp4": "/media/turnia/recorrido.mp4",
+      "webm": "/media/turnia/recorrido.webm",
+      "poster": "/media/turnia/recorrido-poster.webp",
+      "w": 1280,
+      "h": 720,
+      "seconds": 11,
+      "mp4Kb": 858,
+      "webmKb": 694,
+      "from": "Playwright recordVideo 1440x810 de turnia-saas.vercel.app + /app/agenda (demo)"
+    }
+  },
+  "vera": {
+    "barberia-portada": {
+      "src": "/media/vera/barberia-portada.webp",
+      "w": 1600,
+      "h": 900,
+      "from": "recepcionista-wa/barberia/wk-01-chat.jpg",
+      "webpQ": 80,
+      "kb": 70,
+      "avif": "/media/vera/barberia-portada.avif",
+      "avifKb": 54
+    },
+    "cantina-portada": {
+      "src": "/media/vera/cantina-portada.webp",
+      "w": 1600,
+      "h": 900,
+      "from": "recepcionista-wa/cantina/wk-01-chat.jpg",
+      "webpQ": 80,
+      "kb": 71,
+      "avif": "/media/vera/cantina-portada.avif",
+      "avifKb": 55
+    },
+    "odontologia-portada": {
+      "src": "/media/vera/odontologia-portada.webp",
+      "w": 1600,
+      "h": 900,
+      "from": "recepcionista-wa/odontologia/wk-01-chat.jpg",
+      "webpQ": 80,
+      "kb": 81,
+      "avif": "/media/vera/odontologia-portada.avif",
+      "avifKb": 63
+    },
+    "taller-portada": {
+      "src": "/media/vera/taller-portada.webp",
+      "w": 1600,
+      "h": 900,
+      "from": "recepcionista-wa/taller/wk-01-chat.jpg",
+      "webpQ": 80,
+      "kb": 74,
+      "avif": "/media/vera/taller-portada.avif",
+      "avifKb": 56
+    },
+    "barberia-recorrido": {
+      "mp4": "/media/vera/barberia-recorrido.mp4",
+      "poster": "/media/vera/barberia-portada.webp",
+      "w": 1280,
+      "h": 720,
+      "seconds": 36.6,
+      "mp4Kb": 562,
+      "from": "recepcionista-wa/barberia/wk-00-portada.gif",
+      "note": "sin webm: VP9 CRF38 salía más pesado que el mp4"
+    },
+    "cantina-recorrido": {
+      "mp4": "/media/vera/cantina-recorrido.mp4",
+      "poster": "/media/vera/cantina-portada.webp",
+      "w": 1280,
+      "h": 720,
+      "seconds": 42.8,
+      "mp4Kb": 747,
+      "from": "recepcionista-wa/cantina/wk-00-portada.gif",
+      "note": "sin webm: VP9 CRF38 salía más pesado que el mp4"
+    },
+    "odontologia-recorrido": {
+      "mp4": "/media/vera/odontologia-recorrido.mp4",
+      "poster": "/media/vera/odontologia-portada.webp",
+      "w": 1280,
+      "h": 720,
+      "seconds": 45,
+      "mp4Kb": 1177,
+      "from": "recepcionista-wa/odontologia/wk-00-portada.gif",
+      "note": "sin webm: VP9 CRF38 salía más pesado que el mp4; recortado a 45 s (meta 1.2 MB)"
+    },
+    "taller-recorrido": {
+      "mp4": "/media/vera/taller-recorrido.mp4",
+      "poster": "/media/vera/taller-portada.webp",
+      "w": 1280,
+      "h": 720,
+      "seconds": 41.6,
+      "mp4Kb": 900,
+      "from": "recepcionista-wa/taller/wk-00-portada.gif",
+      "note": "sin webm: VP9 CRF38 salía más pesado que el mp4"
+    }
+  },
+  "pipeline-ia": {
+    "portada": {
+      "src": "/media/pipeline-ia/portada.webp",
+      "w": 1600,
+      "h": 900,
+      "from": "pipeline-ia/hub-00-portada.jpg",
+      "webpQ": 80,
+      "kb": 61,
+      "avif": "/media/pipeline-ia/portada.avif",
+      "avifKb": 46
+    },
+    "galeria-01": {
+      "src": "/media/pipeline-ia/galeria-01.webp",
+      "w": 1600,
+      "h": 900,
+      "from": "pipeline-ia/hub-03.jpg",
+      "webpQ": 80,
+      "kb": 66
+    }
+  },
+  "lume": {
+    "portada": {
+      "src": "/media/lume/portada.webp",
+      "w": 1600,
+      "h": 900,
+      "from": "workana-set/lume-portada.jpg",
+      "webpQ": 80,
+      "kb": 41,
+      "avif": "/media/lume/portada.avif",
+      "avifKb": 23
+    },
+    "recorrido": {
+      "mp4": "/media/lume/recorrido.mp4",
+      "webm": "/media/lume/recorrido.webm",
+      "poster": "/media/lume/portada.webp",
+      "w": 640,
+      "h": 360,
+      "seconds": 8,
+      "mp4Kb": 187,
+      "webmKb": 118,
+      "from": "workana-set/lume-portada.gif"
+    }
+  },
+  "recreo": {
+    "portada": {
+      "src": "/media/recreo/portada.webp",
+      "w": 1600,
+      "h": 900,
+      "from": "workana-set/recreo-portada.jpg",
+      "webpQ": 80,
+      "kb": 97,
+      "avif": "/media/recreo/portada.avif",
+      "avifKb": 64
+    },
+    "recorrido": {
+      "mp4": "/media/recreo/recorrido.mp4",
+      "webm": "/media/recreo/recorrido.webm",
+      "poster": "/media/recreo/portada.webp",
+      "w": 640,
+      "h": 360,
+      "seconds": 7,
+      "mp4Kb": 441,
+      "webmKb": 270,
+      "from": "workana-set/recreo-portada.gif"
+    }
+  },
+  "solnova": {
+    "portada": {
+      "src": "/media/solnova/portada.webp",
+      "w": 1600,
+      "h": 900,
+      "from": "workana-set/solnova-portada.jpg",
+      "webpQ": 80,
+      "kb": 113,
+      "avif": "/media/solnova/portada.avif",
+      "avifKb": 85
+    },
+    "recorrido": {
+      "mp4": "/media/solnova/recorrido.mp4",
+      "webm": "/media/solnova/recorrido.webm",
+      "poster": "/media/solnova/portada.webp",
+      "w": 600,
+      "h": 338,
+      "seconds": 11.1,
+      "mp4Kb": 432,
+      "webmKb": 333,
+      "from": "workana-set/solnova-portada.gif"
+    }
+  },
+  "meridiano": {
+    "portada": {
+      "src": "/media/meridiano/portada.webp",
+      "w": 1600,
+      "h": 900,
+      "from": "workana-set/meridiano-portada.jpg",
+      "webpQ": 80,
+      "kb": 46,
+      "avif": "/media/meridiano/portada.avif",
+      "avifKb": 29
+    },
+    "recorrido": {
+      "mp4": "/media/meridiano/recorrido.mp4",
+      "webm": "/media/meridiano/recorrido.webm",
+      "poster": "/media/meridiano/portada.webp",
+      "w": 640,
+      "h": 360,
+      "seconds": 7,
+      "mp4Kb": 336,
+      "webmKb": 146,
+      "from": "workana-set/meridiano-portada.gif"
+    }
+  },
+  "bitacora": {
+    "portada": {
+      "src": "/media/bitacora/portada.webp",
+      "w": 1600,
+      "h": 900,
+      "from": "workana-set/bitacora-portada.jpg",
+      "webpQ": 80,
+      "kb": 65,
+      "avif": "/media/bitacora/portada.avif",
+      "avifKb": 45
+    },
+    "recorrido": {
+      "mp4": "/media/bitacora/recorrido.mp4",
+      "webm": "/media/bitacora/recorrido.webm",
+      "poster": "/media/bitacora/portada.webp",
+      "w": 560,
+      "h": 314,
+      "seconds": 15,
+      "mp4Kb": 566,
+      "webmKb": 438,
+      "from": "workana-set/bitacora-portada.gif"
+    }
+  },
+  "ironpulse": {
+    "portada": {
+      "src": "/media/ironpulse/portada.webp",
+      "w": 1280,
+      "h": 720,
+      "from": "workana-set/ironpulse-portada.jpg",
+      "webpQ": 80,
+      "kb": 44
+    }
+  },
+  "reverso": {
+    "portada": {
+      "src": "/media/reverso/portada.webp",
+      "w": 1280,
+      "h": 720,
+      "from": "workana-set/reverso-portada.jpg",
+      "webpQ": 80,
+      "kb": 54
+    }
+  },
+  "aromas-del-sur": {
+    "portada": {
+      "src": "/media/aromas-del-sur/portada.webp",
+      "w": 1280,
+      "h": 720,
+      "from": "portadas/aromas-del-sur.png",
+      "webpQ": 80,
+      "kb": 80
+    }
+  },
+  "instituto-del-sur": {
+    "portada": {
+      "src": "/media/instituto-del-sur/portada.webp",
+      "w": 1280,
+      "h": 720,
+      "from": "portadas/instituto-del-sur.png",
+      "webpQ": 80,
+      "kb": 25
+    }
+  },
+  "vertice-studio": {
+    "portada": {
+      "src": "/media/vertice-studio/portada.webp",
+      "w": 1280,
+      "h": 720,
+      "from": "portadas/vertice-studio.png",
+      "webpQ": 80,
+      "kb": 35
+    }
+  },
+  "ahumados-pavon": {
+    "portada": {
+      "src": "/media/ahumados-pavon/portada.webp",
+      "w": 1280,
+      "h": 720,
+      "from": "portadas/ahumados-pavon.png",
+      "webpQ": 80,
+      "kb": 41
+    }
+  },
+  "reborn": {
+    "portada": {
+      "src": "/media/reborn/portada.webp",
+      "w": 1280,
+      "h": 720,
+      "from": "portadas/undo-wellness.png",
+      "webpQ": 80,
+      "kb": 32
+    }
+  },
+  "tecnostore": {
+    "portada": {
+      "src": "/media/tecnostore/portada.webp",
+      "w": 1280,
+      "h": 720,
+      "from": "whatsapp-bot/frame-05-respuesta-garantia.png",
+      "webpQ": 80,
+      "kb": 25
+    }
+  },
+  "nebula-cafe": {
+    "portada": {
+      "src": "/media/nebula-cafe/portada.webp",
+      "w": 1280,
+      "h": 720,
+      "from": "demos-nextjs/tienda-online/portada.jpg",
+      "webpQ": 80,
+      "kb": 52
+    }
+  },
+  "citaly": {
+    "portada": {
+      "src": "/media/citaly/portada.webp",
+      "w": 1280,
+      "h": 720,
+      "from": "demos-nextjs/panel-citas-saas/portada.jpg",
+      "webpQ": 80,
+      "kb": 32
+    }
+  },
+  "clinica-aurora": {
+    "portada": {
+      "src": "/media/clinica-aurora/portada.webp",
+      "w": 1280,
+      "h": 720,
+      "from": "demos-nextjs/aurora-recaptura/portada.png",
+      "webpQ": 80,
+      "kb": 47
+    }
+  },
+  "finansfit": {
+    "portada": {
+      "src": "/media/finansfit/portada.webp",
+      "w": 600,
+      "h": 1300,
+      "from": "finansfit/home.png",
+      "webpQ": 80,
+      "kb": 35
+    }
+  },
+  "finansfit-web": {
+    "portada": {
+      "src": "/media/finansfit-web/portada.webp",
+      "w": 1280,
+      "h": 860,
+      "from": "demos-nextjs/finansfit/portada.jpg",
+      "webpQ": 80,
+      "kb": 44
+    }
+  },
+  "evaluar": {
+    "portada": {
+      "src": "/media/evaluar/portada.webp",
+      "w": 1280,
+      "h": 772,
+      "from": "demos-nextjs/evaluar/portada.png",
+      "webpQ": 80,
+      "kb": 47
+    }
+  },
+  "appsmonitor": {
+    "proyectos": {
+      "src": "/media/appsmonitor/proyectos.webp",
+      "w": 1200,
+      "h": 897,
+      "from": "appsmonitor/proyectos-desktop.png",
+      "webpQ": 80,
+      "kb": 23
+    },
+    "modal-logs": {
+      "src": "/media/appsmonitor/modal-logs.webp",
+      "w": 720,
+      "h": 809,
+      "from": "appsmonitor/modal-logs.png",
+      "webpQ": 80,
+      "kb": 44
+    }
+  },
+  "automatizaciones": {
+    "portada": {
+      "src": "/media/automatizaciones/portada.webp",
+      "w": 1600,
+      "h": 900,
+      "from": "automatizaciones/hub-00-portada.jpg",
+      "webpQ": 80,
+      "kb": 99,
+      "avif": "/media/automatizaciones/portada.avif",
+      "avifKb": 75
+    }
+  }
+}
