@@ -5,8 +5,8 @@ const withNextIntl = createNextIntlPlugin();
 
 const nextConfig: NextConfig = {
   images: {
-    // Sprites are pixel-art; keep them crisp instead of optimizing.
-    unoptimized: true,
+    // Las fuentes en /public/media ya vienen en webp; Next sirve AVIF/WebP a la medida del slot.
+    formats: ["image/avif", "image/webp"],
   },
 };
 

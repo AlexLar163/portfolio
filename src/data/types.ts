@@ -1,73 +1,135 @@
-import type { Locale } from "@/i18n/routing";
+/**
+ * Modelo de datos del portfolio.
+ *
+ * Los datos estructurales (ids, URLs, stack, estado, media, cajas del diagrama)
+ * viven en `src/data/*.ts`. Los TEXTOS visibles viven en `messages/{es,en}.json`,
+ * indexados por el mismo `id`, para que traducir no obligue a tocar código.
+ */
 
-/** A string available in every supported locale. */
-export type Localized = Record<Locale, string>;
+export type Status =
+  | "production"
+  | "live"
+  | "in-progress"
+  | "on-demand"
+  | "captures-only"
+  | "internal";
 
-/** Pick the right language out of a Localized value. */
-export function t(value: Localized, locale: Locale): string {
-  return value[locale] ?? value.es;
+export type ShowcaseLabel = "demo" | "own-tool" | "personal" | "previous";
+
+/** Referencia a una pieza de `public/media/manifest.json` (slug → clave). */
+export interface MediaRef {
+  slug: string;
+  key: string;
+  fit?: "cover" | "contain";
+  /** object-position, p. ej. "top" */
+  position?: string;
 }
 
-export interface SocialLink {
-  id: string;
-  label: string;
-  /** Shown in the 8-bit UI, e.g. "AlexLar163 →". */
-  handle: string;
-  href: string;
+export interface GalleryRef {
+  main: MediaRef;
+  /** Recorrido en video (se reproduce solo si pasa la regla de 0,8 × slot). */
+  video?: MediaRef;
+  /** Miniaturas que cambian la media principal (3Destiny). */
+  items?: MediaRef[];
+  /** Vista móvil superpuesta. */
+  inset?: MediaRef;
 }
 
-export interface SkillCategory {
+export interface Client {
   id: string;
-  /** Category label per locale (e.g. Frontend / Cloud). */
-  name: Localized;
-  /** Plain tool names — order matters, render as-is. */
-  tools: string[];
-}
-
-export interface Project {
-  id: string;
-  title: Localized;
-  /** Groups the project under "Personal projects" or "Work". */
-  category: "personal" | "work";
-  /** Quest type shown in the header, e.g. "Main Quest". */
-  kind: Localized;
+  name: string;
+  domain?: string;
+  url?: string;
   year: string;
-  featured?: boolean;
-  /** Case study fields. */
-  problem: Localized;
-  solution: Localized;
-  result: Localized;
+  status: "production" | "in-progress";
   tech: string[];
-  links?: {
-    demo?: string;
-    repo?: string;
-  };
+  media?: GalleryRef;
+  review?: { source: "Workana"; stars: 5 };
+  /** Diamante: el demo que ganó el proyecto. */
+  demoUrl?: string;
+  /** 3Destiny → ClientCase. */
+  lead?: boolean;
+}
+
+export interface Showcase {
+  id: string;
+  name: string;
+  label: ShowcaseLabel;
+  tier: "featured" | "other";
+  order: number;
+  size?: "feature" | "half" | "third";
+  group?: "woocommerce" | "wordpress" | "nextjs" | "personal" | "previous";
+  year: string;
+  tech: string[];
+  /** Sin estado: trabajos anteriores que ya no están publicados. */
+  status?: Status;
+  url?: string;
+  /** Texto de la barra de dirección cuando hay destino. */
+  domain?: string;
+  repo?: string;
+  media?: GalleryRef;
+  /** Turnia: Landing · App · Bot. Textos en messages. */
+  parts?: { id: "landing" | "app" | "bot"; media: GalleryRef; url: string }[];
+  /** Vera: 4 rubros. */
+  variants?: { id: string; media: GalleryRef }[];
+}
+
+export interface Box {
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+}
+
+export type Point = [number, number];
+
+export interface InfraNode {
+  id: string;
+  kind: "external" | "service" | "on-demand" | "boundary" | "strip" | "cloud";
+  land: Box;
+  port: Box;
+  /** Nodos que no se seleccionan (fronteras). */
+  interactive: boolean;
+}
+
+export interface InfraEdge {
+  id: string;
+  from: string;
+  to: string;
+  type: "traffic" | "control" | "scheduled";
+  land: Point[];
+  port: Point[];
+  /** Posición de la etiqueta visible, si la tiene. */
+  labelLand?: { x: number; y: number; anchor: "start" | "end" };
+  labelPort?: { x: number; y: number; anchor: "start" | "end" };
+}
+
+export interface InfraRoute {
+  id: 1 | 2;
+  /** Aristas que se resaltan al trazar este recorrido. */
+  edges: string[];
+  land: Point[];
+  port: Point[];
 }
 
 export interface ExperienceItem {
   id: string;
-  role: Localized;
   company: string;
-  period: Localized;
-  description: Localized;
+  /** "2026-01"; sin `end` = actualidad. */
+  start: string;
+  end?: string;
+  parallelWith?: string;
+  tech?: string[];
 }
 
-export interface Stat {
+export interface SkillCategory {
   id: string;
-  label: Localized;
-  value: string;
+  tools: string[];
 }
 
-export interface Profile {
-  name: string;
-  role: Localized;
-  tagline: Localized;
-  /** Two-line console summary used by the hero. */
-  summary: Localized;
-  email: string;
-  cvUrl?: string;
-  socials: SocialLink[];
-  stats: Stat[];
-  /** Core technologies highlighted in the hero. */
-  core: string[];
+export interface Social {
+  id: "github" | "linkedin" | "email";
+  label: string;
+  handle: string;
+  href: string;
 }

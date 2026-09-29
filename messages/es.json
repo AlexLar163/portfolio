@@ -1,115 +1,849 @@
 {
   "meta": {
-    "title": "Alex Largo — Fullstack Developer",
-    "description": "Portfolio 8-bit de Alex Largo, desarrollador Fullstack. React, NestJS, AWS, Next.js. Carta de presentación interactiva."
+    "title": "Alex Largo — Fullstack & DevOps Engineer",
+    "description": "Alex Largo, Fullstack & DevOps Engineer en Cuenca, Ecuador. Construyo aplicaciones web y opero el servidor donde corren: Next.js, WordPress a medida, Docker, Caddy, CI/CD, AWS y automatización con n8n y agentes IA.",
+    "ogAlt": "Alex Largo — Fullstack & DevOps Engineer"
   },
-  "ui": {
-    "switch": "Cambiar interfaz",
-    "toggle": "🎮 ⇄ 📄",
-    "toEditorial": "Vista normal",
-    "toPixel": "Modo 8-bit"
+  "nav": {
+    "skip": "Saltar al contenido",
+    "home": "Alex Largo, ir al inicio",
+    "primary": "Secciones",
+    "clientes": "Clientes",
+    "devops": "DevOps",
+    "proyectos": "Proyectos",
+    "experiencia": "Experiencia",
+    "contacto": "Contacto",
+    "cv": "CV",
+    "menuOpen": "Abrir menú",
+    "menuClose": "Cerrar menú",
+    "lang": "Idioma"
   },
-  "editorial": {
-    "about": "Sobre mí",
-    "skills": "Skills & herramientas",
-    "projects": "Proyectos",
-    "experience": "Experiencia",
-    "github": "GitHub",
-    "contact": "Contacto",
-    "viewProjects": "Ver proyectos",
-    "downloadCv": "Descargar CV",
-    "personal": "Proyectos personales",
-    "work": "Trabajos & casos",
-    "available": "Disponible para nuevos proyectos",
-    "contactTitle": "¿Tienes un proyecto?",
-    "contactLead": "Escríbeme y te respondo en menos de 24h.",
-    "viewProfile": "Ver perfil de GitHub"
+  "common": {
+    "newTab": "(se abre en otra pestaña)",
+    "play": "Reproducir recorrido de {name}",
+    "pause": "Pausar recorrido de {name}",
+    "captures": "capturas",
+    "requestDemo": "Pedirla",
+    "onDemandNote": "Demo en vivo bajo pedido",
+    "requestPrefill": "Hola Alex, me gustaría ver la demo de {name} en vivo.",
+    "gallery": "Vistas de {name}",
+    "view": "Vista {n} de {name}",
+    "viewLive": "Ver en vivo",
+    "viewCode": "Ver código",
+    "viewSite": "Ver sitio",
+    "stack": "Stack",
+    "year": "Año",
+    "alt": "Captura de {name}",
+    "altView": "Captura de {name}, vista {n}",
+    "altMobile": "Vista móvil de {name}"
   },
-  "hud": {
-    "about": "ABOUT",
-    "skills": "INVENTORY",
-    "quests": "QUESTS",
-    "levels": "LEVEL_LOG",
-    "talk": "DIALOGUE",
-    "online": "ONLINE",
-    "sound": "SONIDO",
-    "lang": "IDIOMA"
+  "status": {
+    "production": "En producción",
+    "live": "En vivo",
+    "in-progress": "En curso",
+    "on-demand": "Bajo pedido",
+    "captures-only": "Solo capturas",
+    "internal": "Uso interno"
+  },
+  "labels": {
+    "demo": "Proyecto demo",
+    "own-tool": "Herramienta propia",
+    "personal": "Proyecto personal",
+    "previous": "Trabajo anterior"
+  },
+  "profile": {
+    "role": "Fullstack & DevOps Engineer",
+    "lead": "Construyo la aplicación y el servidor donde corre: del frontend y la API a Docker, el proxy, el CI/CD y la automatización con agentes IA.",
+    "availability": "Disponible para proyectos freelance",
+    "sheetLabel": "Ficha de Alex Largo",
+    "now": "Ahora",
+    "nowMain": "NTT DATA · Junior Engineer",
+    "nowParallel": "En paralelo: freelance en Workana, desde ene 2026",
+    "base": "Base",
+    "baseValue": "Cuenca, Ecuador",
+    "languages": "Idiomas",
+    "languagesValue": "Español nativo · Inglés B1",
+    "links": "Enlaces",
+    "monogram": "Iniciales de Alex Largo"
   },
   "hero": {
-    "newGame": "★ NEW GAME ★",
-    "viewQuests": "▶ VER QUESTS",
-    "cv": "CV",
-    "github": "GITHUB",
-    "insertCoin": "INSERT COIN — ¡HABLEMOS!",
-    "xp": "XP · FULLSTACK"
+    "contact": "Escríbeme",
+    "downloadCv": "Descargar CV",
+    "otherCv": "English version (PDF)"
   },
-  "sections": {
-    "inventory": "INVENTORY",
-    "inventorySub": "TODAS LAS HERRAMIENTAS",
-    "quests": "QUESTS",
-    "questsSub": "CASOS DE ESTUDIO",
-    "questsPersonal": "🎮 Proyectos personales",
-    "questsWork": "💼 Trabajos & casos",
-    "levels": "LEVEL_LOG",
-    "levelsSub": "TRAYECTORIA",
-    "map": "WORLD_MAP",
-    "dialogue": "DIALOGUE",
-    "dialogueSub": "CONTACTO"
+  "clients": {
+    "title": "Clientes",
+    "lead": "Proyectos reales para clientes que los usan todos los días.",
+    "visit": "Ver sitio",
+    "demoWon": "Ver el demo que ganó el proyecto",
+    "review": "Reseña 5★ en Workana",
+    "published": "Publicado",
+    "lighthouse": "Lighthouse",
+    "infra": "Infra",
+    "stack": "Stack",
+    "items": {
+      "3destiny": {
+        "country": "Argentina",
+        "summary": "Agencia de realidad aumentada, realidad virtual e IA para empresas. Tema de WordPress propio, sin page builder: casos de éxito con métricas, cuatro verticales con página propia, blog y formulario conectado al panel. Lo desplegué y lo opero en el servidor de AWS del cliente.",
+        "publishedValue": "17-sep-2026",
+        "lighthouseValue": "SEO 100 · Accesibilidad 100",
+        "infraValue": "AWS EC2 · acceso por SSM · Let's Encrypt con challenge DNS en Route53 · PHP 8.3 · migraciones con wp-cli"
+      },
+      "orthodent": {
+        "country": "Ecuador",
+        "summary": "Clínica odontológica. Sitio multi-idioma con formularios de contacto, tienda y reseñas de Google.",
+        "stackValue": "WordPress · Elementor · Contact Form 7 · WooCommerce · TranslatePress"
+      },
+      "argentina-local-expert": {
+        "country": "Argentina",
+        "summary": "Landing y embudo de ventas en Systeme.io, con los leads entrando al CRM nativo de la plataforma.",
+        "stackValue": "Systeme.io · embudo · CRM de leads"
+      },
+      "diamante": {
+        "summary": "App de anotación de béisbol. Proyecto ganado en Workana con un demo funcional; la fase 1 es una app móvil en React Native.",
+        "stackValue": "React Native · fase 1 en desarrollo"
+      }
+    }
   },
-  "quest": {
-    "problem": "Boss",
-    "solution": "Skill",
-    "result": "Loot",
-    "demo": "DEMO",
-    "code": "CÓDIGO",
-    "featured": "★ Destacado"
+  "devops": {
+    "title": "DevOps e infraestructura",
+    "lead": "Opero mi propio servidor en producción: 11 sitios, automatizaciones y agentes IA detrás de un solo proxy. En NTT DATA, Kubernetes sobre AWS.",
+    "diagramTitle": "Infraestructura del servidor propio y nubes que opero",
+    "diagramDesc": "Las visitas y los webhooks de Telegram entran por DNS a Caddy, que reparte el tráfico dentro de una red Docker sin puertos públicos: WordPress bajo demanda con MariaDB compartida, el panel appsMonitor, n8n y el runner de agentes IA. Fuera del VPS: Vercel, AWS y Cloudflare.",
+    "diagramHint": "Toca o enfoca un nodo para ver qué hace.",
+    "outside": "Fuera del VPS",
+    "listSummary": "Ver la infraestructura como lista",
+    "legendTitle": "Leyenda",
+    "legend": {
+      "traffic": "Tráfico HTTP(S)",
+      "control": "Control o ejecución interna",
+      "scheduled": "Programado (cron, backup)",
+      "production": "En producción",
+      "onDemand": "Bajo demanda"
+    },
+    "panelWhat": "Qué hace",
+    "panelFacts": "Datos",
+    "incident": {
+      "title": "Respuesta a incidente · septiembre 2026",
+      "lead": "Cómo respondí, en orden.",
+      "steps": {
+        "detect": {
+          "title": "Detección y contención",
+          "text": "Una intrusión por fuerza bruta entró por un sitio de staging."
+        },
+        "rescue": {
+          "title": "Rescate de datos",
+          "text": "Los datos se rescataron antes de reconstruir."
+        },
+        "rebuild": {
+          "title": "Reconstrucción desde cero",
+          "text": "El servidor se volvió a levantar con el script de aprovisionamiento."
+        },
+        "harden": {
+          "title": "Hardening y rotación de credenciales",
+          "text": "Se endureció el host y se rotaron las credenciales."
+        }
+      }
+    },
+    "capabilitiesTitle": "Qué opero",
+    "capabilities": {
+      "provisioning": {
+        "title": "Aprovisionamiento y hardening",
+        "items": [
+          {
+            "text": "VPS en DigitalOcean",
+            "data": "Ubuntu 24.04 · 1 vCPU · 2 GB"
+          },
+          {
+            "text": "Script de aprovisionamiento: Docker del repo oficial, ufw, fail2ban, swap de 2 GB y unattended-upgrades"
+          },
+          {
+            "text": "Usuario no-root y SSH solo con llave"
+          }
+        ]
+      },
+      "proxy": {
+        "title": "Proxy y TLS (Caddy)",
+        "items": [
+          {
+            "text": "Reverse proxy con TLS automático y wildcard",
+            "data": "*.taller.works · 11 virtual hosts"
+          },
+          {
+            "text": "DNS con registro A wildcard"
+          },
+          {
+            "text": "n8n detrás del proxy; el webhook de Telegram solo acepta los rangos de IP de Telegram"
+          }
+        ]
+      },
+      "containers": {
+        "title": "Contenedores en producción",
+        "items": [
+          {
+            "text": "Docker Compose con una MariaDB compartida y servicios WordPress activados por profiles"
+          },
+          {
+            "text": "Límite de memoria por sitio",
+            "data": "384 MB"
+          },
+          {
+            "text": "Contenedor de herramientas",
+            "data": "wp-cli"
+          },
+          {
+            "text": "Stack de Caddy + n8n + runner de agentes IA sin puertos públicos, con auth por header"
+          }
+        ]
+      },
+      "panel": {
+        "title": "Panel de control propio (appsMonitor)",
+        "items": [
+          {
+            "text": "Fastify + TypeScript: enciende y apaga demos leyendo las labels de Compose, con RAM, disco, carga, uptime y modal de logs"
+          },
+          {
+            "text": "Tope de demos encendidas a la vez",
+            "data": "MAX_RUNNING=2"
+          },
+          {
+            "text": "Antes de encender exige memoria libre y carga baja: regla sacada de una caída de 12 min",
+            "data": "≥ 400 MB libres · carga < 2"
+          },
+          {
+            "text": "Antes era un servicio systemd de usuario; hoy es un contenedor con el socket de Docker montado"
+          }
+        ],
+        "mediaAlt": [
+          "Panel appsMonitor: lista de proyectos con su estado y controles para encender o apagar",
+          "Panel appsMonitor: modal con los logs de un contenedor Docker"
+        ]
+      },
+      "backups": {
+        "title": "Backups y restore",
+        "items": [
+          {
+            "text": "Base de datos y uploads",
+            "data": "wp db export + tar"
+          },
+          {
+            "text": "Restore con search-replace de URL"
+          },
+          {
+            "text": "Backup de los workflows de n8n"
+          }
+        ]
+      },
+      "monitoring": {
+        "title": "Monitoreo",
+        "items": [
+          {
+            "text": "Script que verifica que las URLs en vivo respondan",
+            "data": "HTTP 200"
+          },
+          {
+            "text": "Cron semanal que manda el estado a Telegram vía n8n",
+            "data": "lunes 9:00"
+          }
+        ]
+      },
+      "automation": {
+        "title": "Automatización con n8n y agentes IA",
+        "items": [
+          {
+            "text": "Flujos de n8n en producción: aprobación humana con Wait + webhook, 3 bots de Telegram, Gmail, estado en Postgres y rate limiting",
+            "data": "6 flujos"
+          },
+          {
+            "text": "Servicio Express que corre Claude Code headless en Docker, con watchdog de inactividad y Chromium para capturas"
+          },
+          {
+            "text": "Sincronización de contexto por script y fallback de modelo cuando se queda sin memoria (OOM)"
+          }
+        ],
+        "mediaAlt": [
+          "Los seis flujos de n8n del portafolio en el editor de n8n"
+        ]
+      },
+      "clouds": {
+        "title": "Nubes",
+        "items": [
+          {
+            "text": "Vercel: Neon desde el Marketplace, env vars marcadas como Sensitive y crons",
+            "data": "13 proyectos"
+          },
+          {
+            "text": "AWS en NTT DATA: EKS, RDS Oracle, EC2 vía SSM, Transit Gateway, S3, CloudWatch, Helm, KEDA, Karpenter, Istio y Terraform"
+          },
+          {
+            "text": "AWS en 3Destiny: EC2 con acceso por SSM y Route53"
+          },
+          {
+            "text": "Cloudflare: tunnels para exponer demos locales",
+            "data": "cloudflared"
+          }
+        ]
+      },
+      "qa": {
+        "title": "QA automatizado",
+        "items": [
+          {
+            "text": "Scripts de Playwright: barrido de páginas, 404 y estados"
+          },
+          {
+            "text": "Detector de cortes de layout en todo el rango de anchos",
+            "data": "320 → 2560 px"
+          }
+        ]
+      }
+    },
+    "pipeline": {
+      "title": "CI/CD",
+      "caption": "Pipelines que escribí y mantengo",
+      "project": "Proyecto",
+      "steps": "Pasos",
+      "target": "Destino",
+      "rows": {
+        "appsmonitor": {
+          "steps": [
+            "SSH",
+            "rsync",
+            "restart del servicio"
+          ],
+          "target": "VPS propio"
+        },
+        "finansfit-web": {
+          "steps": [
+            "vitest",
+            "build"
+          ],
+          "target": "GitHub Actions · además corre en Docker en el VPS"
+        },
+        "medicalapp": {
+          "steps": [
+            "typecheck",
+            "lint",
+            "migrate + seed",
+            "tests",
+            "Playwright E2E"
+          ],
+          "target": "GitHub Actions"
+        },
+        "evaluar": {
+          "steps": [
+            "build",
+            "push a Docker Hub",
+            "kubectl"
+          ],
+          "target": "AWS EKS · 8 entornos"
+        },
+        "trompo": {
+          "steps": [
+            "ssh-action",
+            "docker-compose",
+            "nginx"
+          ],
+          "target": "Servidor con nginx"
+        }
+      }
+    }
   },
-  "map": {
-    "viewProfile": "VER PERFIL →",
-    "repos": "REPOS",
-    "years": "XP/AÑOS",
-    "top": "TOP"
+  "infra": {
+    "frames": {
+      "vps": {
+        "label": "VPS · DigitalOcean",
+        "sub": [
+          "Ubuntu 24.04",
+          "1 vCPU · 2 GB"
+        ]
+      },
+      "docker": {
+        "label": [
+          "Red interna de Docker",
+          "sin puertos públicos"
+        ]
+      }
+    },
+    "edges": {
+      "e6": [
+        "solo rangos de IP",
+        "de Telegram"
+      ]
+    },
+    "nodes": {
+      "visitors": {
+        "label": "Visitantes",
+        "sub": [
+          "navegador",
+          "HTTPS"
+        ],
+        "detail": "Cualquier visita a un sitio o a una demo. Entra por HTTPS y resuelve por DNS hacia el único proxy del servidor.",
+        "facts": [
+          "HTTPS",
+          "11 sitios detrás de un proxy"
+        ]
+      },
+      "telegram": {
+        "label": "Telegram",
+        "sub": [
+          "webhooks de los bots"
+        ],
+        "detail": "Los bots de Telegram avisan por webhook. El proxy solo acepta esas peticiones si vienen de los rangos de IP de Telegram.",
+        "facts": [
+          "3 bots",
+          "filtro por rango de IP"
+        ]
+      },
+      "dns": {
+        "label": "DNS",
+        "sub": [
+          "A wildcard",
+          "*.taller.works"
+        ],
+        "detail": "Un registro A wildcard apunta todo *.taller.works al VPS. Agregar un sitio no requiere tocar el DNS.",
+        "facts": [
+          "A wildcard",
+          "*.taller.works"
+        ]
+      },
+      "github": {
+        "label": "GitHub Actions",
+        "sub": [
+          "deploy por SSH",
+          "rsync + restart"
+        ],
+        "detail": "El panel appsMonitor se despliega desde GitHub Actions: SSH, rsync y restart del servicio.",
+        "facts": [
+          "SSH + rsync",
+          "restart del servicio"
+        ]
+      },
+      "host": {
+        "label": "Hardening del host",
+        "sub": [
+          "ufw",
+          "fail2ban",
+          "SSH solo con llave",
+          "usuario no-root",
+          "unattended-upgrades",
+          "swap 2 GB"
+        ],
+        "detail": "Lo que deja el script de aprovisionamiento en el host antes de que corra un solo contenedor.",
+        "facts": [
+          "ufw",
+          "fail2ban",
+          "SSH solo con llave",
+          "usuario no-root",
+          "unattended-upgrades",
+          "swap 2 GB"
+        ]
+      },
+      "caddy": {
+        "label": "Caddy",
+        "sub": [
+          "TLS automático",
+          "11 virtual hosts",
+          "filtro de IP de Telegram"
+        ],
+        "detail": "Reverse proxy único del servidor. Emite y renueva los certificados solo, reparte cada subdominio a su contenedor y es la única puerta hacia la red interna.",
+        "facts": [
+          "TLS automático",
+          "wildcard *.taller.works",
+          "11 virtual hosts",
+          "n8n detrás del proxy"
+        ]
+      },
+      "cron": {
+        "label": "Cron semanal",
+        "sub": [
+          "lunes 9:00",
+          "chequeo de URLs → 200"
+        ],
+        "detail": "Cada lunes a las 9:00 se verifica que las URLs en vivo respondan 200 y el estado llega a Telegram vía n8n.",
+        "facts": [
+          "lunes 9:00",
+          "URLs → 200",
+          "aviso por Telegram"
+        ]
+      },
+      "wordpress": {
+        "label": "WordPress × perfiles",
+        "labelShort": "WordPress",
+        "sub": [
+          "perfiles de Compose",
+          "384 MB c/u",
+          "máx. 2"
+        ],
+        "detail": "Cada sitio es un servicio de Compose activado por profile: se enciende cuando alguien lo pide. Caben dos a la vez.",
+        "facts": [
+          "profiles de Compose",
+          "384 MB por sitio",
+          "máx. 2 encendidos"
+        ]
+      },
+      "mariadb": {
+        "label": "MariaDB",
+        "sub": [
+          "compartida por los WordPress"
+        ],
+        "detail": "Una sola base de datos compartida por todos los WordPress: menos memoria que una por sitio.",
+        "facts": [
+          "una instancia",
+          "backups con wp db export"
+        ]
+      },
+      "appsmonitor": {
+        "label": "appsMonitor",
+        "sub": [
+          "Fastify",
+          "socket de Docker",
+          "≥400 MB libres",
+          "carga <2"
+        ],
+        "detail": "Mi panel de control: enciende y apaga demos leyendo las labels de Compose. Antes de encender exige memoria y carga, regla que salió de una caída de 12 min.",
+        "facts": [
+          "MAX_RUNNING=2",
+          "≥ 400 MB libres",
+          "carga < 2"
+        ]
+      },
+      "wpcli": {
+        "label": "wp-cli",
+        "sub": [
+          "contenedor"
+        ],
+        "detail": "Contenedor de herramientas para migraciones, exportes y search-replace sin instalar nada en el host.",
+        "facts": [
+          "migraciones",
+          "search-replace"
+        ]
+      },
+      "backups": {
+        "label": "Backups",
+        "sub": [
+          "db + uploads"
+        ],
+        "detail": "Exporte de la base y tar de uploads por sitio; el restore reescribe las URLs con search-replace.",
+        "facts": [
+          "wp db export",
+          "tar de uploads",
+          "workflows de n8n"
+        ]
+      },
+      "n8n": {
+        "label": "n8n · 6 flujos",
+        "sub": [
+          "webhooks",
+          "estado en Postgres"
+        ],
+        "detail": "Seis flujos en producción: inscripciones, reservas, bots, recordatorios y el estado semanal. Aprobación humana con Wait + webhook y rate limiting.",
+        "facts": [
+          "6 flujos",
+          "Wait + webhook",
+          "rate limiting"
+        ]
+      },
+      "runner": {
+        "label": "Runner de agentes IA",
+        "labelShort": "Runner IA",
+        "sub": [
+          "Claude Code headless",
+          "Chromium",
+          "sin puertos públicos"
+        ],
+        "detail": "Servicio Express que corre Claude Code headless dentro de Docker. Solo lo llama n8n desde la red interna, con auth por header.",
+        "facts": [
+          "watchdog de inactividad",
+          "Chromium para capturas",
+          "fallback de modelo por OOM"
+        ]
+      },
+      "vercel": {
+        "label": "Vercel · 13 proyectos",
+        "sub": [
+          "Neon",
+          "crons",
+          "env Sensitive"
+        ],
+        "detail": "Los productos en Next.js viven en Vercel, con Neon desde el Marketplace, crons y variables marcadas como Sensitive.",
+        "facts": [
+          "13 proyectos",
+          "Neon",
+          "crons"
+        ]
+      },
+      "aws": {
+        "label": "AWS",
+        "sub": [
+          "NTT DATA: EKS",
+          "RDS Oracle",
+          "Karpenter",
+          "KEDA",
+          "Istio",
+          "Terraform",
+          "3Destiny: EC2 vía SSM",
+          "Route53"
+        ],
+        "detail": "En NTT DATA opero sobre Kubernetes en AWS; para 3Destiny, el EC2 del cliente con acceso por SSM y DNS en Route53.",
+        "facts": [
+          "EKS",
+          "RDS Oracle",
+          "EC2 vía SSM",
+          "Route53"
+        ]
+      },
+      "cloudflare": {
+        "label": "Cloudflare",
+        "sub": [
+          "tunnels para demos locales"
+        ],
+        "detail": "Tunnels de Cloudflare para mostrar una demo que corre en mi máquina sin abrir puertos.",
+        "facts": [
+          "cloudflared"
+        ]
+      }
+    }
+  },
+  "projects": {
+    "title": "Productos y demos",
+    "lead": "Productos propios y demos que construí para mostrar cómo trabajo. Las marcas de los demos son ficticias; el código y el despliegue son reales.",
+    "note": "Los sitios marcados bajo pedido se encienden en mi servidor cuando alguien los pide: caben dos a la vez. Si quieres verlos en vivo,",
+    "noteLink": "escríbeme",
+    "partsLabel": "Partes de Turnia",
+    "variantsLabel": "Rubros de Vera",
+    "indexTitle": "Otros proyectos",
+    "groups": {
+      "woocommerce": "Tiendas WooCommerce",
+      "wordpress": "Sitios WordPress",
+      "nextjs": "Demos Next.js",
+      "personal": "Proyectos personales",
+      "previous": "Trabajos anteriores"
+    },
+    "items": {
+      "turnia": {
+        "summary": "SaaS de reservas para barberías, en tres partes: landing, app de gestión y bot de Telegram.",
+        "parts": {
+          "landing": {
+            "label": "Landing",
+            "action": "Ver la landing",
+            "facts": [
+              "En vivo en Vercel",
+              "Next.js 16",
+              "Recordatorios por WhatsApp y membresías"
+            ]
+          },
+          "app": {
+            "label": "App",
+            "action": "Entrar a la app",
+            "facts": [
+              "Drizzle + Neon Postgres",
+              "Agenda con drag & drop y atajo ⌘K",
+              "Un cron de Vercel con CRON_SECRET resetea los datos cada noche"
+            ]
+          },
+          "bot": {
+            "label": "Bot",
+            "action": "Probar el bot",
+            "facts": [
+              "Telegram + n8n",
+              "Estado en Postgres",
+              "Recordatorios a las 24 h y a las 2 h"
+            ]
+          }
+        }
+      },
+      "vera": {
+        "summary": "Recepcionista de WhatsApp con IA: maqueta del chat + flujos de n8n, en cuatro rubros.",
+        "highlights": [
+          "Mockup del chat y del panel",
+          "Flujos de n8n con IA",
+          "Barbería, cantina, odontología y taller"
+        ],
+        "variants": {
+          "barberia": "Barbería",
+          "cantina": "Cantina",
+          "odontologia": "Odontología",
+          "taller": "Taller"
+        }
+      },
+      "pipeline-ia": {
+        "name": "Pipeline de automatización con agentes IA",
+        "summary": "n8n orquesta un agente IA que corre en Docker; nada sale sin aprobación humana por chat.",
+        "highlights": [
+          "6 flujos de n8n en producción",
+          "Aprobación humana con Wait + webhook",
+          "3 bots de Telegram, Gmail y estado en Postgres"
+        ]
+      },
+      "lume": {
+        "summary": "Centro de estética con motor de reservas propio en WordPress.",
+        "highlights": [
+          "REST API propia",
+          "Wizard de 4 pasos",
+          "Bloqueo de doble reserva"
+        ]
+      },
+      "recreo": {
+        "summary": "Tienda WooCommerce de mochilas y cartucheras escolares.",
+        "highlights": [
+          "Carrito lateral y filtros combinados (AND)",
+          "Cupones y envío por zona",
+          "Wizard buscador que guarda el lead"
+        ]
+      },
+      "solnova": {
+        "summary": "Empresa de energía solar con cotizador y CRM en WordPress.",
+        "highlights": [
+          "Cotizador de 4 pasos",
+          "Ahorro y retorno de la inversión",
+          "CRM de solicitudes en el panel"
+        ]
+      },
+      "meridiano": {
+        "summary": "Estudio B2B de diseño y desarrollo web con casos de estudio.",
+        "highlights": [
+          "Casos de estudio con filtro por rubro",
+          "CRM de consultas por pipeline"
+        ]
+      },
+      "bitacora": {
+        "summary": "Landing de un evento en HTML, CSS y JS puro, con la inscripción automatizada.",
+        "highlights": [
+          "330 KB en total",
+          "Lighthouse 100",
+          "La inscripción dispara n8n: Gmail + Telegram"
+        ]
+      },
+      "ironpulse": {
+        "summary": "Tienda de equipos de fitness inteligentes."
+      },
+      "reverso": {
+        "summary": "Galería de arte con tienda de obra única y mosaico infinito arrastrable."
+      },
+      "aromas": {
+        "summary": "Tienda de café de especialidad con variaciones por molienda y mini-cart AJAX."
+      },
+      "instituto": {
+        "summary": "Educación a distancia: catálogo de carreras y cursos con CRM de solicitudes."
+      },
+      "vertice": {
+        "summary": "Agencia web B2B con CRM de leads por pipeline de estados."
+      },
+      "pavon": {
+        "summary": "Tienda de carnes ahumadas artesanales."
+      },
+      "reborn": {
+        "summary": "Gimnasio boutique con reservas por créditos y mapa de cupos."
+      },
+      "tecnostore": {
+        "summary": "Bot de atención al cliente para WhatsApp con Anthropic SDK."
+      },
+      "nebula": {
+        "summary": "Tienda de café de especialidad."
+      },
+      "aurora": {
+        "summary": "Landing de una clínica dental."
+      },
+      "citaly": {
+        "summary": "Gestión de citas para negocios de servicios."
+      },
+      "finansfit": {
+        "summary": "App de finanzas personales local-first (SQLite + Drizzle)."
+      },
+      "finansfit-web": {
+        "summary": "PWA offline con sync a Neon, 2FA TOTP, CI y Docker."
+      },
+      "panel": {
+        "summary": "Panel de gestión propio con Better Auth y 2FA."
+      },
+      "trompo": {
+        "summary": "Catálogo web, API y app móvil para una marca de muebles infantiles."
+      },
+      "evaluar": {
+        "summary": "Plataforma en producción: frontend y APIs sobre AWS."
+      },
+      "gad": {
+        "summary": "Sitio del cantón San Fernando con React y NestJS."
+      }
+    }
+  },
+  "experience": {
+    "title": "Experiencia",
+    "parallel": "en paralelo",
+    "present": "actualidad",
+    "items": {
+      "freelance": {
+        "role": "Freelance Fullstack & DevOps",
+        "summary": "Clientes reales (3Destiny, Orthodent, Argentina Local Expert y Diamante, en curso) y operación de mi VPS: Docker, Caddy, TLS, hardening, backups y respuesta a incidente. CI/CD, n8n en producción, pipeline de agentes IA, WordPress y WooCommerce a medida y SaaS en Next.js + Neon."
+      },
+      "ntt": {
+        "role": "Junior Engineer",
+        "summary": "Clientes del sector bancario sobre la plataforma Temenos: corrección de errores en Java, incidentes y nuevas funcionalidades. Opero en Linux sobre AWS (EKS, RDS Oracle, EC2 vía SSM, CloudWatch) con Kubernetes, Helm, KEDA, Karpenter, Istio y Terraform."
+      },
+      "evaluar-fs": {
+        "role": "Fullstack Developer",
+        "summary": "Vue, React, Nuxt, Next, NestJS y Java. APIs entre proyectos, caché en consultas y endpoints sobre S3 y DynamoDB; despliegue al cierre de cada sprint."
+      },
+      "evaluar-fe": {
+        "role": "Frontend Developer",
+        "summary": "Interfaces con Vue, React y Angular, responsive, componentes en Storybook y tests unitarios con Jest y Testing Library."
+      },
+      "trompo-gad": {
+        "role": "Fullstack Developer",
+        "summary": "Next.js + NestJS + PostgreSQL y MySQL, app móvil en React Native y despliegue con Docker en Vercel, Render y CentOS."
+      }
+    },
+    "education": {
+      "label": "Educación",
+      "degree": "Ingeniería de Software",
+      "school": "Universidad Católica de Cuenca"
+    }
+  },
+  "stack": {
+    "title": "Stack y herramientas",
+    "legend": "Resaltadas: las que aparecen en proyectos de esta página.",
+    "categories": {
+      "infra": "Infra y DevOps",
+      "aws": "AWS y Kubernetes",
+      "automation": "Automatización e IA",
+      "backend": "Backend",
+      "frontend": "Frontend",
+      "data": "Datos",
+      "mobile": "Móvil",
+      "cms": "CMS y plataformas",
+      "testing": "Testing y QA"
+    }
+  },
+  "cv": {
+    "title": "Currículum",
+    "text": "Dos páginas, actualizado en {date}.",
+    "es": "CV en español",
+    "en": "CV in English"
   },
   "contact": {
-    "player": "▶ PLAYER 1 dice:",
-    "intro": "\"¿Tienes una quest para mí? Respondo en <24h.\"",
-    "writeMessage": "▶ ESCRIBE TU MENSAJE:",
-    "name": "NOMBRE",
-    "email": "EMAIL",
-    "message": "MENSAJE",
-    "send": "► ENVIAR",
-    "sending": "ENVIANDO...",
-    "success": "¡MENSAJE ENVIADO! Te respondo pronto.",
-    "error": "ERROR AL ENVIAR. Escríbeme por email.",
+    "title": "Hablemos",
+    "lead": "Escríbeme y te respondo en menos de 24 h.",
+    "channels": "Canales directos",
+    "copy": "Copiar email",
+    "copied": "Copiado",
+    "name": "Nombre",
+    "email": "Email",
+    "message": "Mensaje",
+    "send": "Enviar mensaje",
+    "sending": "Enviando…",
+    "success": "Mensaje enviado. Te respondo en menos de 24 h.",
+    "errorSend": "No se pudo enviar. Escríbeme directo a",
+    "errName": "Escribe tu nombre (mínimo 2 letras).",
+    "errEmail": "Revisa el email: parece incompleto.",
+    "errMessage": "Cuéntame un poco más (mínimo 5 caracteres).",
     "namePlaceholder": "Tu nombre",
     "emailPlaceholder": "tu@email.com",
-    "messagePlaceholder": "Cuéntame tu proyecto..."
-  },
-  "arcade": {
-    "coins": "MONEDAS",
-    "spend": "GASTAR",
-    "spent": "¡Monedas gastadas! 🎉",
-    "noCoins": "Junta monedas para gastarlas 🪙",
-    "sConfetti": "🎉 Confeti",
-    "sFireworks": "🎆 Fuegos",
-    "sDog": "🐕 Soltar perrito",
-    "sParty": "🥳 Fiesta total",
-    "konamiHint": "¿Conoces el código Konami? Pruébalo aquí 👾",
-    "konamiUnlocked": "¡CÓDIGO KONAMI! Jauría de perritos desbloqueada 🐕",
-    "achievement": "LOGRO DESBLOQUEADO",
-    "konamiTitle": "¡CÓDIGO KONAMI!",
-    "reward": "+25 monedas 🪙",
-    "cooldown": "⏳ Recarga: faltan {s}s",
-    "cooldownNote": "Se recarga cada 20s",
-    "minigame": "MINI-JUEGO: pulsa ESPACIO para saltar",
-    "play": "JUGAR",
-    "score": "PUNTOS",
-    "best": "RÉCORD",
-    "gameOver": "GAME OVER"
+    "messagePlaceholder": "Qué necesitas, para cuándo y cualquier enlace útil."
   },
   "footer": {
-    "thanks": "★ THANKS FOR PLAYING ★",
-    "rights": "© 2026 Alex Largo · Fullstack Developer",
-    "built": "Hecho con Next.js, TypeScript y mucho pixel"
+    "rights": "© 2026 Alex Largo · Fullstack & DevOps Engineer",
+    "built": "Next.js en Vercel",
+    "build": "build",
+    "top": "Volver arriba"
   }
 }

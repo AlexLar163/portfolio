@@ -1,33 +1,38 @@
-import type { Metadata } from "next";
-import { cookies } from "next/headers";
+import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { Press_Start_2P, VT323 } from "next/font/google";
+import { Archivo, JetBrains_Mono } from "next/font/google";
 import { routing, type Locale } from "@/i18n/routing";
 import { profile } from "@/data/profile";
 import { skills } from "@/data/skills";
 import { SITE_URL } from "@/lib/site";
 import "../globals.css";
-import "../editorial.css";
 
-const pixelHeading = Press_Start_2P({
-  weight: "400",
+// Archivo con eje de ancho real: titulares a wdth 78–85, cuerpo a 100.
+const archivo = Archivo({
   subsets: ["latin"],
-  variable: "--font-pixel",
+  axes: ["wdth"],
+  variable: "--font-archivo",
   display: "swap",
 });
 
-const pixelBody = VT323({
-  weight: "400",
+// Solo para datos: dominios, versiones, fechas, comandos y valores de tablas.
+const jetbrains = JetBrains_Mono({
   subsets: ["latin"],
-  variable: "--font-pixel-body",
+  variable: "--font-jbmono",
   display: "swap",
+  preload: false,
 });
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
 }
+
+export const viewport: Viewport = {
+  themeColor: "#0D0F11",
+  colorScheme: "dark",
+};
 
 export async function generateMetadata({
   params,
@@ -48,37 +53,32 @@ export async function generateMetadata({
     creator: profile.name,
     keywords: [
       profile.name,
+      "Fullstack & DevOps Engineer",
       "Fullstack Developer",
+      "DevOps",
       "desarrollador fullstack",
-      ...profile.core,
-      "portfolio",
+      "Next.js",
+      "WordPress",
+      "Docker",
+      "Caddy",
+      "AWS",
+      "n8n",
+      "Cuenca, Ecuador",
     ],
     alternates: {
       canonical: `/${locale}`,
-      languages: {
-        es: "/es",
-        en: "/en",
-        "x-default": "/es",
-      },
+      languages: { es: "/es", en: "/en", "x-default": "/es" },
     },
     openGraph: {
       title,
       description,
       url: `/${locale}`,
-      siteName: title,
+      siteName: "Alex Largo",
       locale: locale === "es" ? "es_ES" : "en_US",
       type: "website",
     },
-    twitter: {
-      card: "summary_large_image",
-      title,
-      description,
-    },
-    robots: {
-      index: true,
-      follow: true,
-      googleBot: { index: true, follow: true },
-    },
+    twitter: { card: "summary_large_image", title, description },
+    robots: { index: true, follow: true, googleBot: { index: true, follow: true } },
   };
 }
 
@@ -90,42 +90,31 @@ export default async function LocaleLayout({
   params: Promise<{ locale: string }>;
 }) {
   const { locale } = await params;
-  if (!hasLocale(routing.locales, locale)) {
-    notFound();
-  }
+  if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
-
-  const cookieStore = await cookies();
-  const ui =
-    cookieStore.get("ui")?.value === "pixel" ? "pixel" : "editorial";
+  const t = await getTranslations({ locale, namespace: "profile" });
 
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Person",
     name: profile.name,
-    jobTitle: profile.role[locale as Locale] ?? profile.role.es,
+    jobTitle: t("role"),
     email: `mailto:${profile.email}`,
     url: SITE_URL,
-    sameAs: profile.socials
-      .filter((s) => s.href.startsWith("http"))
-      .map((s) => s.href),
+    address: { "@type": "PostalAddress", addressLocality: "Cuenca", addressCountry: "EC" },
+    sameAs: profile.socials.filter((s) => s.href.startsWith("http")).map((s) => s.href),
     knowsAbout: skills.flatMap((c) => c.tools),
   };
 
   return (
-    <html
-      lang={locale}
-      className={`${pixelHeading.variable} ${pixelBody.variable}`}
-      data-ui={ui}
-      suppressHydrationWarning
-    >
+    <html lang={locale} className={`${archivo.variable} ${jetbrains.variable}`}>
       <body>
         <script
           type="application/ld+json"
-          // eslint-disable-next-line react/no-danger
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
         />
-        <NextIntlClientProvider>{children}</NextIntlClientProvider>
+        {/* Los componentes cliente reciben sus textos por props: no se envía el JSON entero. */}
+        <NextIntlClientProvider messages={{}}>{children}</NextIntlClientProvider>
       </body>
     </html>
   );
