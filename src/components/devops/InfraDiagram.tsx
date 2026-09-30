@@ -108,7 +108,10 @@ function NodeShape({
       data-node={node.id}
       onPointerEnter={() => onHover(node.id)}
       onPointerLeave={() => onHover(null)}
-      onFocus={() => onHover(node.id)}
+      onFocus={() => {
+        onHover(node.id);
+        onSelect(node.id);
+      }}
       onBlur={() => onHover(null)}
       onClick={() => onSelect(node.id)}
       onKeyDown={onKey}

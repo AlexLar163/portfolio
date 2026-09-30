@@ -111,8 +111,11 @@ export async function DevOps() {
         {capabilityGroups.map((g) => {
           const items = t.raw(`capabilities.${g.id}.items`) as CapItem[];
           const alts = g.media ? ((t.raw(`capabilities.${g.id}.mediaAlt`) as string[]) ?? []) : [];
+          const captions = t.has(`capabilities.${g.id}.mediaCaption`)
+            ? (t.raw(`capabilities.${g.id}.mediaCaption`) as string[])
+            : [];
           const media = (g.media ?? [])
-            .map((ref, i) => ({ img: resolveImage(ref), alt: alts[i] ?? "" }))
+            .map((ref, i) => ({ img: resolveImage(ref), alt: alts[i] ?? "", caption: captions[i] }))
             .filter((m) => m.img);
           return (
             <section key={g.id} className="grid caps__row" aria-labelledby={`cap-${g.id}`}>
@@ -130,14 +133,16 @@ export async function DevOps() {
                 </ul>
                 {media.length > 0 && (
                   <div className={`caps__media${media.length === 1 ? " caps__media--one" : ""}`}>
-                    {media.map(({ img, alt }) => (
-                      <figure
-                        key={img!.src}
-                        className={`capture${img!.w / img!.h > 1.5 ? " capture--wide" : ""}${
-                          img!.fit === "contain" ? " capture--contain" : ""
-                        }${img!.position === "top" ? " capture--top" : ""}`}
-                      >
-                        <Image src={img!.src} alt={alt} fill sizes={SIZES.capture} />
+                    {media.map(({ img, alt, caption }) => (
+                      <figure key={img!.src} className="capture-fig">
+                        <div
+                          className={`capture${img!.w / img!.h > 1.5 ? " capture--wide" : ""}${
+                            img!.fit === "contain" ? " capture--contain" : ""
+                          }${img!.position === "top" ? " capture--top" : ""}`}
+                        >
+                          <Image src={img!.src} alt={alt} fill sizes={SIZES.capture} />
+                        </div>
+                        {caption && <figcaption className="t-small ink-3">{caption}</figcaption>}
                       </figure>
                     ))}
                   </div>
@@ -151,6 +156,31 @@ export async function DevOps() {
       {/* CI/CD */}
       <div className="pipeline">
         <h3 className="subhead">{t("pipeline.title")}</h3>
+        {/* Por debajo de 600 px de contenedor la tabla pasa a lista apilada (la otra
+            vista queda en display:none, así el lector de pantalla no la lee dos veces). */}
+        <ul className="pipeline-list" aria-label={t("pipeline.caption")}>
+          {pipelineRows.map((r) => (
+            <li key={r.id}>
+              <p className="pipeline-list__name">{r.project}</p>
+              <dl>
+                <div>
+                  <dt>{t("pipeline.steps")}</dt>
+                  <dd>
+                    <ul className="steps t-data">
+                      {(t.raw(`pipeline.rows.${r.id}.steps`) as string[]).map((s) => (
+                        <li key={s}>{s}</li>
+                      ))}
+                    </ul>
+                  </dd>
+                </div>
+                <div>
+                  <dt>{t("pipeline.target")}</dt>
+                  <dd className="ink-2">{t(`pipeline.rows.${r.id}.target`)}</dd>
+                </div>
+              </dl>
+            </li>
+          ))}
+        </ul>
         <div className="table-scroll" role="region" aria-labelledby="pipeline-caption" tabIndex={0}>
           <table>
             <caption id="pipeline-caption" className="t-small">

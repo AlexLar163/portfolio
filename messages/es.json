@@ -215,8 +215,7 @@
           }
         ],
         "mediaAlt": [
-          "Panel appsMonitor: lista de proyectos con su estado y controles para encender o apagar",
-          "Panel appsMonitor: modal con los logs de un contenedor Docker"
+          "Panel appsMonitor: lista de proyectos con su estado y controles para encender o apagar"
         ]
       },
       "backups": {
@@ -251,8 +250,11 @@
         "title": "Automatización con n8n y agentes IA",
         "items": [
           {
-            "text": "Flujos de n8n en producción: aprobación humana con Wait + webhook, 3 bots de Telegram, Gmail, estado en Postgres y rate limiting",
+            "text": "Flujos de n8n en producción: inscripción, lista de espera, reserva pública, bot de turnos, recordatorios y estado semanal",
             "data": "6 flujos"
+          },
+          {
+            "text": "En el pipeline de agentes IA: aprobación humana con Wait + webhook, estado en Postgres y rate limiting"
           },
           {
             "text": "Servicio Express que corre Claude Code headless en Docker, con watchdog de inactividad y Chromium para capturas"
@@ -262,7 +264,10 @@
           }
         ],
         "mediaAlt": [
-          "Los seis flujos de n8n del portafolio en el editor de n8n"
+          "Los seis flujos de n8n del portafolio agrupados en captación, operación y gestión, con dos bots de Telegram separados por canal"
+        ],
+        "mediaCaption": [
+          "Los seis flujos del portafolio. Los dos bots de la imagen son los del portafolio (avisos y turnos); el tercero atiende el pipeline de agentes IA."
         ]
       },
       "clouds": {
@@ -845,5 +850,11 @@
     "built": "Next.js en Vercel",
     "build": "build",
     "top": "Volver arriba"
+  },
+  "notFound": {
+    "title": "Esta página no existe",
+    "text": "La dirección no lleva a ninguna parte del portfolio. Puede que el enlace esté mal escrito o que la página se haya movido.",
+    "home": "Volver al inicio",
+    "code": "404"
   }
 }

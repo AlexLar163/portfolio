@@ -176,6 +176,7 @@ export function MediaFrame({
               ref={videoRef}
               className="frame__video"
               data-visible={playing}
+              style={current.image?.position ? { objectPosition: current.image.position } : undefined}
               muted
               playsInline
               loop

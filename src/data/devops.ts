@@ -15,10 +15,8 @@ export const capabilityGroups: {
   {
     id: "panel",
     tools: ["Fastify", "TypeScript", "systemd", "Docker"],
-    media: [
-      { slug: "appsmonitor", key: "proyectos", position: "top" },
-      { slug: "appsmonitor", key: "modal-logs", fit: "contain" },
-    ],
+    // Solo la lista de proyectos: el modal de logs mostraba la URL de un repo y un bug abierto.
+    media: [{ slug: "appsmonitor", key: "proyectos", position: "top" }],
   },
   { id: "backups", tools: ["wp-cli", "n8n"] },
   { id: "monitoring", tools: ["cron", "n8n", "Telegram Bot API"] },

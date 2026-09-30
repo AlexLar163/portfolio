@@ -22,7 +22,7 @@
     "newTab": "(opens in a new tab)",
     "play": "Play the {name} walkthrough",
     "pause": "Pause the {name} walkthrough",
-    "captures": "captures",
+    "captures": "screenshots",
     "requestDemo": "Request it",
     "onDemandNote": "Live demo on request",
     "requestPrefill": "Hi Alex, I'd like to see the {name} demo live.",
@@ -215,8 +215,7 @@
           }
         ],
         "mediaAlt": [
-          "appsMonitor panel: project list with status and start/stop controls",
-          "appsMonitor panel: modal showing a Docker container's logs"
+          "appsMonitor panel: project list with status and start/stop controls"
         ]
       },
       "backups": {
@@ -251,8 +250,11 @@
         "title": "Automation with n8n and AI agents",
         "items": [
           {
-            "text": "n8n flows in production: human approval with Wait + webhook, 3 Telegram bots, Gmail, state in Postgres and rate limiting",
+            "text": "n8n flows in production: sign-up, waitlist, public booking, booking bot, reminders and weekly status",
             "data": "6 flows"
+          },
+          {
+            "text": "In the AI agent pipeline: human approval with Wait + webhook, state in Postgres and rate limiting"
           },
           {
             "text": "Express service that runs Claude Code headless in Docker, with an idle watchdog and Chromium for screenshots"
@@ -262,7 +264,10 @@
           }
         ],
         "mediaAlt": [
-          "The six portfolio n8n flows in the n8n editor"
+          "The six portfolio n8n flows grouped into capture, operations and management, with two Telegram bots split by channel"
+        ],
+        "mediaCaption": [
+          "The six portfolio flows. The two bots in the image are the portfolio's (alerts and bookings); the third one serves the AI agent pipeline."
         ]
       },
       "clouds": {
@@ -409,7 +414,7 @@
       "github": {
         "label": "GitHub Actions",
         "sub": [
-          "deploy por SSH",
+          "deploy over SSH",
           "rsync + restart"
         ],
         "detail": "The appsMonitor panel deploys from GitHub Actions: SSH, rsync and a service restart.",
@@ -456,8 +461,8 @@
       "cron": {
         "label": "Weekly cron",
         "sub": [
-          "lunes 9:00",
-          "chequeo de URLs → 200"
+          "Mondays 9:00",
+          "URL check → 200"
         ],
         "detail": "Every Monday at 9:00 the live URLs are checked for a 200 and the status reaches Telegram through n8n.",
         "facts": [
@@ -845,5 +850,11 @@
     "built": "Next.js on Vercel",
     "build": "build",
     "top": "Back to top"
+  },
+  "notFound": {
+    "title": "This page doesn't exist",
+    "text": "The address doesn't lead anywhere in the portfolio. The link may be mistyped or the page may have moved.",
+    "home": "Back to home",
+    "code": "404"
   }
 }

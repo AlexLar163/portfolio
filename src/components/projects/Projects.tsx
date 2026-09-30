@@ -202,7 +202,10 @@ export async function Projects() {
                     </div>
                     <div className="row__rest">
                       <div className="row__main">
-                        <p className="row__name">{name}</p>
+                        <p className="row__name">
+                          {name}
+                          {p.label === "demo" && <LabelTag label={p.label} text={l(p.label)} />}
+                        </p>
                         <p className="row__desc t-small">{t(`items.${p.id}.summary`)}</p>
                       </div>
                       <div className="row__stack">

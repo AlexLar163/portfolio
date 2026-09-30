@@ -132,7 +132,8 @@ export const showcase: Showcase[] = [
     tech: ["WordPress", "PHP", "JS"],
     status: "on-demand",
     media: {
-      main: { slug: "meridiano", key: "portada" },
+      // Material 16:10 en un slot 16:9: se recorta abajo, nunca el nav.
+      main: { slug: "meridiano", key: "portada", position: "top" },
       video: { slug: "meridiano", key: "recorrido" },
     },
   },
@@ -241,7 +242,6 @@ export const showcase: Showcase[] = [
     year: "2026",
     tech: ["Expo", "React Native", "SQLite", "Drizzle"],
     status: "captures-only",
-    repo: "https://github.com/AlexLar163/FinansFit",
     media: { main: { slug: "finansfit", key: "portada", fit: "contain" } },
   },
   {

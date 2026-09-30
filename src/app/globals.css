@@ -1700,6 +1700,10 @@ section[id] {
   background: var(--surface);
 }
 
+.capture-fig figcaption {
+  margin-top: var(--s-2);
+}
+
 .capture--wide {
   aspect-ratio: 16 / 9;
 }
@@ -1751,6 +1755,7 @@ section[id] {
 }
 
 .table-scroll {
+  display: none;
   overflow-x: auto;
   border: 1px solid var(--line);
   border-radius: var(--r-3);
@@ -1763,7 +1768,6 @@ section[id] {
 
 .pipeline table {
   width: 100%;
-  min-width: 40rem;
   border-collapse: collapse;
   text-align: left;
 }
@@ -1796,6 +1800,41 @@ section[id] {
 .pipeline tbody th {
   font-weight: 600;
   white-space: nowrap;
+}
+
+.pipeline-list {
+  border-top: 1px solid var(--line);
+}
+
+.pipeline-list > li {
+  display: grid;
+  gap: var(--s-2);
+  padding-block: var(--s-4);
+  border-bottom: 1px solid var(--line);
+}
+
+.pipeline-list__name {
+  font-weight: 600;
+}
+
+.pipeline-list dl {
+  display: grid;
+  gap: var(--s-2);
+}
+
+.pipeline-list dt {
+  font-size: 0.875rem;
+  color: var(--ink-3);
+}
+
+@container shell (min-width: 37.5rem) {
+  .pipeline-list {
+    display: none;
+  }
+
+  .table-scroll {
+    display: block;
+  }
 }
 
 .steps {
@@ -1969,6 +2008,10 @@ section[id] {
 }
 
 .row__name {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-1) var(--s-3);
   font-weight: 600;
 }
 
@@ -2350,6 +2393,16 @@ textarea.input {
   .contact__form {
     grid-column: span 7;
   }
+}
+
+/* ─── 404 ─────────────────────────────────────────────────────────────── */
+
+.not-found {
+  display: grid;
+  gap: var(--s-5);
+  justify-items: start;
+  min-height: 50dvh;
+  align-content: center;
 }
 
 /* ─── Footer ───────────────────────────────────────────────────────────── */
