@@ -1421,6 +1421,12 @@ section[id] {
   margin-top: var(--s-4);
 }
 
+.stage-body {
+  display: grid;
+  gap: var(--s-6);
+  min-width: 0;
+}
+
 .stage-diagram {
   display: flex;
   flex-direction: column;
@@ -1666,25 +1672,46 @@ section[id] {
 
 /* 700 px de contenedor sin escena: diagrama vertical a la izquierda, panel a la derecha. */
 @container shell (min-width: 43.75rem) and (max-width: 69.99rem) {
-  .devops-stage {
+  .stage-body {
     grid-template-columns: minmax(0, 26.25rem) minmax(0, 1fr);
     column-gap: var(--s-6);
-  }
-
-  .stage-title,
-  .stage-foot {
-    grid-column: 1 / -1;
   }
 
   .stage-steps {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  /* Sin sticky: pegado se montaba sobre el carril de CI y la leyenda (QA 768–1119). */
+  /* Sticky acotado a .stage-body (diagrama + panel): acompaña al diagrama
+     mientras se tocan nodos y no puede pisar el carril de CI ni la leyenda,
+     que quedan fuera del envoltorio. */
+  .infra__panel {
+    position: sticky;
+    top: calc(var(--header-h) + var(--s-4));
+  }
 }
 
 /* Horizontal desde 70 rem (1120 px): a 66 rem la subetiqueta de 13 u daba 11,4 px,
    por debajo del piso de 12 px de DISENO §3.3.1. A 70 rem la escala es ≥ 0,933 → 12,1 px. */
+/* Horizontal sin escena: el panel va pegado debajo del diagrama (antes de la
+   lista de pasos), así un clic lo trae a la vista con un scroll mínimo. */
+@container shell (min-width: 70rem) {
+  html:not(.scene-devops) .stage-body .stage-diagram {
+    display: contents;
+  }
+
+  html:not(.scene-devops) .stage-body .stage-svg {
+    order: 1;
+  }
+
+  html:not(.scene-devops) .stage-body .infra__panel {
+    order: 2;
+  }
+
+  html:not(.scene-devops) .stage-body .stage-steps {
+    order: 3;
+  }
+}
+
 @container shell (min-width: 70rem) {
   .dg-wrap--land {
     display: block;
@@ -1701,13 +1728,14 @@ section[id] {
   }
 }
 
-/* ── Escena fija (solo .motion-ok y desde 1280×800): el alto se reserva en CSS
+/* ── Escena fija (solo .motion-ok y desde 1280 de ancho; alto ≥ 700 ya lo pide .motion-ok): el alto se reserva en CSS
    desde el primer paint, así nada se mueve cuando llega GSAP (CLS 0, v2 §7.1).
    Top = header: con top 0 el header sticky tapaba los primeros 56 px del stage.
    Umbral: con la tipografía de escena (todo ≥ 16 u) el diagrama necesita escala
    ≥ 0,75 para el piso de 12 px: medido 11,7 px a 1280×760, 12,2 a 1366×768 y
    13,3 a 1440×900; con el layout anterior 1024×700 o 1280×720 daban 6–9 px.
-   Debajo de 1280×800: diagrama estático (≥ 12,8 px).
+   Con alto < 800 la escena va compacta (.is-compact: título a .42, leyenda
+   abajo). Debajo de 1280 de ancho: diagrama estático (≥ 12,8 px).
    .scene-devops lo pone el script de <head> (y MotionRoot al redimensionar). ── */
 
 .scene-devops .devops-scene {
@@ -1725,6 +1753,7 @@ section[id] {
   padding-block: var(--s-5);
 }
 
+.scene-devops .stage-body,
 .scene-devops .stage-diagram {
   display: contents;
 }
@@ -1770,7 +1799,7 @@ section[id] {
    al diagrama la mitad de su alto a 1024×700. En reposo se ve el panel (estado
    final); la escena decide qué se ve según el progreso. */
 .scene-devops .stage-steps,
-.scene-devops .devops-stage > .infra__panel {
+.scene-devops .devops-stage .infra__panel {
   grid-column: 9 / -1;
   grid-row: 2 / span 2;
   align-self: center;
@@ -1803,7 +1832,7 @@ section[id] {
   }
 
   .scene-devops .stage-steps,
-  .scene-devops .devops-stage > .infra__panel {
+  .scene-devops .devops-stage .infra__panel {
     grid-column: 10 / -1;
   }
 }
@@ -1819,7 +1848,8 @@ section[id] {
   fill: var(--ink);
 }
 
-.dg .t-strip-label {
+.dg .t-strip-label,
+.dg .t-sub--scene {
   display: none;
 }
 
@@ -3870,8 +3900,24 @@ html:not(.motion-lite) .pause-btn {
   font-size: 17px;
 }
 
-.devops-stage.is-scene .dg-wrap--land .t-strip-label {
+.devops-stage.is-scene .dg-wrap--land .t-strip-label,
+.devops-stage.is-scene .dg-wrap--land .node.is-lit .t-sub--scene {
   display: inline;
+}
+
+/* Escena compacta (alto < 800): título a .42 y la fila de abajo solo con el
+   carril de CI (40 px). La leyenda sigue arriba a la derecha y desborda hacia
+   la columna de pasos, que por eso se alinea abajo. Medido a 1366×768: la
+   leyenda en la fila de abajo la subía a 140 px y el texto bajaba a 11,8 px. */
+.devops-stage.is-scene.is-compact .stage-steps,
+.devops-stage.is-scene.is-compact .infra__panel {
+  grid-row: 2;
+  align-self: end;
+}
+
+.devops-stage.is-scene.is-compact {
+  padding-block: var(--s-3);
+  row-gap: var(--s-3);
 }
 
 .devops-stage.is-scene .stage-ci {
@@ -3928,11 +3974,11 @@ html:not(.motion-lite) .pause-btn {
   transition: opacity 300ms, visibility 0s 300ms;
 }
 
-.devops-stage.is-scene > .infra__panel {
+.devops-stage.is-scene .infra__panel {
   transition: opacity 300ms, visibility 0s;
 }
 
-.devops-stage.is-scene:not(.is-vivo) > .infra__panel {
+.devops-stage.is-scene:not(.is-vivo) .infra__panel {
   opacity: 0;
   visibility: hidden;
   transition: opacity 150ms, visibility 0s 150ms;

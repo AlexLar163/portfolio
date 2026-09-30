@@ -84,7 +84,14 @@ export function mount(root: HTMLElement, { gsap, ScrollTrigger, debug }: Kit): (
     // Solo el h2: el lead se funde durante el armado (encogido a .62 quedaba en 12 px).
     const h2 = title.querySelector<HTMLElement>("h2") ?? title;
     const lead = title.querySelector<HTMLElement>(".stage-lead");
-    const measure = () => stage.style.setProperty("--title-h", `${h2.offsetHeight * 0.62}px`);
+    // Alto < 800: escena compacta (título a .42, leyenda abajo) para que el
+    // diagrama conserve el alto y el texto no baje de 12 px (1366×768, 1440×790).
+    const compact = () => window.innerHeight < 800;
+    const titleScale = () => (compact() ? 0.42 : 0.62);
+    const measure = () => {
+      stage.classList.toggle("is-compact", compact());
+      stage.style.setProperty("--title-h", `${h2.offsetHeight * titleScale()}px`);
+    };
     measure();
     ScrollTrigger.addEventListener("refreshInit", measure);
 
@@ -104,7 +111,7 @@ export function mount(root: HTMLElement, { gsap, ScrollTrigger, debug }: Kit): (
     tl.addLabel("intro", 0)
       .to(words, { opacity: 1, duration: 0.12, stagger: 0.88 / Math.max(1, words.length) }, 0)
       .addLabel("armado", 1)
-      .to(title, { scale: 0.62, duration: 1.2, ease: "power2.inOut" }, 1)
+      .to(title, { scale: () => titleScale(), duration: 1.2, ease: "power2.inOut" }, 1)
       .to(lead, { opacity: 0, duration: 0.6 }, 1.2)
       .to('[data-frame="vps"]', { strokeDashoffset: 0, duration: 1, ease: "power2.inOut" }, 1)
       .to('[data-frame="docker"]', { strokeDashoffset: 0, duration: 0.8, ease: "power2.inOut" }, 1.3)
@@ -197,7 +204,7 @@ export function mount(root: HTMLElement, { gsap, ScrollTrigger, debug }: Kit): (
       stage.removeEventListener("focusin", onFocus);
       ScrollTrigger.removeEventListener("refreshInit", measure);
       stage.style.removeProperty("--title-h");
-      stage.classList.remove("is-scene", "is-vivo", "is-live");
+      stage.classList.remove("is-scene", "is-vivo", "is-live", "is-compact");
       q(".node", svg).forEach((n) => n.classList.remove("is-lit"));
       steps.forEach((li, i) => li.toggleAttribute("data-active", i === 0));
       chips.forEach((c) => c.classList.remove("is-on", "is-done"));

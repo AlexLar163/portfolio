@@ -12,12 +12,12 @@
 export const MOTION_OK_QUERY =
   "(min-width:1024px) and (min-height:700px) and (hover:hover) and (pointer:fine)";
 
-/** La escena DevOps pide además alto y ancho: debajo el texto del diagrama baja de 12 px. */
-export const SCENE_DEVOPS_QUERY = `${MOTION_OK_QUERY} and (min-width:1280px) and (min-height:800px)`;
+/** La escena DevOps pide además 1280 de ancho: debajo el texto del diagrama baja de 12 px. */
+export const SCENE_DEVOPS_QUERY = `${MOTION_OK_QUERY} and (min-width:1280px)`;
 
 export const REDUCE_QUERY = "(prefers-reduced-motion: reduce)";
 
-export const SCENE_SIZE_QUERY = "(min-width:1280px) and (min-height:800px)";
+export const SCENE_SIZE_QUERY = "(min-width:1280px)";
 
 export const LEVEL_SCRIPT = `(()=>{const d=document.documentElement,c=d.classList,m=q=>matchMedia(q).matches;c.add('js');if(/[?&]motion=0\\b/.test(location.search)||m('${REDUCE_QUERY}'))return;c.add('motion-lite');if(m('${MOTION_OK_QUERY}')){c.add('motion-ok');m('${SCENE_SIZE_QUERY}')&&c.add('scene-devops')}})()`;
 

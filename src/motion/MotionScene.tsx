@@ -48,6 +48,19 @@ export function MotionScene({ name }: { name: SceneName }) {
       const root = ROOT[name]();
       if (!root) return;
       const my = ++token;
+      // Precarga en reposo tras `load`: el chunk ya está cuando la sección se acerca
+      // y el montaje no suma la evaluación de GSAP a su frame (re-QA, long task).
+      afterLoad().then(() => {
+        const idle = (cb: () => void) => {
+          if (typeof window.requestIdleCallback === "function") window.requestIdleCallback(cb, { timeout: 2000 });
+          else setTimeout(cb, 200);
+        };
+        idle(() => {
+          if (my !== token) return;
+          gsapReady().catch(() => {});
+          SCENES[name]().catch(() => {});
+        });
+      });
       const start = async () => {
         io?.disconnect();
         try {

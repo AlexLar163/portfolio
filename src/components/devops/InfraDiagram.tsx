@@ -89,7 +89,7 @@ function NodeShape({
   hot: boolean;
   selected: boolean;
   onHover: (id: string | null) => void;
-  onSelect: (id: string) => void;
+  onSelect: (id: string, scroll?: boolean) => void;
 }) {
   const b = node[o];
   const ty = TYPE[o];
@@ -101,9 +101,25 @@ function NodeShape({
   const onKey = (e: KeyboardEvent) => {
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
-      onSelect(node.id);
+      onSelect(node.id, true);
     }
   };
+
+  // Subetiquetas de escena (v2, re-QA): a 17 u, solo las que entran enteras en
+  // la caja, y solo visibles en el nodo encendido de su paso. Nunca se parte ni
+  // se recorta una línea: se muestran menos segmentos.
+  const SCENE = 17;
+  const sceneBudget = Math.floor((b.w - 24) / (SCENE * 0.6));
+  const sceneMax = Math.max(0, Math.min(4, Math.floor((b.h - 34) / 20)));
+  // Tantos segmentos ENTEROS como quepan: nunca se muestra media frase.
+  let sceneLines: string[] = [];
+  if (o === "land" && !isStrip) {
+    for (let k = 1; k <= text.sub.length; k++) {
+      const next = wrapSegments(text.sub.slice(0, k), sceneBudget);
+      if (next.length > sceneMax) break;
+      sceneLines = next;
+    }
+  }
 
   // La franja del host no lleva etiqueta visible: solo sus datos.
   const firstY = isStrip
@@ -117,14 +133,8 @@ function NodeShape({
       className={`node node--${node.kind}${hot ? " is-hot" : ""}`}
       role="button"
       tabIndex={0}
-      // El nombre accesible empieza por el texto visible (label-content-name-mismatch).
-      aria-label={
-        isStrip
-          ? `${lines.join(" · ")} · ${text.label}`
-          : label === text.label
-            ? label
-            : `${label} · ${text.label}`
-      }
+      // Sin aria-label: el nombre es el texto visible (título + subetiquetas), así
+      // siempre lo contiene entero (label-content-name-mismatch, re-QA).
       aria-pressed={selected}
       aria-controls="infra-detail"
       data-node={node.id}
@@ -136,7 +146,7 @@ function NodeShape({
         onSelect(node.id);
       }}
       onBlur={() => onHover(null)}
-      onClick={() => onSelect(node.id)}
+      onClick={() => onSelect(node.id, true)}
       onKeyDown={onKey}
     >
       {/* Halo de foco: relleno --accent-dim de 4 u, no glow (DISENO-v2 §11 #8). */}
@@ -165,6 +175,18 @@ function NodeShape({
           {line}
         </text>
       ))}
+      {sceneLines.map((line, i) => (
+        <text
+          key={`s${i}`}
+          className="t-sub t-sub--scene"
+          x={b.x + 12}
+          y={b.y + 48 + i * 20}
+          fontSize={SCENE}
+          aria-hidden
+        >
+          {line}
+        </text>
+      ))}
     </g>
   );
 }
@@ -184,7 +206,7 @@ function Diagram({
   selected: string;
   trace: "idle" | "run" | "done";
   onHover: (id: string | null) => void;
-  onSelect: (id: string) => void;
+  onSelect: (id: string, scroll?: boolean) => void;
 }) {
   const uid = useId().replace(/:/g, "");
   const vb = VIEWBOX[o];
@@ -416,9 +438,28 @@ export function InfraStage({
   const [selected, setSelected] = useState<string>(DEFAULT_NODE);
   const [trace, setTrace] = useState<"idle" | "run" | "done">("idle");
   const picked = useRef(false);
-  const select = (id: string) => {
+  const select = (id: string, scroll?: boolean) => {
     picked.current = true;
     setSelected(id);
+    if (scroll) revealPanel();
+  };
+
+  // Diagrama horizontal sin escena: el panel va debajo y el diagrama mide más
+  // que la ventana. Tras un clic o Enter, se trae el panel a la vista lo mínimo
+  // (block:"nearest"); con reduce, sin animar. En la escena y con el panel al
+  // lado (700–1119 px) no hace falta.
+  const revealPanel = () => {
+    const stage = stageRef.current;
+    const panel = stage?.querySelector<HTMLElement>(".infra__panel");
+    if (!stage || !panel || stage.classList.contains("is-scene")) return;
+    if (getComputedStyle(panel).position === "sticky") return;
+    requestAnimationFrame(() => {
+      const r = panel.getBoundingClientRect();
+      const vis = Math.max(0, Math.min(r.bottom, window.innerHeight) - Math.max(r.top, 0));
+      if (vis >= r.height * 0.8) return;
+      const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      panel.scrollIntoView({ block: "nearest", behavior: reduce ? "auto" : "smooth" });
+    });
   };
 
   // Trazo único de v1 al llegar al 40 % visible: solo es el respaldo de la
@@ -475,6 +516,9 @@ export function InfraStage({
   return (
     <div className="devops-stage" ref={stageRef}>
       {title}
+      {/* Diagrama + panel en su propio envoltorio: el panel sticky queda acotado a
+          él y nunca pisa el carril de CI ni la leyenda, que van afuera (re-QA). */}
+      <div className="stage-body">
       <div className="stage-diagram">
         <div className="stage-svg">
           {(["land", "port"] as const).map((o) => (
@@ -516,6 +560,7 @@ export function InfraStage({
           </div>
         </div>
       </aside>
+      </div>
       {foot}
     </div>
   );

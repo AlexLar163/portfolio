@@ -12,7 +12,7 @@ export function mount(root: HTMLElement, { gsap, ScrollTrigger, debug }: Kit): (
   const mm = gsap.matchMedia(root);
   let unregister = () => {};
 
-  mm.add(`${MOTION_OK_QUERY} and (prefers-reduced-motion: no-preference)`, () => {
+  mm.add(`${MOTION_OK_QUERY} and (prefers-reduced-motion: no-preference)`, (ctx) => {
     const header = () =>
       parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--header-h")) || 56;
     const top = () => header() + 16;
@@ -42,11 +42,13 @@ export function mount(root: HTMLElement, { gsap, ScrollTrigger, debug }: Kit): (
         c.removeAttribute("data-stack");
         if (c.offsetHeight > window.innerHeight - top()) c.setAttribute("data-stack", "off");
       });
-    fit();
     ScrollTrigger.addEventListener("refreshInit", fit);
 
     const triggers: ReturnType<typeof ScrollTrigger.create>[] = [];
-    cards.forEach((card, i) => {
+    // Montaje troceado (re-QA: 52–60 ms de long task con CPU 4×): las medidas
+    // en un frame y los triggers de cada tarjeta en el siguiente. ctx.add los
+    // registra en el contexto de matchMedia, así el revert los alcanza igual.
+    const build = (card: HTMLElement, i: number) => {
       const next = cards[i + 1];
       const stacked = card.dataset.stack !== "off";
 
@@ -130,7 +132,21 @@ export function mount(root: HTMLElement, { gsap, ScrollTrigger, debug }: Kit): (
           onToggle: (self) => frame.dispatchEvent(new Event(self.isActive ? "media:play" : "media:pause")),
         });
       }
-    });
+    };
+    const rafs: number[] = [];
+    let k = 0;
+    const step = () => {
+      if (k >= cards.length) return;
+      const i = k++;
+      ctx.add(() => build(cards[i], i));
+      rafs.push(requestAnimationFrame(step));
+    };
+    rafs.push(
+      requestAnimationFrame(() => {
+        fit();
+        rafs.push(requestAnimationFrame(step));
+      }),
+    );
 
     unregister = register(debug, "clients", {
       triggers,
@@ -141,6 +157,7 @@ export function mount(root: HTMLElement, { gsap, ScrollTrigger, debug }: Kit): (
     });
 
     return () => {
+      rafs.forEach(cancelAnimationFrame);
       ScrollTrigger.removeEventListener("refreshInit", fit);
       cards.forEach((c) => {
         c.removeAttribute("data-stack");
