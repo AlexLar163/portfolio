@@ -2,28 +2,13 @@ import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { Archivo, JetBrains_Mono } from "next/font/google";
+import { fontClasses } from "../fonts";
 import { routing, type Locale } from "@/i18n/routing";
 import { profile } from "@/data/profile";
 import { skills } from "@/data/skills";
 import { SITE_URL } from "@/lib/site";
 import "../globals.css";
 
-// Archivo con eje de ancho real: titulares a wdth 78–85, cuerpo a 100.
-const archivo = Archivo({
-  subsets: ["latin"],
-  axes: ["wdth"],
-  variable: "--font-archivo",
-  display: "swap",
-});
-
-// Solo para datos: dominios, versiones, fechas, comandos y valores de tablas.
-const jetbrains = JetBrains_Mono({
-  subsets: ["latin"],
-  variable: "--font-jbmono",
-  display: "swap",
-  preload: false,
-});
 
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale }));
@@ -40,6 +25,8 @@ export async function generateMetadata({
   params: Promise<{ locale: Locale }>;
 }): Promise<Metadata> {
   const { locale } = await params;
+  // /cv/nada.pdf llega aquí con locale «cv»: sin metadatos propios (ni canonical a /cv).
+  if (!hasLocale(routing.locales, locale)) return {};
   const t = await getTranslations({ locale, namespace: "meta" });
   const title = t("title");
   const description = t("description");
@@ -78,7 +65,8 @@ export async function generateMetadata({
       type: "website",
     },
     twitter: { card: "summary_large_image", title, description },
-    robots: { index: true, follow: true, googleBot: { index: true, follow: true } },
+    // Sin `robots`: index/follow es el valor por defecto, y declararlo contradecía
+    // el noindex que Next agrega en las 404.
   };
 }
 
@@ -107,7 +95,7 @@ export default async function LocaleLayout({
   };
 
   return (
-    <html lang={locale} className={`${archivo.variable} ${jetbrains.variable}`}>
+    <html lang={locale} className={fontClasses}>
       <body>
         <script
           type="application/ld+json"
