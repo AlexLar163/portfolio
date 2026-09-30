@@ -16,6 +16,25 @@ export function mount(root: HTMLElement, { gsap, ScrollTrigger, debug }: Kit): (
     const header = () =>
       parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--header-h")) || 56;
     const top = () => header() + 16;
+    // Las tarjetas son sticky: su offsetTop y su rect dan la posición PEGADA si
+    // se miden con una tarjeta pegada, y los tramos quedaban corridos (el
+    // recorrido se pausaba solo, QA). La posición de flujo se suma desde la pila,
+    // que no es sticky.
+    const stack = cards[0].parentElement as HTMLElement;
+    const abs = (el: HTMLElement) => {
+      let y = 0;
+      for (let e: HTMLElement | null = el; e; e = e.offsetParent as HTMLElement | null) y += e.offsetTop;
+      return y;
+    };
+    const nt = (el: HTMLElement) => {
+      let y = abs(stack);
+      for (const c of cards) {
+        y += parseFloat(getComputedStyle(c).marginTop) || 0;
+        if (c === el) return y;
+        y += c.offsetHeight;
+      }
+      return y;
+    };
 
     // Una tarjeta más alta que la ventana no se apila: se leería cortada.
     const fit = () =>
@@ -44,8 +63,8 @@ export function mount(root: HTMLElement, { gsap, ScrollTrigger, debug }: Kit): (
             transformOrigin: "50% 0",
             scrollTrigger: {
               trigger: next,
-              start: "top bottom",
-              end: () => `top ${top()}px`,
+              start: () => nt(next) - window.innerHeight,
+              end: () => nt(next) - top(),
               scrub: true,
               markers: debug,
               invalidateOnRefresh: true,
@@ -63,7 +82,7 @@ export function mount(root: HTMLElement, { gsap, ScrollTrigger, debug }: Kit): (
         duration: 0.6,
         ease: "expo.out",
         stagger: 0.06,
-        scrollTrigger: { trigger: card, start: "top 70%", once: true },
+        scrollTrigger: { trigger: card, start: () => nt(card) - window.innerHeight * 0.7, once: true },
       });
 
       // Parallax de la media dentro de su marco (recorte intencional: data-overflow-ok).
@@ -75,7 +94,12 @@ export function mount(root: HTMLElement, { gsap, ScrollTrigger, debug }: Kit): (
         {
           yPercent: 4,
           ease: "none",
-          scrollTrigger: { trigger: card, start: "top bottom", end: "bottom top", scrub: true },
+          scrollTrigger: {
+            trigger: card,
+            start: () => nt(card) - window.innerHeight,
+            end: () => nt(card) + card.offsetHeight,
+            scrub: true,
+          },
         },
       );
       // El teléfono flota (±24 px: con 40 salía del marco, que lo recorta abajo).
@@ -87,7 +111,12 @@ export function mount(root: HTMLElement, { gsap, ScrollTrigger, debug }: Kit): (
           {
             y: -24,
             ease: "none",
-            scrollTrigger: { trigger: card, start: "top bottom", end: "bottom top", scrub: true },
+            scrollTrigger: {
+              trigger: card,
+              start: () => nt(card) - window.innerHeight,
+              end: () => nt(card) + card.offsetHeight,
+              scrub: true,
+            },
           },
         );
 
@@ -96,9 +125,8 @@ export function mount(root: HTMLElement, { gsap, ScrollTrigger, debug }: Kit): (
       if (frame && card.querySelector("video")) {
         ScrollTrigger.create({
           trigger: card,
-          start: "top 70%",
-          endTrigger: next ?? card,
-          end: () => (next ? `top ${top()}px` : "bottom top"),
+          start: () => nt(card) - window.innerHeight * 0.7,
+          end: () => (next ? nt(next) - top() : nt(card) + card.offsetHeight),
           onToggle: (self) => frame.dispatchEvent(new Event(self.isActive ? "media:play" : "media:pause")),
         });
       }

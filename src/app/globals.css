@@ -691,9 +691,13 @@ section[id] {
 }
 
 @container shell (min-width: 56.25rem) {
-  .nav-desktop,
-  .header-cv {
+  .nav-desktop {
     display: block;
+  }
+
+  /* inline-flex como todo .btn: con display:block el texto quedaba descentrado. */
+  .header-cv {
+    display: inline-flex;
   }
 
   .menu-btn {
@@ -986,9 +990,12 @@ section[id] {
   font-size: 0.75rem;
 }
 
+/* Recorta el zoom y el parallax de la imagen DEBAJO de la barra de dirección:
+   con el recorte solo en .frame, la imagen escalada tapaba la barra (QA). */
 .frame__media {
   position: relative;
   aspect-ratio: 16 / 9;
+  overflow: clip;
   background: var(--raised);
 }
 
@@ -1344,10 +1351,12 @@ section[id] {
 }
 
 /* Stack de despliegues (v2 §8.1): un cliente por pantalla. */
+/* Tope de 40 rem: a 56 rem (844 px a 1440×900) quedaban ~185 px vacíos arriba y
+   abajo de la media (QA). */
 .motion-ok .client-card:not([data-stack="off"]) {
   position: sticky;
   top: calc(var(--header-h) + var(--s-4));
-  min-height: min(calc(100dvh - var(--header-h) - var(--s-6)), 56rem);
+  min-height: min(calc(100dvh - var(--header-h) - var(--s-6)), 40rem);
 }
 
 .motion-ok .client-card + .client-card {
@@ -1671,10 +1680,7 @@ section[id] {
     grid-template-columns: minmax(0, 1fr);
   }
 
-  .infra__panel {
-    position: sticky;
-    top: calc(var(--header-h) + var(--s-4));
-  }
+  /* Sin sticky: pegado se montaba sobre el carril de CI y la leyenda (QA 768–1119). */
 }
 
 /* Horizontal desde 70 rem (1120 px): a 66 rem la subetiqueta de 13 u daba 11,4 px,
@@ -1695,14 +1701,20 @@ section[id] {
   }
 }
 
-/* ── Escena fija (solo .motion-ok): el alto se reserva en CSS desde el primer
-   paint, así nada se mueve cuando llega GSAP (CLS 0, v2 §7.1). Top = header:
-   con top 0 el header sticky tapaba los primeros 56 px del stage. ── */
-.motion-ok .devops-scene {
+/* ── Escena fija (solo .motion-ok y desde 1280×800): el alto se reserva en CSS
+   desde el primer paint, así nada se mueve cuando llega GSAP (CLS 0, v2 §7.1).
+   Top = header: con top 0 el header sticky tapaba los primeros 56 px del stage.
+   Umbral: con la tipografía de escena (todo ≥ 16 u) el diagrama necesita escala
+   ≥ 0,75 para el piso de 12 px: medido 11,7 px a 1280×760, 12,2 a 1366×768 y
+   13,3 a 1440×900; con el layout anterior 1024×700 o 1280×720 daban 6–9 px.
+   Debajo de 1280×800: diagrama estático (≥ 12,8 px).
+   .scene-devops lo pone el script de <head> (y MotionRoot al redimensionar). ── */
+
+.scene-devops .devops-scene {
   height: calc(100dvh * 4.2);
 }
 
-.motion-ok .devops-stage {
+.scene-devops .devops-stage {
   position: sticky;
   top: var(--header-h);
   height: calc(100dvh - var(--header-h));
@@ -1713,17 +1725,17 @@ section[id] {
   padding-block: var(--s-5);
 }
 
-.motion-ok .stage-diagram {
+.scene-devops .stage-diagram {
   display: contents;
 }
 
-.motion-ok .stage-title {
+.scene-devops .stage-title {
   grid-column: 1 / -1;
   grid-row: 1;
   transform-origin: 0 0;
 }
 
-.motion-ok .stage-svg {
+.scene-devops .stage-svg {
   grid-column: 1 / span 8;
   grid-row: 2;
   display: grid;
@@ -1732,23 +1744,23 @@ section[id] {
 }
 
 /* El tamaño del diagrama sale del alto disponible, no de una constante (regla 1). */
-.motion-ok .dg-wrap--land {
+.scene-devops .dg-wrap--land {
   display: block;
   height: 100%;
   min-height: 0;
 }
 
-.motion-ok .dg-wrap--port {
+.scene-devops .dg-wrap--port {
   display: none;
 }
 
-.motion-ok .dg-wrap--land .infra__svg {
+.scene-devops .dg-wrap--land .infra__svg {
   width: auto;
   height: 100%;
   max-width: 100%;
 }
 
-.motion-ok .stage-foot {
+.scene-devops .stage-foot {
   grid-column: 1 / span 8;
   grid-row: 3;
 }
@@ -1757,41 +1769,41 @@ section[id] {
    (como pedía §5.2 para 1024–1279) el panel de «vivo» mide ~250 px y le quitaba
    al diagrama la mitad de su alto a 1024×700. En reposo se ve el panel (estado
    final); la escena decide qué se ve según el progreso. */
-.motion-ok .stage-steps,
-.motion-ok .devops-stage > .infra__panel {
+.scene-devops .stage-steps,
+.scene-devops .devops-stage > .infra__panel {
   grid-column: 9 / -1;
   grid-row: 2 / span 2;
   align-self: center;
   position: static;
 }
 
-.motion-ok .stage-steps {
+.scene-devops .stage-steps {
   grid-template-columns: minmax(0, 1fr);
   grid-template-areas: "step";
   opacity: 0;
 }
 
-.motion-ok .stage-steps li {
+.scene-devops .stage-steps li {
   grid-area: step;
   opacity: 0;
 }
 
-.motion-ok .stage-steps li[data-active] {
+.scene-devops .stage-steps li[data-active] {
   opacity: 1;
 }
 
-.motion-ok .infra__panel-inner {
+.scene-devops .infra__panel-inner {
   grid-template-columns: minmax(0, 1fr);
 }
 
 @container shell (min-width: 74rem) {
-  .motion-ok .stage-svg,
-  .motion-ok .stage-foot {
+  .scene-devops .stage-svg,
+  .scene-devops .stage-foot {
     grid-column: 1 / span 9;
   }
 
-  .motion-ok .stage-steps,
-  .motion-ok .devops-stage > .infra__panel {
+  .scene-devops .stage-steps,
+  .scene-devops .devops-stage > .infra__panel {
     grid-column: 10 / -1;
   }
 }
@@ -1805,6 +1817,10 @@ section[id] {
 .dg .t-label {
   font-weight: 600;
   fill: var(--ink);
+}
+
+.dg .t-strip-label {
+  display: none;
 }
 
 .dg .t-sub {
@@ -2036,7 +2052,7 @@ section[id] {
 /* Fuera de pantalla, con la pestaña oculta o antes de «vivo» en la escena: quietos y ocultos. */
 .devops:not(.in-view) .packets path,
 .is-hidden .packets path,
-.motion-ok .devops-stage:not(.is-live) .packets path {
+.devops-stage.is-scene:not(.is-live) .packets path {
   animation-play-state: paused;
   opacity: 0;
 }
@@ -2701,8 +2717,14 @@ section[id] {
   display: inline-flex;
 }
 
-.motion-lite .feature__steps > li:not([data-current]) {
-  opacity: 0.4;
+/* Paso inactivo: se apaga con un token de texto (ink-3, 6,1:1 sobre --bg), no
+   con opacity (0,4 daba 2,47:1). */
+.motion-lite .feature__steps > li:not([data-current]) :is(.feature-step__title, p, li, .link) {
+  color: var(--ink-3);
+}
+
+.feature__steps :is(.feature-step__title, p, li, .link) {
+  transition: color var(--dur-2) ease;
 }
 
 /* Móvil y tablet con motion: la media arriba y sticky corta, los pasos pasan debajo. */
@@ -2752,7 +2774,12 @@ section[id] {
   .motion-ok .feature__steps > li {
     display: flex;
     align-items: center;
-    min-height: 64dvh;
+    min-height: 52dvh;
+  }
+
+  /* Con el alto de un paso por pantalla, el texto sube de escala. */
+  .motion-ok .feature-step {
+    font-size: 1.125rem;
   }
 
   .motion-ok .feature__stage {
@@ -2771,7 +2798,7 @@ section[id] {
 
 @container shell (min-width: 74rem) {
   .motion-ok .feature__steps > li {
-    min-height: 72dvh;
+    min-height: 58dvh;
   }
 }
 
@@ -3829,6 +3856,29 @@ html:not(.motion-lite) .pause-btn {
 
 .devops-stage.is-scene .stage-lead {
   max-width: 52rem;
+}
+
+/* Tipografía de escena: el diagrama se lee a escala ≥ 0,73 (1280×800, medido),
+   así que todo lo visible va a 17 u (≥ 12,4 px) y las subetiquetas de 13 u se
+   ocultan (sus datos están en los pasos y en el panel). La franja del host
+   muestra su nombre. */
+.devops-stage.is-scene .dg-wrap--land :is(.t-sub, .t-frame-sub) {
+  display: none;
+}
+
+.devops-stage.is-scene .dg-wrap--land :is(.t-label, .t-frame, .t-caption, .edge-label) {
+  font-size: 17px;
+}
+
+.devops-stage.is-scene .dg-wrap--land .t-strip-label {
+  display: inline;
+}
+
+.devops-stage.is-scene .stage-ci {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-2) var(--s-4);
 }
 
 .devops-stage.is-scene .stage-foot {

@@ -102,7 +102,7 @@ export interface InfraEdge {
   land: Point[];
   port: Point[];
   /** Posición de la etiqueta visible, si la tiene. */
-  labelLand?: { x: number; y: number; anchor: "start" | "middle" | "end" };
+  labelLand?: { x: number; y: number; anchor: "start" | "middle" | "end"; lines?: boolean };
   labelPort?: { x: number; y: number; anchor: "start" | "middle" | "end" };
 }
 

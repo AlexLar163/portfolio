@@ -117,7 +117,14 @@ function NodeShape({
       className={`node node--${node.kind}${hot ? " is-hot" : ""}`}
       role="button"
       tabIndex={0}
-      aria-label={text.label}
+      // El nombre accesible empieza por el texto visible (label-content-name-mismatch).
+      aria-label={
+        isStrip
+          ? `${lines.join(" · ")} · ${text.label}`
+          : label === text.label
+            ? label
+            : `${label} · ${text.label}`
+      }
       aria-pressed={selected}
       aria-controls="infra-detail"
       data-node={node.id}
@@ -139,6 +146,12 @@ function NodeShape({
       {!isStrip && (
         <text className="t-label" x={b.x + 12} y={b.y + ty.labelY} fontSize={ty.label}>
           {label}
+        </text>
+      )}
+      {/* En la escena las subetiquetas se ocultan: la franja muestra su nombre. */}
+      {isStrip && o === "land" && (
+        <text className="t-label t-strip-label" x={b.x + 12} y={b.y + b.h / 2 + ty.label * 0.35} fontSize={ty.label}>
+          {text.label}
         </text>
       )}
       {lines.map((line, i) => (
@@ -195,7 +208,7 @@ function Diagram({
     const pos = o === "land" ? edge.labelLand : edge.labelPort;
     const lines = text.edgeLabels[edge.id];
     if (!pos || !lines) return null;
-    const rows = o === "land" ? [lines.join(" ")] : lines;
+    const rows = o === "land" && !edge.labelLand?.lines ? [lines.join(" ")] : lines;
     return (
       <text
         key={`${edge.id}-l`}

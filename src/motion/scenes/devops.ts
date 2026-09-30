@@ -1,4 +1,4 @@
-import { MOTION_OK_QUERY } from "../level";
+import { SCENE_DEVOPS_QUERY } from "../level";
 import { register, type Kit } from "../load";
 
 /**
@@ -64,7 +64,7 @@ export function mount(root: HTMLElement, { gsap, ScrollTrigger, debug }: Kit): (
   const mm = gsap.matchMedia(root);
   let unregister = () => {};
 
-  mm.add(`${MOTION_OK_QUERY} and (prefers-reduced-motion: no-preference)`, () => {
+  mm.add(`${SCENE_DEVOPS_QUERY} and (prefers-reduced-motion: no-preference)`, () => {
     const q = <E extends Element = HTMLElement>(sel: string, el: ParentNode = stage) =>
       Array.from(el.querySelectorAll<E>(sel));
     const title = stage.querySelector<HTMLElement>(".stage-title")!;
@@ -81,7 +81,10 @@ export function mount(root: HTMLElement, { gsap, ScrollTrigger, debug }: Kit): (
 
     stage.classList.add("is-scene");
     // Alto de la fila del título = el título encogido (transform no cambia el layout).
-    const measure = () => stage.style.setProperty("--title-h", `${title.offsetHeight * 0.62}px`);
+    // Solo el h2: el lead se funde durante el armado (encogido a .62 quedaba en 12 px).
+    const h2 = title.querySelector<HTMLElement>("h2") ?? title;
+    const lead = title.querySelector<HTMLElement>(".stage-lead");
+    const measure = () => stage.style.setProperty("--title-h", `${h2.offsetHeight * 0.62}px`);
     measure();
     ScrollTrigger.addEventListener("refreshInit", measure);
 
@@ -102,6 +105,7 @@ export function mount(root: HTMLElement, { gsap, ScrollTrigger, debug }: Kit): (
       .to(words, { opacity: 1, duration: 0.12, stagger: 0.88 / Math.max(1, words.length) }, 0)
       .addLabel("armado", 1)
       .to(title, { scale: 0.62, duration: 1.2, ease: "power2.inOut" }, 1)
+      .to(lead, { opacity: 0, duration: 0.6 }, 1.2)
       .to('[data-frame="vps"]', { strokeDashoffset: 0, duration: 1, ease: "power2.inOut" }, 1)
       .to('[data-frame="docker"]', { strokeDashoffset: 0, duration: 0.8, ease: "power2.inOut" }, 1.3)
       .to(q("[data-frame]", svg), { fillOpacity: 1, duration: 0.6 }, 1.6)
@@ -169,13 +173,7 @@ export function mount(root: HTMLElement, { gsap, ScrollTrigger, debug }: Kit): (
       animation: tl,
       invalidateOnRefresh: true,
       markers: debug,
-      // ?motion=debug&snap=0 (solo fuera de producción): sin snap, para capturar fases exactas.
-      snap: debug && new URLSearchParams(window.location.search).get("snap") === "0" ? undefined : {
-        snapTo: "labelsDirectional",
-        duration: { min: 0.2, max: 0.6 },
-        delay: 0.2,
-        ease: "power1.inOut",
-      },
+      // Sin snap: con muescas espaciadas devolvía al usuario al último label (QA: la escena atrapaba).
     });
     apply();
 

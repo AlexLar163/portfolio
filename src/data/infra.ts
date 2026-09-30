@@ -74,7 +74,8 @@ export const edges: InfraEdge[] = [
     type: "traffic",
     land: [[184, 316], [400, 316], [400, 248], [432, 248]],
     port: [[328, 80], [328, 296]],
-    labelLand: { x: 192, y: 306, anchor: "start" },
+    // Dos líneas sobre la arista: en una sola, a 17 u (escena) cruzaba el borde del VPS.
+    labelLand: { x: 192, y: 290, anchor: "start", lines: true },
     labelPort: { x: 318, y: 124, anchor: "end" },
   },
   {

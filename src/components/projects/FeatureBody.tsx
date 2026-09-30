@@ -61,6 +61,7 @@ export function FeatureBody({
   const [videoOn, setVideoOn] = useState(false); // src asignado
   const [playing, setPlaying] = useState(false);
   const [auto, setAuto] = useState(false); // hay motion: el video corre solo
+  const [userPaused, setUserPaused] = useState(false); // la persona lo pausó: no se reanuda solo
   const panelId = useId();
 
   const activeRef = useRef(0);
@@ -125,19 +126,24 @@ export function FeatureBody({
   useEffect(() => {
     const v = videoRef.current;
     if (!v) return;
-    if (auto && isVideo && inView && videoOn) {
+    if (auto && isVideo && inView && videoOn && !userPaused) {
       const id = window.setTimeout(() => v.play().catch(() => setPlaying(false)), 0);
       return () => window.clearTimeout(id);
     }
     v.pause();
-  }, [auto, isVideo, inView, videoOn]);
+  }, [auto, isVideo, inView, videoOn, userPaused]);
 
   const toggle = () => {
     const v = videoRef.current;
     if (!v) return;
     setVideoOn(true);
-    if (v.paused) window.setTimeout(() => v.play().catch(() => setPlaying(false)), 0);
-    else v.pause();
+    if (v.paused) {
+      setUserPaused(false);
+      window.setTimeout(() => v.play().catch(() => setPlaying(false)), 0);
+    } else {
+      setUserPaused(true);
+      v.pause();
+    }
   };
 
   return (
@@ -213,7 +219,8 @@ export function FeatureBody({
                 </div>
               );
             })}
-            {isVideo && !auto && (
+            {/* Siempre visible con video: si corre solo, es su pausa (WCAG 2.2.2). */}
+            {isVideo && (
               <button
                 type="button"
                 className="play-btn play-btn--always"

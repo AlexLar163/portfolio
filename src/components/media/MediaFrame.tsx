@@ -70,15 +70,40 @@ export function MediaFrame({
   const current = slides[active] ?? slides[0];
   const video = current?.video;
 
-  // Al montar las fuentes o cambiar de diapositiva: se detiene (el evento pause
-  // oculta el video) y se recarga con las fuentes nuevas. Layout effect: tiene que
-  // correr antes del play() que agenda el clic o el hover.
+  // Quién pidió reproducir: `want` sobrevive al re-render que monta las fuentes.
+  // Antes el play() de un setTimeout(0) corría ANTES del layout effect que hace
+  // load(), y el load() lo cancelaba: el recorrido se bajaba y nunca arrancaba (QA).
+  const want = useRef(false);
+  const userPaused = useRef(false);
+  const [auto, setAuto] = useState(false); // lo reproduce la escena: el botón se ve
+
+  const playNow = () => {
+    const v = videoRef.current;
+    if (!v) return;
+    v.play().catch(() => setPlaying(false));
+  };
+
+  // Al montar las fuentes o cambiar de diapositiva: se detiene y se recarga con
+  // las fuentes nuevas; si alguien ya lo había pedido, arranca recién ahí.
   useLayoutEffect(() => {
     const v = videoRef.current;
     if (!v || !loaded) return;
     v.pause();
     v.load();
+    if (want.current) playNow();
   }, [active, loaded]);
+
+  const requestPlay = () => {
+    want.current = true;
+    if (loaded) playNow();
+    else setLoaded(true);
+  };
+
+  const stop = () => {
+    want.current = false;
+    window.clearTimeout(timer.current);
+    videoRef.current?.pause();
+  };
 
   // Todo video que sale de la vista se pausa.
   useEffect(() => {
@@ -94,19 +119,19 @@ export function MediaFrame({
   useEffect(() => () => window.clearTimeout(timer.current), []);
 
   // La escena de Clientes reproduce el recorrido mientras la tarjeta está activa:
-  // lo pide con eventos sobre el marco (no conoce el estado de React).
+  // lo pide con eventos sobre el marco. Si la persona lo pausó, no se reanuda solo.
+  const bridge = useRef({ requestPlay, stop });
+  useEffect(() => {
+    bridge.current = { requestPlay, stop };
+  });
   useEffect(() => {
     const el = frameRef.current;
     if (!el || !video) return;
     const onPlay = () => {
-      setLoaded(true);
-      window.clearTimeout(timer.current);
-      timer.current = window.setTimeout(() => videoRef.current?.play().catch(() => setPlaying(false)), 0);
+      setAuto(true);
+      if (!userPaused.current) bridge.current.requestPlay();
     };
-    const onPause = () => {
-      window.clearTimeout(timer.current);
-      videoRef.current?.pause();
-    };
+    const onPause = () => bridge.current.stop();
     el.addEventListener("media:play", onPlay);
     el.addEventListener("media:pause", onPause);
     return () => {
@@ -115,35 +140,28 @@ export function MediaFrame({
     };
   }, [video]);
 
-  const play = () => {
-    const v = videoRef.current;
-    if (!v) return;
-    v.play().catch(() => setPlaying(false));
-  };
-
   const onEnter = () => {
     onWarm?.();
-    if (!video || !prefersHoverPlay()) return;
-    setLoaded(true);
+    if (!video || auto || !prefersHoverPlay()) return;
     window.clearTimeout(timer.current);
-    timer.current = window.setTimeout(play, HOVER_DELAY);
+    timer.current = window.setTimeout(requestPlay, HOVER_DELAY);
   };
 
   const onLeave = () => {
     window.clearTimeout(timer.current);
-    if (!video || !prefersHoverPlay()) return;
-    videoRef.current?.pause();
+    if (!video || auto || !prefersHoverPlay()) return;
+    stop();
   };
 
   const toggle = () => {
-    setLoaded(true);
     const v = videoRef.current;
     if (!v) return;
     if (v.paused) {
-      // El <source> recién montado necesita un tick para existir.
-      window.setTimeout(play, 0);
+      userPaused.current = false;
+      requestPlay();
     } else {
-      v.pause();
+      userPaused.current = true;
+      stop();
     }
   };
 
@@ -200,6 +218,8 @@ export function MediaFrame({
             <video
               ref={videoRef}
               className="frame__video"
+              // Mismo recorte intencional que la imagen: parallax dentro del marco.
+              data-overflow-ok
               data-visible={playing}
               style={current.image?.position ? { objectPosition: current.image.position } : undefined}
               muted
@@ -216,7 +236,8 @@ export function MediaFrame({
             </video>
             <button
               type="button"
-              className="play-btn"
+              // Visible siempre que corre solo (WCAG 2.2.2): si no, solo con foco.
+              className={`play-btn${auto ? " play-btn--always" : ""}`}
               onClick={toggle}
               aria-label={(playing ? labels.pause : labels.play).replace("{name}", name)}
               aria-pressed={playing}
