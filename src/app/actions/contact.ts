@@ -34,13 +34,19 @@ export async function sendContact(
 
   try {
     const resend = new Resend(apiKey);
-    await resend.emails.send({
+    // El SDK no lanza: devuelve { data, error }. Sin revisar `error`, un fallo
+    // de Resend (clave inválida, remitente sin verificar) se mostraba como éxito.
+    const { error } = await resend.emails.send({
       from: process.env.CONTACT_FROM || "Portfolio <onboarding@resend.dev>",
       to: [process.env.CONTACT_TO || "alexlar163@gmail.com"],
       replyTo: email,
       subject: `Portfolio · nuevo mensaje de ${name}`,
       text: `${name} <${email}>\n\n${message}`,
     });
+    if (error) {
+      console.error("[contact] Resend rejected the email", error);
+      return { status: "error", reason: "send" };
+    }
     return { status: "success" };
   } catch (error) {
     console.error("[contact] send failed", error);

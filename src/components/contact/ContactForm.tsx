@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useRef, useState, type FormEvent } from "react";
+import { startTransition, useActionState, useEffect, useRef, useState, type FormEvent } from "react";
 import { sendContact, type ContactState } from "@/app/actions/contact";
 import { DEMO_REQUEST_EVENT } from "@/components/projects/DemoRequestLink";
 import { CopyEmail } from "./CopyEmail";
@@ -60,14 +60,21 @@ export function ContactForm({ t, email }: { t: Texts; email: string }) {
     if (state?.status === "success") successRef.current?.focus();
   }, [state]);
 
+  // Con JS se despacha a mano: un <form action> de React 19 vacía los campos al
+  // terminar la acción, y un envío fallido no puede costarle el mensaje a nadie.
+  // Sin JS sigue funcionando el `action` del formulario.
   const onSubmit = (e: FormEvent<HTMLFormElement>) => {
-    const found = validate(e.currentTarget);
+    e.preventDefault();
+    const form = e.currentTarget;
+    const found = validate(form);
     setErrors(found);
     const first = (Object.keys(found) as Field[])[0];
     if (first) {
-      e.preventDefault();
-      (e.currentTarget.elements.namedItem(first) as HTMLElement | null)?.focus();
+      (form.elements.namedItem(first) as HTMLElement | null)?.focus();
+      return;
     }
+    const data = new FormData(form);
+    startTransition(() => action(data));
   };
 
   if (state?.status === "success") {
