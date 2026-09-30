@@ -581,6 +581,26 @@
       "from": "appsmonitor/proyectos-desktop.png",
       "webpQ": 80,
       "kb": 23
+    },
+    "recursos": {
+      "src": "/media/appsmonitor/recursos.webp",
+      "w": 1636,
+      "h": 218,
+      "from": "images/2.png (tarjeta DROPLET, sin la columna Host ni las pestañas)",
+      "webpQ": 86,
+      "kb": 11,
+      "avif": "/media/appsmonitor/recursos.avif",
+      "avifKb": 8
+    },
+    "recursos-movil": {
+      "src": "/media/appsmonitor/recursos-movil.webp",
+      "w": 1000,
+      "h": 330,
+      "from": "images/2.png (misma tarjeta DROPLET recompuesta en 2 filas para móvil, sin Host)",
+      "webpQ": 86,
+      "kb": 11,
+      "avif": "/media/appsmonitor/recursos-movil.avif",
+      "avifKb": 8
     }
   },
   "automatizaciones": {

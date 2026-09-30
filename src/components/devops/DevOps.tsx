@@ -115,7 +115,12 @@ export async function DevOps() {
             ? (t.raw(`capabilities.${g.id}.mediaCaption`) as string[])
             : [];
           const media = (g.media ?? [])
-            .map((ref, i) => ({ img: resolveImage(ref), alt: alts[i] ?? "", caption: captions[i] }))
+            .map((ref, i) => ({
+              img: resolveImage(ref),
+              narrow: resolveImage({ ...ref, key: `${ref.key}-movil` }),
+              alt: alts[i] ?? "",
+              caption: captions[i],
+            }))
             .filter((m) => m.img);
           return (
             <section key={g.id} className="grid caps__row" aria-labelledby={`cap-${g.id}`}>
@@ -133,7 +138,31 @@ export async function DevOps() {
                 </ul>
                 {media.length > 0 && (
                   <div className={`caps__media${media.length === 1 ? " caps__media--one" : ""}`}>
-                    {media.map(({ img, alt, caption }) => (
+                    {media.map(({ img, alt, caption, narrow }) =>
+                      // Captura apaisada (tarjeta de recursos): va a su tamaño natural, fila entera.
+                      img!.w / img!.h > 3 ? (
+                        <figure key={img!.src} className="capture-fig capture-fig--strip">
+                          <Image
+                            className={`capture-strip${narrow ? " capture-strip--wide" : ""}`}
+                            src={img!.src}
+                            alt={alt}
+                            width={img!.w}
+                            height={img!.h}
+                            sizes="(min-width: 1440px) 1000px, (min-width: 900px) 70vw, 100vw"
+                          />
+                          {/* En móvil la tira de 5 columnas quedaba en ~6 px de letra: versión en 2 filas. */}
+                          {narrow && (
+                            <Image
+                              className="capture-strip capture-strip--narrow"
+                              src={narrow.src}
+                              alt={alt}
+                              width={narrow.w}
+                              height={narrow.h}
+                              sizes="100vw"
+                            />
+                          )}
+                        </figure>
+                      ) : (
                       <figure key={img!.src} className="capture-fig">
                         <div
                           className={`capture${img!.w / img!.h > 1.5 ? " capture--wide" : ""}${
@@ -144,7 +173,8 @@ export async function DevOps() {
                         </div>
                         {caption && <figcaption className="t-small ink-3">{caption}</figcaption>}
                       </figure>
-                    ))}
+                      ),
+                    )}
                   </div>
                 )}
               </div>

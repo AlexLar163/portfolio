@@ -15,8 +15,12 @@ export const capabilityGroups: {
   {
     id: "panel",
     tools: ["Fastify", "TypeScript", "systemd", "Docker"],
-    // Solo la lista de proyectos: el modal de logs mostraba la URL de un repo y un bug abierto.
-    media: [{ slug: "appsmonitor", key: "proyectos", position: "top" }],
+    // Recursos del droplet (recortado sin pestañas ni Host) + lista de proyectos.
+    // El modal de logs no se usa: mostraba la URL de un repo y un bug abierto.
+    media: [
+      { slug: "appsmonitor", key: "recursos" },
+      { slug: "appsmonitor", key: "proyectos", position: "top" },
+    ],
   },
   { id: "backups", tools: ["wp-cli", "n8n"] },
   { id: "monitoring", tools: ["cron", "n8n", "Telegram Bot API"] },
