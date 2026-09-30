@@ -93,6 +93,28 @@ export function MediaFrame({
 
   useEffect(() => () => window.clearTimeout(timer.current), []);
 
+  // La escena de Clientes reproduce el recorrido mientras la tarjeta está activa:
+  // lo pide con eventos sobre el marco (no conoce el estado de React).
+  useEffect(() => {
+    const el = frameRef.current;
+    if (!el || !video) return;
+    const onPlay = () => {
+      setLoaded(true);
+      window.clearTimeout(timer.current);
+      timer.current = window.setTimeout(() => videoRef.current?.play().catch(() => setPlaying(false)), 0);
+    };
+    const onPause = () => {
+      window.clearTimeout(timer.current);
+      videoRef.current?.pause();
+    };
+    el.addEventListener("media:play", onPlay);
+    el.addEventListener("media:pause", onPause);
+    return () => {
+      el.removeEventListener("media:play", onPlay);
+      el.removeEventListener("media:pause", onPause);
+    };
+  }, [video]);
+
   const play = () => {
     const v = videoRef.current;
     if (!v) return;

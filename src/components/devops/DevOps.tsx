@@ -85,7 +85,7 @@ export async function DevOps() {
             panelLabels={{ facts: t("panelFacts"), kind: { "on-demand": t("legend.onDemand") } }}
             stepIds={stepIds}
             title={
-              <header className="stage-title">
+              <header key="title" className="stage-title">
                 <h2 id="devops-title" className="t-chapter">
                   {t("title")}
                 </h2>
@@ -100,7 +100,7 @@ export async function DevOps() {
               </header>
             }
             steps={
-              <ol className="stage-steps" aria-label={t("stepsLabel")}>
+              <ol key="steps" className="stage-steps" aria-label={t("stepsLabel")}>
                 {stepIds.map((id, i) => (
                   <li key={id} data-step={id} data-active={i === 0 ? "" : undefined}>
                     <h3 className="step__title">{steps[id].title}</h3>
@@ -111,7 +111,7 @@ export async function DevOps() {
               </ol>
             }
             foot={
-              <div className="stage-foot">
+              <div key="foot" className="stage-foot">
                 <div className="stage-ci" role="group" aria-labelledby="stage-ci-label">
                   <p id="stage-ci-label" className="t-small ink-3">
                     {t("ci.label")}

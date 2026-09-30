@@ -1320,7 +1320,7 @@ section[id] {
   inset: 0;
   border-radius: inherit;
   background: var(--bg);
-  opacity: 0;
+  opacity: var(--veil, 0);
   pointer-events: none;
 }
 
@@ -1595,6 +1595,7 @@ section[id] {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
+  align-content: flex-start;
   row-gap: var(--s-2);
   min-width: 0;
 }
@@ -1723,7 +1724,7 @@ section[id] {
 }
 
 .motion-ok .stage-svg {
-  grid-column: 1 / -1;
+  grid-column: 1 / span 8;
   grid-row: 2;
   display: grid;
   place-items: center;
@@ -1748,17 +1749,19 @@ section[id] {
 }
 
 .motion-ok .stage-foot {
-  grid-column: 1 / span 7;
+  grid-column: 1 / span 8;
   grid-row: 3;
 }
 
-/* Pasos y panel comparten celda: en reposo se ve el panel (estado final);
-   la escena decide qué se ve según el progreso. */
+/* Pasos y panel comparten celda, en la columna derecha: en la fila de abajo
+   (como pedía §5.2 para 1024–1279) el panel de «vivo» mide ~250 px y le quitaba
+   al diagrama la mitad de su alto a 1024×700. En reposo se ve el panel (estado
+   final); la escena decide qué se ve según el progreso. */
 .motion-ok .stage-steps,
 .motion-ok .devops-stage > .infra__panel {
-  grid-column: 8 / -1;
-  grid-row: 3;
-  align-self: start;
+  grid-column: 9 / -1;
+  grid-row: 2 / span 2;
+  align-self: center;
   position: static;
 }
 
@@ -1790,8 +1793,6 @@ section[id] {
   .motion-ok .stage-steps,
   .motion-ok .devops-stage > .infra__panel {
     grid-column: 10 / -1;
-    grid-row: 2 / span 2;
-    align-self: center;
   }
 }
 
@@ -3786,6 +3787,167 @@ html:not(.motion-lite) .pause-btn {
   .motion-lite .client-card:hover .frame__slide[data-active="true"] .frame__img,
   .motion-lite .chapter:hover .chapter__thumb img {
     scale: 1.03;
+  }
+}
+
+/* ─── Escenas GSAP (v2 bloque 3, solo .motion-ok) ──────────────────────── */
+
+/* Las clases .is-scene / .is-vivo / .is-live las pone la escena al montar y las
+   quita al revertir: sin GSAP rige el estado final de arriba. */
+.is-scene .dg .node,
+.is-scene .dg .edge,
+.is-scene .dg .edge-label {
+  transition: stroke var(--dur-2);
+}
+
+.is-scene .dg .node__box {
+  transition:
+    stroke 150ms,
+    fill 150ms;
+}
+
+.is-scene .dg .node.is-lit .node__box {
+  stroke: var(--accent);
+  fill: var(--accent-dim);
+}
+
+.is-scene .dg .trace {
+  stroke: var(--accent);
+  transition: stroke 300ms var(--ease-out);
+}
+
+.is-scene .dg .trace.is-rest {
+  stroke: var(--ink-3);
+}
+
+/* La fila del título mide el título YA encogido (lo mide la escena): el título
+   grande del intro se superpone a un diagrama que todavía no existe, y el
+   diagrama gana el alto que el título suelta. La leyenda sube a esa fila. */
+.devops-stage.is-scene {
+  grid-template-rows: var(--title-h, auto) minmax(0, 1fr) auto;
+}
+
+.devops-stage.is-scene .stage-lead {
+  max-width: 52rem;
+}
+
+.devops-stage.is-scene .stage-foot {
+  display: contents;
+}
+
+.devops-stage.is-scene .stage-ci {
+  grid-column: 1 / span 8;
+  grid-row: 3;
+}
+
+.devops-stage.is-scene .stage-foot__end {
+  grid-column: 9 / -1;
+  grid-row: 1;
+  align-self: start;
+  justify-content: flex-end;
+}
+
+.devops-stage.is-scene .stage-foot__end .legend {
+  justify-content: flex-end;
+  gap: var(--s-1) var(--s-4);
+}
+
+@container shell (min-width: 74rem) {
+  .devops-stage.is-scene .stage-ci {
+    grid-column: 1 / span 9;
+  }
+
+  .devops-stage.is-scene .stage-foot__end {
+    grid-column: 10 / -1;
+  }
+}
+
+/* Antes de «vivo» el diagrama se lee, no se toca (el foco sí: salta a «vivo»). */
+.devops-stage.is-scene:not(.is-vivo) .dg .node {
+  pointer-events: none;
+}
+
+.devops-stage.is-scene .stage-steps {
+  opacity: 1;
+  transition: opacity 300ms, visibility 0s;
+}
+
+.devops-stage.is-scene.is-vivo .stage-steps {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 300ms, visibility 0s 300ms;
+}
+
+.devops-stage.is-scene > .infra__panel {
+  transition: opacity 300ms, visibility 0s;
+}
+
+.devops-stage.is-scene:not(.is-vivo) > .infra__panel {
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 150ms, visibility 0s 150ms;
+}
+
+.devops-stage.is-scene .stage-steps li {
+  transform: translateX(12px);
+  transition:
+    opacity 150ms,
+    transform 300ms var(--ease-out);
+}
+
+.devops-stage.is-scene .stage-steps li[data-active] {
+  transform: none;
+  transition:
+    opacity 300ms var(--ease-out),
+    transform 300ms var(--ease-out);
+}
+
+.is-scene .chips--ci .chip {
+  border-color: var(--line-ui);
+}
+
+.is-scene .chips--ci .chip.is-on {
+  border-color: var(--accent);
+}
+
+.is-scene .chips--ci .chip.is-done {
+  border-color: var(--line-strong);
+}
+
+.is-scene .chips--ci .chip__check {
+  transition: opacity var(--dur-2);
+}
+
+.is-scene .chips--ci .chip:not(.is-on, .is-done) .chip__check {
+  opacity: 0;
+}
+
+/* Destacados: el progreso lo escribe el scrub (sin transición que lo retrase). */
+.feature.is-scene .feature__progress i {
+  transition: none;
+}
+
+/* Capas con teléfono y la grilla de Vera se arman al activarse. */
+.motion-lite .layer[data-state="on"] .layer__phone {
+  animation: phone-up 800ms var(--ease-out) 100ms both;
+}
+
+.motion-lite .layer--grid[data-state="on"] .layer__tile {
+  animation: tile-in 600ms var(--ease-out) both;
+  animation-delay: calc(var(--i, 0) * 60ms);
+}
+
+@keyframes phone-up {
+  from {
+    opacity: 0;
+    translate: 0 48px;
+  }
+}
+
+@keyframes tile-in {
+  from {
+    opacity: 0;
+    scale: 0.92;
   }
 }
 

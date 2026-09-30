@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { computeLevel, LEVEL_EVENT, MOTION_OK_QUERY, REDUCE_QUERY } from "./level";
+import { computeLevel, GSAP_FAILED_EVENT, LEVEL_EVENT, MOTION_OK_QUERY, REDUCE_QUERY } from "./level";
 import { mountObserve } from "./lite/observe";
 
 /**
@@ -32,12 +32,14 @@ export function MotionRoot() {
     apply();
     const mqs = [window.matchMedia(MOTION_OK_QUERY), window.matchMedia(REDUCE_QUERY)];
     mqs.forEach((m) => m.addEventListener("change", apply));
+    window.addEventListener(GSAP_FAILED_EVENT, apply);
 
     // Pestaña oculta: todo lo que corre en bucle (paquetes, marquee) se pausa.
     const onVis = () => html.classList.toggle("is-hidden", document.hidden);
     document.addEventListener("visibilitychange", onVis);
     return () => {
       mqs.forEach((m) => m.removeEventListener("change", apply));
+      window.removeEventListener(GSAP_FAILED_EVENT, apply);
       document.removeEventListener("visibilitychange", onVis);
       offObserve?.();
     };

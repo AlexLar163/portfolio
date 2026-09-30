@@ -23,7 +23,16 @@ export function computeLevel(): MotionLevel {
   if (typeof window === "undefined") return "none";
   const q = new URLSearchParams(window.location.search).get("motion");
   if (q === "0" || window.matchMedia(REDUCE_QUERY).matches) return "none";
+  // Si GSAP no llegó (red), el desktop se queda en el nivel liviano: estado final estático.
+  if (gsapFailed) return "lite";
   return window.matchMedia(MOTION_OK_QUERY).matches ? "ok" : "lite";
+}
+
+let gsapFailed = false;
+export const GSAP_FAILED_EVENT = "portfolio:gsap-failed";
+export function markGsapFailed() {
+  gsapFailed = true;
+  window.dispatchEvent(new Event(GSAP_FAILED_EVENT));
 }
 
 export function currentLevel(): MotionLevel {

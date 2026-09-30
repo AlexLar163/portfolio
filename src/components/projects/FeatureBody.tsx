@@ -203,8 +203,8 @@ export function FeatureBody({
                   )}
                   {l.kind === "grid" && (
                     <div className="layer__grid">
-                      {l.tiles.map((tile) => (
-                        <div key={tile.src} className="layer__tile">
+                      {l.tiles.map((tile, k) => (
+                        <div key={tile.src} className="layer__tile" style={{ ["--i" as string]: k }}>
                           <Img img={tile} sizes={SIZES_TILE} />
                         </div>
                       ))}
