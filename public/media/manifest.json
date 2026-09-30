@@ -581,14 +581,6 @@
       "from": "appsmonitor/proyectos-desktop.png",
       "webpQ": 80,
       "kb": 23
-    },
-    "modal-logs": {
-      "src": "/media/appsmonitor/modal-logs.webp",
-      "w": 720,
-      "h": 809,
-      "from": "appsmonitor/modal-logs.png",
-      "webpQ": 80,
-      "kb": 44
     }
   },
   "automatizaciones": {
