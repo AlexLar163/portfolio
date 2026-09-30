@@ -421,7 +421,9 @@
       "sheetSummary": "Ver las 9 áreas"
     },
     "lanesTitle": "Pipelines de CI/CD",
-    "tableSummary": "Ver los pipelines como tabla"
+    "tableSummary": "Ver los pipelines como tabla",
+    "pauseTraffic": "Pausar el tráfico",
+    "playTraffic": "Reanudar el tráfico"
   },
   "infra": {
     "frames": {
@@ -870,7 +872,9 @@
     "moreTitle": "Más demos",
     "othersTitle": "Otros proyectos",
     "showAll": "Ver los {n} proyectos",
-    "moreCount": "+{n}"
+    "moreCount": "+{n}",
+    "pauseCovers": "Pausar portadas",
+    "playCovers": "Reanudar portadas"
   },
   "experience": {
     "title": "Trayectoria",

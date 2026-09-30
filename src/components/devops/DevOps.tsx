@@ -5,6 +5,7 @@ import { incidentSteps, pipelineRows } from "@/data/devops";
 import { MotionScene } from "@/motion/MotionScene";
 import { InfraStage, type DiagramText, type NodeText } from "./InfraDiagram";
 import { CapabilityBento, CapabilitySheet, PipelineTable } from "./Capabilities";
+import { PauseToggle } from "@/components/ui/PauseToggle";
 
 type Step = { title: string; text: string; data: string };
 
@@ -38,7 +39,7 @@ function Chips({ items, className = "" }: { items: string[]; className?: string 
   return (
     <ol className={`chips t-data ${className}`}>
       {items.map((s, i) => (
-        <li key={s} className="chip" data-chip={i}>
+        <li key={s} className="chip" data-chip={i} style={{ ["--i" as string]: i }}>
           <Check className="chip__check" size={14} strokeWidth={2} aria-hidden />
           <span>{s}</span>
         </li>
@@ -76,7 +77,7 @@ export async function DevOps() {
   const words = t("lead").split(" ");
 
   return (
-    <section id="devops" aria-labelledby="devops-title" className="section section--canvas devops">
+    <section id="devops" aria-labelledby="devops-title" className="section section--canvas devops" data-inview>
       <div className="shell shell--wide">
         <div className="devops-scene">
           <InfraStage
@@ -117,7 +118,10 @@ export async function DevOps() {
                   </p>
                   <Chips items={t.raw("ci.chips") as string[]} className="chips--ci" />
                 </div>
-                <Legend t={(k) => t(k)} />
+                <div className="stage-foot__end">
+                  <Legend t={(k) => t(k)} />
+                  <PauseToggle target=".devops" pauseLabel={t("pauseTraffic")} playLabel={t("playTraffic")} />
+                </div>
               </div>
             }
           />
@@ -175,8 +179,8 @@ export async function DevOps() {
         <div className="lanes">
           <h3 className="subhead">{t("lanesTitle")}</h3>
           <ul className="lanes__list">
-            {pipelineRows.map((r) => (
-              <li key={r.id} className="lane">
+            {pipelineRows.map((r, l) => (
+              <li key={r.id} className="lane" data-reveal style={{ ["--l" as string]: l }}>
                 <p className="lane__name">{r.project}</p>
                 <Chips items={t.raw(`pipeline.rows.${r.id}.steps`) as string[]} />
                 <p className="lane__target t-data">{t(`pipeline.rows.${r.id}.target`)}</p>

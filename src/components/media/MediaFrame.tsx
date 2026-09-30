@@ -129,6 +129,7 @@ export function MediaFrame({
     <div
       ref={frameRef}
       className="frame"
+      data-warm={warm ? "" : undefined}
       onPointerEnter={onEnter}
       onPointerLeave={onLeave}
       onFocus={onWarm}
@@ -151,6 +152,8 @@ export function MediaFrame({
                   sizes={sizes}
                   priority={priority && i === 0}
                   className={`frame__img${s.image.fit === "contain" ? " frame__img--contain" : ""}`}
+                  // Recorte intencional de un hijo transformado (zoom al hover, parallax).
+                  data-overflow-ok
                   style={s.image.position ? { objectPosition: s.image.position } : undefined}
                 />
               ) : (

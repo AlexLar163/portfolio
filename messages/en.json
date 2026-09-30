@@ -422,7 +422,9 @@
       "sheetSummary": "See all 9 areas"
     },
     "lanesTitle": "CI/CD pipelines",
-    "tableSummary": "See the pipelines as a table"
+    "tableSummary": "See the pipelines as a table",
+    "pauseTraffic": "Pause the traffic",
+    "playTraffic": "Resume the traffic"
   },
   "infra": {
     "frames": {
@@ -871,7 +873,9 @@
     "moreTitle": "More demos",
     "othersTitle": "Other projects",
     "showAll": "See all {n} projects",
-    "moreCount": "+{n}"
+    "moreCount": "+{n}",
+    "pauseCovers": "Pause covers",
+    "playCovers": "Resume covers"
   },
   "experience": {
     "title": "Experience",

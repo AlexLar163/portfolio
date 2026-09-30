@@ -31,6 +31,8 @@
   /* v2 §2.3: relleno de nodo activo / fondo de fase, y estela del paquete. */
   --color-accent-dim: rgb(255 139 61 / 0.14);
   --color-accent-trail: rgb(255 139 61 / 0.38);
+  /* Borde spotlight (v2 §11 #1): un trazo de 1 px, nunca un halo. */
+  --color-accent-spot: rgb(255 139 61 / 0.18);
 }
 
 :root {
@@ -50,6 +52,7 @@
   --danger: var(--color-danger);
   --accent-dim: var(--color-accent-dim);
   --accent-trail: var(--color-accent-trail);
+  --accent-spot: var(--color-accent-spot);
 
   --r-1: var(--radius-1);
   --r-2: var(--radius-2);
@@ -394,6 +397,7 @@ section[id] {
 
 .btn {
   display: inline-flex;
+  scale: 1;
   align-items: center;
   justify-content: center;
   gap: var(--s-2);
@@ -410,7 +414,13 @@ section[id] {
   transition:
     background-color var(--dur-1),
     border-color var(--dur-1),
-    color var(--dur-1);
+    color var(--dur-1),
+    scale 160ms var(--ease-out);
+}
+
+/* Pulsación (v2 §11 #3): scale compone con el translate del magnético. */
+.btn:active {
+  scale: 0.97;
 }
 
 .btn--lg {
@@ -1080,7 +1090,7 @@ section[id] {
 /* En escritorio con cursor fino el video va por hover: el botón queda solo para
    teclado (se hace visible al enfocarlo). */
 @media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
-  .play-btn:not(:focus-visible) {
+  .play-btn:not(:focus-visible, .play-btn--always) {
     width: 1px;
     height: 1px;
     padding: 0;
@@ -1118,22 +1128,31 @@ section[id] {
   border-color: var(--line-strong);
 }
 
-.thumb::after,
-.segment button::after {
+/* Un solo indicador por tablist que se desliza (v2 §11 #5); con flechas salta. */
+[data-indicator] {
+  position: relative;
+}
+
+[data-indicator]::after {
   content: "";
   position: absolute;
   left: 0;
-  right: 0;
   bottom: 0;
+  width: 1px;
   height: 2px;
   background: var(--accent);
-  opacity: 0;
-  transition: opacity var(--dur-2);
+  transform: translateX(var(--ix, 0)) scaleX(var(--iw, 0));
+  transform-origin: 0 50%;
+  transition: transform 240ms var(--ease-out);
+  pointer-events: none;
 }
 
-.thumb[aria-selected="true"]::after,
-.segment button[aria-selected="true"]::after {
-  opacity: 1;
+.segment[data-indicator]::after {
+  bottom: 2px;
+}
+
+[data-indicator][data-kbd]::after {
+  transition: none;
 }
 
 .thumb img {
@@ -3465,6 +3484,311 @@ textarea.input {
   }
 }
 
+/* ─── Motion liviano (v2 bloque 2: CSS + IntersectionObserver, sin GSAP) ── */
+
+/* Todo cuelga de .motion-lite (lo pone el script de <head>; nunca con reduce).
+   Nada queda en opacity:0 por CSS salvo bajo .reveal-on, que pone el propio JS. */
+
+.pause-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-1);
+  min-height: 32px;
+  padding: var(--s-1) var(--s-2);
+  border: 1px solid var(--line-ui);
+  border-radius: var(--r-2);
+  color: var(--ink-2);
+  background: var(--bg);
+  cursor: pointer;
+  transition:
+    color var(--dur-1),
+    border-color var(--dur-1);
+}
+
+.pause-btn:hover {
+  color: var(--ink);
+  border-color: var(--ink-3);
+}
+
+/* Sin motion no hay nada que pausar. */
+html:not(.motion-lite) .pause-btn {
+  display: none;
+}
+
+.stage-foot__end {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-3) var(--s-5);
+  min-width: 0;
+}
+
+.others__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--s-3);
+  margin-bottom: var(--s-5);
+}
+
+[data-paused] .packets path,
+[data-paused] .marquee__row {
+  animation-play-state: paused;
+}
+
+/* Hero (v2 §4.3): se ve una vez por visita. El lead y los botones no se animan:
+   el lead es el LCP en móvil y nunca pasa por opacity 0. */
+.motion-lite .hero::before {
+  animation: fade-in 1200ms linear both;
+}
+
+.motion-lite .hero__index li {
+  --delay: calc(200ms + var(--i, 0) * 80ms);
+  animation: row-in var(--dur-4) var(--ease-out) both;
+  animation-delay: var(--delay);
+}
+
+.motion-lite .chapter__thumb {
+  animation: thumb-in var(--dur-4) var(--ease-out) both;
+  animation-delay: var(--delay, 0ms);
+}
+
+@keyframes row-in {
+  from {
+    clip-path: inset(0 100% 0 0);
+  }
+  to {
+    clip-path: inset(0);
+  }
+}
+
+@keyframes thumb-in {
+  from {
+    scale: 0.96;
+  }
+}
+
+/* El eje de ancho: el texto se pinta desde el primer frame (el LCP no espera). */
+@media (min-width: 768px) {
+  .motion-lite .hero__name {
+    animation: wdth-in 900ms var(--ease-out) both;
+  }
+}
+
+@keyframes wdth-in {
+  from {
+    font-variation-settings: "wdth" 62;
+  }
+  to {
+    font-variation-settings: "wdth" 78;
+  }
+}
+
+/* Recorridos del diagrama vertical dibujados con el scroll (v2 §5.6). */
+@supports (animation-timeline: view()) {
+  .motion-lite:not(.motion-ok) .infra__svg--port {
+    view-timeline: --diag block;
+  }
+
+  .motion-lite:not(.motion-ok) .infra__svg--port [data-route],
+  .motion-lite:not(.motion-ok) .infra__svg--port [data-edge-mask="e13"] {
+    stroke-dashoffset: 1;
+    animation: draw linear both;
+    animation-timeline: --diag;
+    transition: none;
+  }
+
+  .motion-lite:not(.motion-ok) .infra__svg--port [data-route="1"] {
+    animation-range: cover 10% cover 55%;
+  }
+
+  .motion-lite:not(.motion-ok) .infra__svg--port [data-route="2"] {
+    stroke: var(--accent);
+    animation-range: cover 35% cover 80%;
+  }
+
+  .motion-lite:not(.motion-ok) .infra__svg--port [data-edge-mask="e13"] {
+    animation-range: cover 75% cover 95%;
+  }
+
+  /* Incidente en móvil: la línea se llena con el scroll y cada nodo se enciende
+     al llegar a la mitad de la ventana. */
+  .motion-lite:not(.motion-ok) .incident__steps {
+    view-timeline: --incident block;
+  }
+
+  .motion-lite:not(.motion-ok) .incident__steps::after {
+    animation: fill-y linear both;
+    animation-timeline: --incident;
+    animation-range: cover 25% cover 65%;
+  }
+
+  .motion-lite:not(.motion-ok) .incident__steps li {
+    view-timeline: --step block;
+  }
+
+  .motion-lite:not(.motion-ok) .incident__steps li::before {
+    animation: node-on linear both;
+    animation-timeline: --step;
+    animation-range: cover 45% cover 50%;
+  }
+
+  /* Media de clientes en móvil: se abre desde un recorte con margen. */
+  .motion-lite:not(.motion-ok) .client-card__media {
+    animation: clip-in linear both;
+    animation-timeline: view();
+    animation-range: entry 0% entry 60%;
+  }
+}
+
+@keyframes draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes fill-y {
+  from {
+    transform: scaleY(0);
+  }
+  to {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes node-on {
+  from {
+    background-color: var(--bg);
+  }
+  to {
+    background-color: var(--accent);
+  }
+}
+
+@keyframes clip-in {
+  from {
+    clip-path: inset(6% 6% 6% 6% round 8px);
+  }
+  to {
+    clip-path: inset(0 round 8px);
+  }
+}
+
+/* Destacados en móvil: el barrido es una transición CSS de 500 ms (v2 §9.3). */
+.motion-lite:not(.motion-ok) .layer[data-state="on"] {
+  transition-duration: 500ms, 0s;
+}
+
+/* Reveals de una vez (bento y carriles). */
+.reveal-on .bento__cell[data-reveal] {
+  transition:
+    opacity var(--dur-4) var(--ease-out),
+    scale var(--dur-4) var(--ease-out);
+  transition-delay: calc(var(--i, 0) * 60ms);
+}
+
+.reveal-on .bento__cell[data-reveal]:not(.is-in) {
+  opacity: 0;
+  scale: 0.97;
+}
+
+.reveal-on .lane[data-reveal] .chip {
+  transition: border-color var(--dur-2) var(--ease-out);
+  transition-delay: calc(var(--l, 0) * 120ms + var(--i, 0) * 30ms);
+}
+
+.reveal-on .lane[data-reveal] .chip__check {
+  transition: opacity var(--dur-2) var(--ease-out);
+  transition-delay: inherit;
+}
+
+.reveal-on .lane[data-reveal]:not(.is-in) .chip {
+  border-color: var(--line);
+}
+
+.reveal-on .lane[data-reveal]:not(.is-in) .chip__check {
+  opacity: 0;
+}
+
+/* Marquee de «Otros»: velocidad fija en px/s (la duración la escribe el JS). */
+.motion-lite .marquee__row--fwd,
+.motion-lite .marquee__row--rev {
+  animation: marquee var(--marquee-d, 60s) linear infinite;
+}
+
+.motion-lite .marquee__row--rev {
+  animation-direction: reverse;
+}
+
+.marquee:not(.in-view) .marquee__row,
+.marquee:hover .marquee__row,
+.others:focus-within .marquee__row,
+.is-hidden .marquee__row {
+  animation-play-state: paused;
+}
+
+@keyframes marquee {
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+/* Crossfade de pestañas con un blur a mitad (Emil), solo tras la primera interacción. */
+.motion-lite .frame[data-warm] .frame__slide[data-active="true"] {
+  animation: tab-blur var(--dur-2) var(--ease-out);
+}
+
+@keyframes tab-blur {
+  50% {
+    filter: blur(2px);
+  }
+}
+
+/* Microinteracciones de puntero fino (v2 §11). */
+@media (hover: hover) and (pointer: fine) {
+  /* #1 Borde spotlight: el gradiente sigue al cursor, enmascarado al borde de 1 px. */
+  .motion-lite .spot::before {
+    content: "";
+    position: absolute;
+    inset: -1px;
+    z-index: 3;
+    padding: 1px;
+    border-radius: inherit;
+    background: radial-gradient(
+      240px circle at var(--mx, 50%) var(--my, 50%),
+      var(--accent-spot),
+      transparent 60%
+    );
+    mask:
+      linear-gradient(#000 0 0) content-box exclude,
+      linear-gradient(#000 0 0);
+    opacity: 0;
+    transition: opacity 150ms ease;
+    pointer-events: none;
+  }
+
+  .motion-lite .spot:hover::before {
+    opacity: 1;
+    transition-duration: var(--dur-2);
+  }
+
+  /* #2 Zoom de la imagen dentro de su marco. */
+  .frame__img,
+  .chapter__thumb img {
+    transition: scale 600ms var(--ease-out);
+  }
+
+  .motion-lite .demo-card:hover .frame__img,
+  .motion-lite .client-card:hover .frame__slide[data-active="true"] .frame__img,
+  .motion-lite .chapter:hover .chapter__thumb img {
+    scale: 1.03;
+  }
+}
+
 /* ─── Disclosures ──────────────────────────────────────────────────────── */
 
 /* <details> nativo: funciona sin JS. La apertura anima grid-template-rows
@@ -3517,6 +3841,22 @@ textarea.input {
 
 .disclosure__body {
   min-height: 0;
+}
+
+/* Apertura animada (v2 §3.2 y §11 #9): 0fr → 1fr sobre ::details-content. */
+@supports selector(::details-content) {
+  .motion-lite .disclosure::details-content {
+    display: grid;
+    grid-template-rows: 0fr;
+    overflow: clip;
+    transition:
+      grid-template-rows var(--dur-3) var(--ease-out),
+      content-visibility var(--dur-3) allow-discrete;
+  }
+
+  .motion-lite .disclosure[open]::details-content {
+    grid-template-rows: 1fr;
+  }
 }
 
 .disclosure__inner {

@@ -64,11 +64,11 @@ export async function Hero() {
 
           <nav className="hero__index" aria-label={t("indexLabel")}>
             <ul>
-              {CHAPTERS.map((c) => {
+              {CHAPTERS.map((c, i) => {
                 const img = resolveImage(c.image);
                 const vid = "video" in c ? resolveVideo(c.video) : undefined;
                 return (
-                  <li key={c.id}>
+                  <li key={c.id} style={{ ["--i" as string]: i }}>
                     <ChapterRow
                       href={c.href}
                       title={t(`chapters.${c.id}.title`)}

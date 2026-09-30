@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { computeLevel, LEVEL_EVENT, MOTION_OK_QUERY, REDUCE_QUERY } from "./level";
+import { mountObserve } from "./lite/observe";
 
 /**
  * Mantiene las clases de nivel en <html> (el script inline ya las puso antes del
@@ -10,6 +11,7 @@ import { computeLevel, LEVEL_EVENT, MOTION_OK_QUERY, REDUCE_QUERY } from "./leve
 export function MotionRoot() {
   useEffect(() => {
     const html = document.documentElement;
+    let offObserve: (() => void) | undefined;
     const apply = () => {
       const level = computeLevel();
       const lite = level !== "none";
@@ -19,6 +21,12 @@ export function MotionRoot() {
       html.classList.add("js");
       html.classList.toggle("motion-lite", lite);
       html.classList.toggle("motion-ok", ok);
+      // Motion liviano (observers, marquee, spotlight): con cualquier nivel salvo «ninguno».
+      if (lite && !offObserve) offObserve = mountObserve();
+      if (!lite && offObserve) {
+        offObserve();
+        offObserve = undefined;
+      }
       if (changed) window.dispatchEvent(new CustomEvent(LEVEL_EVENT, { detail: level }));
     };
     apply();
@@ -31,6 +39,7 @@ export function MotionRoot() {
     return () => {
       mqs.forEach((m) => m.removeEventListener("change", apply));
       document.removeEventListener("visibilitychange", onVis);
+      offObserve?.();
     };
   }, []);
   return null;

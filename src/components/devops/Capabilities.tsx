@@ -27,7 +27,7 @@ export async function CapabilityBento() {
     <div className="bento-wrap">
       <h3 className="subhead">{t("bento.title")}</h3>
       <div className="bento">
-        <section className="bento__cell bento__cell--a" aria-labelledby="bento-panel">
+        <section className="bento__cell bento__cell--a" data-reveal style={{ ["--i" as string]: 0 }} aria-labelledby="bento-panel">
           <h4 id="bento-panel" className="t-h3">
             {t("capabilities.panel.title")}
           </h4>
@@ -66,7 +66,7 @@ export async function CapabilityBento() {
           )}
         </section>
 
-        <section className="bento__cell bento__cell--b" aria-labelledby="bento-proxy">
+        <section className="bento__cell bento__cell--b" data-reveal style={{ ["--i" as string]: 1 }} aria-labelledby="bento-proxy">
           <h4 id="bento-proxy" className="t-h3">
             {t("capabilities.proxy.title")}
           </h4>
@@ -80,7 +80,7 @@ export async function CapabilityBento() {
           </ul>
         </section>
 
-        <section className="bento__cell bento__cell--c" aria-labelledby="bento-containers">
+        <section className="bento__cell bento__cell--c" data-reveal style={{ ["--i" as string]: 2 }} aria-labelledby="bento-containers">
           <h4 id="bento-containers" className="t-h3">
             {t("capabilities.containers.title")}
           </h4>
@@ -102,7 +102,7 @@ export async function CapabilityBento() {
           </ul>
         </section>
 
-        <section className="bento__cell bento__cell--d" aria-labelledby="bento-automation">
+        <section className="bento__cell bento__cell--d" data-reveal style={{ ["--i" as string]: 3 }} aria-labelledby="bento-automation">
           {flows && (
             <figure className="bento__media">
               <div className="capture capture--wide" data-overflow-ok>

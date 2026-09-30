@@ -10,6 +10,7 @@ import { slideFrom } from "@/components/media/build";
 import { mediaText } from "@/components/media/text";
 import { DemoRequestLink } from "./DemoRequestLink";
 import { FEATURED_IDS } from "./Featured";
+import { PauseToggle } from "@/components/ui/PauseToggle";
 
 const host = (url?: string) => (url ? new URL(url).host : undefined);
 
@@ -108,10 +109,13 @@ export async function MoreProjects() {
         </ul>
 
         <div className="others">
-          <h2 className="t-h2 others__title">{t("othersTitle")}</h2>
+          <div className="others__head">
+            <h2 className="t-h2">{t("othersTitle")}</h2>
+            <PauseToggle target=".others" pauseLabel={t("pauseCovers")} playLabel={t("playCovers")} />
+          </div>
 
           {/* Marquee (solo con motion): decorativo, la información está en el índice. */}
-          <div className="marquee" aria-hidden="true" data-overflow-ok>
+          <div className="marquee" aria-hidden="true" data-overflow-ok data-inview>
             {rows.map((row, r) => (
               <div key={r} className={`marquee__row marquee__row--${r % 2 ? "rev" : "fwd"}`}>
                 {[0, 1].map((copy) => (
