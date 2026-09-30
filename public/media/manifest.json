@@ -387,24 +387,27 @@
   "meridiano": {
     "portada": {
       "src": "/media/meridiano/portada.webp",
-      "w": 1600,
-      "h": 900,
-      "from": "workana-set/meridiano-portada.jpg",
-      "webpQ": 80,
-      "kb": 46,
       "avif": "/media/meridiano/portada.avif",
-      "avifKb": 29
+      "w": 1440,
+      "h": 900,
+      "fit": "cover",
+      "position": "top",
+      "from": "portadas/meridiano-studio.png",
+      "kb": 53,
+      "avifKb": 33,
+      "note": "16:10; workana-set/meridiano-* descartado (muestra casos Recreo/Lume)"
     },
     "recorrido": {
       "mp4": "/media/meridiano/recorrido.mp4",
       "webm": "/media/meridiano/recorrido.webm",
       "poster": "/media/meridiano/portada.webp",
-      "w": 640,
-      "h": 360,
-      "seconds": 7,
-      "mp4Kb": 336,
-      "webmKb": 146,
-      "from": "workana-set/meridiano-portada.gif"
+      "w": 680,
+      "h": 424,
+      "seconds": 8,
+      "mp4Kb": 509,
+      "webmKb": 142,
+      "from": "reels/meridiano-reel.gif",
+      "note": "16:10 (680x424): no pasa la regla 0.8 en slot feature/half, sí en third"
     }
   },
   "bitacora": {
