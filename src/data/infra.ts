@@ -27,28 +27,28 @@ export const TYPE = {
 } as const;
 
 export const nodes: InfraNode[] = [
-  { id: "visitors", kind: "external", interactive: true, land: { x: 0, y: 136, w: 184, h: 72 }, port: { x: 0, y: 0, w: 172, h: 80 } },
-  { id: "telegram", kind: "external", interactive: true, land: { x: 0, y: 280, w: 184, h: 72 }, port: { x: 188, y: 0, w: 172, h: 80 } },
-  { id: "dns", kind: "service", interactive: true, land: { x: 216, y: 136, w: 168, h: 72 }, port: { x: 0, y: 104, w: 172, h: 80 } },
-  { id: "github", kind: "external", interactive: true, land: { x: 0, y: 40, w: 184, h: 72 }, port: { x: 0, y: 1416, w: 360, h: 72 } },
+  { id: "visitors", group: "external", kind: "external", interactive: true, land: { x: 0, y: 136, w: 184, h: 72 }, port: { x: 0, y: 0, w: 172, h: 80 } },
+  { id: "telegram", group: "external", kind: "external", interactive: true, land: { x: 0, y: 280, w: 184, h: 72 }, port: { x: 188, y: 0, w: 172, h: 80 } },
+  { id: "dns", group: "dns", kind: "service", interactive: true, land: { x: 216, y: 136, w: 168, h: 72 }, port: { x: 0, y: 104, w: 172, h: 80 } },
+  { id: "github", group: "external", kind: "external", interactive: true, land: { x: 0, y: 40, w: 184, h: 72 }, port: { x: 0, y: 1416, w: 360, h: 72 } },
 
-  { id: "vps", kind: "boundary", interactive: false, land: { x: 416, y: 16, w: 784, h: 560 }, port: { x: 0, y: 208, w: 360, h: 1184 } },
-  { id: "host", kind: "strip", interactive: true, land: { x: 432, y: 80, w: 752, h: 40 }, port: { x: 16, y: 1264, w: 328, h: 104 } },
-  { id: "caddy", kind: "service", interactive: true, land: { x: 432, y: 144, w: 176, h: 136 }, port: { x: 16, y: 296, w: 328, h: 88 } },
-  { id: "cron", kind: "service", interactive: true, land: { x: 432, y: 320, w: 176, h: 88 }, port: { x: 16, y: 1152, w: 328, h: 88 } },
+  { id: "vps", group: "frame", kind: "boundary", interactive: false, land: { x: 416, y: 16, w: 784, h: 560 }, port: { x: 0, y: 208, w: 360, h: 1184 } },
+  { id: "host", group: "vps", kind: "strip", interactive: true, land: { x: 432, y: 80, w: 752, h: 40 }, port: { x: 16, y: 1264, w: 328, h: 104 } },
+  { id: "caddy", group: "caddy", kind: "service", interactive: true, land: { x: 432, y: 144, w: 176, h: 136 }, port: { x: 16, y: 296, w: 328, h: 88 } },
+  { id: "cron", group: "vps", kind: "service", interactive: true, land: { x: 432, y: 320, w: 176, h: 88 }, port: { x: 16, y: 1152, w: 328, h: 88 } },
 
-  { id: "docker", kind: "boundary", interactive: false, land: { x: 632, y: 144, w: 552, h: 392 }, port: { x: 16, y: 408, w: 328, h: 720 } },
-  { id: "appsmonitor", kind: "service", interactive: true, land: { x: 648, y: 288, w: 252, h: 88 }, port: { x: 44, y: 472, w: 284, h: 88 } },
-  { id: "wordpress", kind: "on-demand", interactive: true, land: { x: 648, y: 184, w: 252, h: 88 }, port: { x: 44, y: 584, w: 284, h: 88 } },
-  { id: "mariadb", kind: "service", interactive: true, land: { x: 916, y: 184, w: 252, h: 88 }, port: { x: 44, y: 696, w: 284, h: 80 } },
-  { id: "wpcli", kind: "service", interactive: true, land: { x: 916, y: 288, w: 120, h: 88 }, port: { x: 44, y: 800, w: 136, h: 64 } },
-  { id: "backups", kind: "service", interactive: true, land: { x: 1048, y: 288, w: 120, h: 88 }, port: { x: 192, y: 800, w: 136, h: 64 } },
-  { id: "runner", kind: "service", interactive: true, land: { x: 916, y: 400, w: 252, h: 104 }, port: { x: 44, y: 888, w: 284, h: 104 } },
-  { id: "n8n", kind: "service", interactive: true, land: { x: 648, y: 400, w: 252, h: 104 }, port: { x: 44, y: 1016, w: 284, h: 88 } },
+  { id: "docker", group: "frame", kind: "boundary", interactive: false, land: { x: 632, y: 144, w: 552, h: 392 }, port: { x: 16, y: 408, w: 328, h: 720 } },
+  { id: "appsmonitor", group: "docker", kind: "service", interactive: true, land: { x: 648, y: 288, w: 252, h: 88 }, port: { x: 44, y: 472, w: 284, h: 88 } },
+  { id: "wordpress", group: "docker", kind: "on-demand", interactive: true, land: { x: 648, y: 184, w: 252, h: 88 }, port: { x: 44, y: 584, w: 284, h: 88 } },
+  { id: "mariadb", group: "docker", kind: "service", interactive: true, land: { x: 916, y: 184, w: 252, h: 88 }, port: { x: 44, y: 696, w: 284, h: 80 } },
+  { id: "wpcli", group: "docker", kind: "service", interactive: true, land: { x: 916, y: 288, w: 120, h: 88 }, port: { x: 44, y: 800, w: 136, h: 64 } },
+  { id: "backups", group: "docker", kind: "service", interactive: true, land: { x: 1048, y: 288, w: 120, h: 88 }, port: { x: 192, y: 800, w: 136, h: 64 } },
+  { id: "runner", group: "docker", kind: "service", interactive: true, land: { x: 916, y: 400, w: 252, h: 104 }, port: { x: 44, y: 888, w: 284, h: 104 } },
+  { id: "n8n", group: "docker", kind: "service", interactive: true, land: { x: 648, y: 400, w: 252, h: 104 }, port: { x: 44, y: 1016, w: 284, h: 88 } },
 
-  { id: "vercel", kind: "cloud", interactive: true, land: { x: 0, y: 616, w: 280, h: 80 }, port: { x: 0, y: 1536, w: 360, h: 72 } },
-  { id: "aws", kind: "cloud", interactive: true, land: { x: 304, y: 616, w: 560, h: 80 }, port: { x: 0, y: 1624, w: 360, h: 120 } },
-  { id: "cloudflare", kind: "cloud", interactive: true, land: { x: 888, y: 616, w: 312, h: 80 }, port: { x: 0, y: 1760, w: 360, h: 64 } },
+  { id: "vercel", group: "cloud", kind: "cloud", interactive: true, land: { x: 0, y: 616, w: 280, h: 80 }, port: { x: 0, y: 1536, w: 360, h: 72 } },
+  { id: "aws", group: "cloud", kind: "cloud", interactive: true, land: { x: 304, y: 616, w: 560, h: 80 }, port: { x: 0, y: 1624, w: 360, h: 120 } },
+  { id: "cloudflare", group: "cloud", kind: "cloud", interactive: true, land: { x: 888, y: 616, w: 312, h: 80 }, port: { x: 0, y: 1760, w: 360, h: 64 } },
 ];
 
 /** Posición del rótulo «Fuera del VPS». */
@@ -77,7 +77,17 @@ export const edges: InfraEdge[] = [
     labelLand: { x: 192, y: 306, anchor: "start" },
     labelPort: { x: 318, y: 124, anchor: "end" },
   },
-  { id: "e7", from: "n8n", to: "runner", type: "control", land: [[900, 452], [916, 452]], port: [[186, 1016], [186, 992]] },
+  {
+    id: "e7",
+    from: "n8n",
+    to: "runner",
+    type: "control",
+    land: [[900, 452], [916, 452]],
+    port: [[186, 1016], [186, 992]],
+    // Bajo el par n8n/runner (land) y en el hueco de 24 u entre los dos (port).
+    labelLand: { x: 908, y: 524, anchor: "middle" },
+    labelPort: { x: 196, y: 1009, anchor: "start" },
+  },
   { id: "e8", from: "appsmonitor", to: "wordpress", type: "control", land: [[774, 288], [774, 272]], port: [[186, 560], [186, 584]] },
   { id: "e9", from: "wordpress", to: "mariadb", type: "traffic", land: [[900, 228], [916, 228]], port: [[186, 672], [186, 696]] },
   { id: "e10", from: "wpcli", to: "mariadb", type: "control", land: [[976, 288], [976, 272]], port: [[112, 800], [112, 776]] },
@@ -128,3 +138,16 @@ export const listOrder = [
 ];
 
 export const DEFAULT_NODE = "caddy";
+
+/**
+ * Nodo que representa cada paso en la composición vertical: los centinelas del
+ * caption móvil se ubican a su altura (DISENO-v2 §5.6).
+ */
+export const STEP_NODES: Record<string, string> = {
+  visit: "visitors",
+  proxy: "caddy",
+  container: "wordpress",
+  webhook: "runner",
+  deploy: "github",
+  ops: "cron",
+};

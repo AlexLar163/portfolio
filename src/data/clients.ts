@@ -30,8 +30,9 @@ export const clients: Client[] = [
     year: "2026",
     status: "production",
     tech: ["WordPress", "Elementor", "WooCommerce", "TranslatePress"],
+    // v2 §8.1: la galería grande + el teléfono superpuesto. Sin afirmaciones de velocidad.
     media: {
-      main: { slug: "orthodent", key: "portada" },
+      main: { slug: "orthodent", key: "galeria-01" },
       inset: { slug: "orthodent", key: "movil" },
     },
   },
@@ -45,7 +46,10 @@ export const clients: Client[] = [
     status: "production",
     tech: ["Systeme.io"],
     review: { source: "Workana", stars: 5 },
-    media: { main: { slug: "argentina-local-expert", key: "portada" } },
+    media: {
+      main: { slug: "argentina-local-expert", key: "portada" },
+      inset: { slug: "argentina-local-expert", key: "movil" },
+    },
   },
   {
     id: "diamante",

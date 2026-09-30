@@ -1,16 +1,19 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { SiteHeader } from "@/components/header/SiteHeader";
 import { Hero } from "@/components/hero/Hero";
-import { Clients } from "@/components/clients/Clients";
 import { DevOps } from "@/components/devops/DevOps";
-import { Projects } from "@/components/projects/Projects";
-import { Experience } from "@/components/experience/Experience";
-import { Stack } from "@/components/stack/Stack";
-import { Cv } from "@/components/cv/Cv";
+import { Clients } from "@/components/clients/Clients";
+import { Featured } from "@/components/projects/Featured";
+import { MoreProjects } from "@/components/projects/MoreProjects";
+import { Trajectory } from "@/components/experience/Trajectory";
 import { Contact } from "@/components/contact/Contact";
 import { SiteFooter } from "@/components/SiteFooter";
+import { MotionRoot } from "@/motion/MotionRoot";
+import { MotionScene } from "@/motion/MotionScene";
 
-// Orden fijo (DISENO §3): Header → Hero → Clientes → DevOps → Productos → Experiencia → Stack → CV → Contacto → Footer.
+// Orden v2 (DISENO-v2 §3): Header → Hero → DevOps → Clientes → Destacados →
+// Más demos + Otros → Trayectoria → Contacto (+CV) → Footer.
+// Si Alex prefiere Clientes antes que DevOps, se invierten esas dos líneas.
 export default async function Home({ params }: { params: Promise<{ locale: string }> }) {
   const { locale } = await params;
   setRequestLocale(locale);
@@ -21,18 +24,19 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
       <a className="skip-link" href="#contenido">
         {t("skip")}
       </a>
+      <MotionRoot />
       <SiteHeader />
       <main id="contenido">
         <Hero />
-        <Clients />
         <DevOps />
-        <Projects />
-        <Experience />
-        <Stack />
-        <Cv />
+        <Clients />
+        <Featured />
+        <MoreProjects />
+        <Trajectory />
         <Contact />
       </main>
       <SiteFooter />
+      <MotionScene name="chrome" />
     </>
   );
 }

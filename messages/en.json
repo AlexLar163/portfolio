@@ -10,13 +10,15 @@
     "primary": "Sections",
     "clientes": "Clients",
     "devops": "DevOps",
-    "proyectos": "Projects",
+    "proyectos": "Products",
     "experiencia": "Experience",
     "contacto": "Contact",
     "cv": "CV",
     "menuOpen": "Open menu",
     "menuClose": "Close menu",
-    "lang": "Language"
+    "lang": "Language",
+    "available": "Available",
+    "progress": "Reading progress"
   },
   "common": {
     "newTab": "(opens in a new tab)",
@@ -54,26 +56,31 @@
   "profile": {
     "role": "Fullstack & DevOps Engineer",
     "lead": "I build the application and the server it runs on: from frontend and API to Docker, the proxy, CI/CD and automation with AI agents.",
-    "availability": "Available for new projects",
-    "sheetLabel": "Alex Largo at a glance",
-    "now": "Now",
-    "nowMain": "NTT DATA · Junior Engineer",
-    "nowParallel": "In parallel: freelance on Workana, since Jan 2026",
-    "base": "Based in",
-    "baseValue": "Cuenca, Ecuador",
-    "languages": "Languages",
-    "languagesValue": "Spanish (native) · English B1",
-    "links": "Links",
-    "monogram": "Alex Largo initials"
+    "availability": "Available for new projects"
   },
   "hero": {
     "contact": "Get in touch",
     "downloadCv": "Download CV",
-    "otherCv": "Versión en español (PDF)"
+    "otherCv": "Versión en español (PDF)",
+    "indexLabel": "Portfolio chapters",
+    "chapters": {
+      "devops": {
+        "title": "Production infrastructure",
+        "sub": "Own VPS · Docker · Caddy · CI/CD"
+      },
+      "clients": {
+        "title": "Real clients",
+        "sub": "3Destiny · Orthodent · Argentina Local Expert · Diamante"
+      },
+      "products": {
+        "title": "Products",
+        "sub": "Turnia · Vera · automation pipeline with AI agents"
+      }
+    }
   },
   "clients": {
     "title": "Clients",
-    "lead": "Real projects for clients who use them every day.",
+    "lead": "Four real clients: three in production, one in progress.",
     "visit": "Visit site",
     "demoWon": "See the demo that won the project",
     "published": "Launched",
@@ -103,7 +110,9 @@
           "org": "Argentina Local Expert",
           "rating": "Workana 5.0",
           "project": "Project: «Desarrollador Web para Personalizar y Completar Diseño de Página en Systeme.io»",
-          "translated": "Translated from Spanish."
+          "translated": "Translated from Spanish.",
+          "pull": "He delivered the project on time and exactly as I requested.",
+          "label": "Workana review"
         }
       },
       "diamante": {
@@ -359,7 +368,61 @@
           "target": "Server with nginx"
         }
       }
-    }
+    },
+    "stepsLabel": "One request, end to end",
+    "steps": {
+      "visit": {
+        "title": "A visit comes in",
+        "text": "Wildcard DNS resolves every demo to the same server.",
+        "data": "A *.taller.works"
+      },
+      "proxy": {
+        "title": "Caddy takes it",
+        "text": "Issues the certificate and routes each subdomain to its container.",
+        "data": "automatic TLS · 11 virtual hosts"
+      },
+      "container": {
+        "title": "It reaches its container",
+        "text": "WordPress via Compose profiles, sharing one MariaDB.",
+        "data": "384 MB each · max. 2 running"
+      },
+      "webhook": {
+        "title": "A webhook arrives",
+        "text": "Only Telegram's IP ranges get through; n8n wakes the AI agent runner.",
+        "data": "header auth · no public ports"
+      },
+      "deploy": {
+        "title": "Push to main",
+        "text": "GitHub Actions deploys over SSH and restarts the service.",
+        "data": "SSH + rsync · restart"
+      },
+      "ops": {
+        "title": "Weekly check and backups",
+        "text": "Every Monday the status goes to Telegram; database and uploads are backed up.",
+        "data": "Mondays 9:00 · wp db export + tar"
+      }
+    },
+    "ci": {
+      "label": "appsMonitor deploy",
+      "chips": [
+        "git push",
+        "SSH + rsync",
+        "build",
+        "service restart"
+      ]
+    },
+    "bento": {
+      "title": "What I run",
+      "panelFacts": [
+        "MAX_RUNNING=2",
+        "≥ 400 MB free · load < 2",
+        "systemd → container"
+      ],
+      "memLabel": "memory limit per site",
+      "sheetSummary": "See all 9 areas"
+    },
+    "lanesTitle": "CI/CD pipelines",
+    "tableSummary": "See the pipelines as a table"
   },
   "infra": {
     "frames": {
@@ -381,6 +444,9 @@
       "e6": [
         "Telegram IP",
         "ranges only"
+      ],
+      "e7": [
+        "header auth"
       ]
     },
     "nodes": {
@@ -677,6 +743,16 @@
           "cantina": "Diner",
           "odontologia": "Dental",
           "taller": "Auto shop"
+        },
+        "steps": {
+          "receptionist": {
+            "title": "The receptionist",
+            "text": "Chat mockup + n8n flows with AI."
+          },
+          "industries": {
+            "title": "Four industries",
+            "text": "Barbershop, diner, dental clinic and auto shop."
+          }
         }
       },
       "pipeline-ia": {
@@ -686,7 +762,17 @@
           "6 n8n flows in production",
           "Human approval with Wait + webhook",
           "3 Telegram bots, Gmail and state in Postgres"
-        ]
+        ],
+        "steps": {
+          "flows": {
+            "title": "The flows",
+            "text": "6 n8n flows in production, 3 Telegram bots, Gmail and state in Postgres."
+          },
+          "approval": {
+            "title": "Human approval",
+            "text": "n8n orchestrates an AI agent in Docker; nothing goes out without approval over chat (Wait + webhook)."
+          }
+        }
       },
       "lume": {
         "summary": "Beauty spa with its own booking engine in WordPress.",
@@ -778,7 +864,14 @@
       "gad": {
         "summary": "Website for the San Fernando canton, with React and NestJS."
       }
-    }
+    },
+    "featuredTitle": "Featured products",
+    "featuredLead": "Demo brands are fictional; the code and the deployment are real.",
+    "layersLabel": "Views of {name}",
+    "moreTitle": "More demos",
+    "othersTitle": "Other projects",
+    "showAll": "See all {n} projects",
+    "moreCount": "+{n}"
   },
   "experience": {
     "title": "Experience",
@@ -810,7 +903,8 @@
       "label": "Education",
       "degree": "Software Engineering",
       "school": "Universidad Católica de Cuenca"
-    }
+    },
+    "earlier": "Earlier experience"
   },
   "stack": {
     "title": "Stack and tools",
@@ -825,7 +919,8 @@
       "mobile": "Mobile",
       "cms": "CMS and platforms",
       "testing": "Testing and QA"
-    }
+    },
+    "all": "Full stack"
   },
   "cv": {
     "title": "Résumé",
@@ -851,13 +946,19 @@
     "errMessage": "Tell me a bit more (at least 5 characters).",
     "namePlaceholder": "Your name",
     "emailPlaceholder": "you@email.com",
-    "messagePlaceholder": "What you need, by when, and any useful links."
+    "messagePlaceholder": "What you need, by when, and any useful links.",
+    "base": "Based in",
+    "baseValue": "Cuenca, Ecuador · UTC−5",
+    "languages": "Languages",
+    "languagesValue": "Spanish (native) · English B1",
+    "cvTitle": "Résumé"
   },
   "footer": {
     "rights": "© 2026 Alex Largo · Fullstack & DevOps Engineer",
     "built": "Next.js on Vercel",
     "build": "build",
-    "top": "Back to top"
+    "top": "Back to top",
+    "links": "Links"
   },
   "notFound": {
     "title": "This page doesn't exist",

@@ -7,13 +7,15 @@ import { LocaleSwitch } from "./LocaleSwitch";
 type Props = {
   sections: { id: string; label: string }[];
   cv: { href: string; label: string };
+  /** Estado real (permitido): punto --live + texto corto; el largo va para lectores. */
+  availability: { short: string; full: string };
   labels: { home: string; primary: string; menuOpen: string; menuClose: string; lang: string };
   name: string;
 };
 
 const useIsoLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
 
-export function HeaderBar({ sections, cv, labels, name }: Props) {
+export function HeaderBar({ sections, cv, availability, labels, name }: Props) {
   const headerRef = useRef<HTMLElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
   const menuBtnRef = useRef<HTMLButtonElement>(null);
@@ -33,11 +35,14 @@ export function HeaderBar({ sections, cv, labels, name }: Props) {
   // Sección activa: la que cruza la franja del 45–50 % de la ventana.
   useEffect(() => {
     const ids = new Set(sections.map((s) => s.id));
-    const targets = Array.from(document.querySelectorAll<HTMLElement>("main section[id]"));
+    // Solo secciones de primer nivel; «Más demos» declara a qué entrada pertenece (data-nav).
+    const targets = Array.from(document.querySelectorAll<HTMLElement>("main > section[id]"));
     const io = new IntersectionObserver(
       (entries) => {
         for (const e of entries) {
-          if (e.isIntersecting) setActive(ids.has(e.target.id) ? e.target.id : null);
+          if (!e.isIntersecting) continue;
+          const id = (e.target as HTMLElement).dataset.nav ?? e.target.id;
+          setActive(ids.has(id) ? id : null);
         }
       },
       { rootMargin: "-45% 0px -50% 0px" },
@@ -90,6 +95,12 @@ export function HeaderBar({ sections, cv, labels, name }: Props) {
           <a href="#inicio" className="brand" aria-label={labels.home}>
             {name}
           </a>
+          <p className="availability" title={availability.full}>
+            <span className="availability__short" aria-hidden>
+              {availability.short}
+            </span>
+            <span className="sr-only">{availability.full}</span>
+          </p>
           <nav className="nav-desktop" aria-label={labels.primary}>
             <ul ref={listRef}>
               {sections.map((s) => (
@@ -119,6 +130,7 @@ export function HeaderBar({ sections, cv, labels, name }: Props) {
           </button>
         </div>
       </div>
+      <div className="read-progress" aria-hidden />
       <div id="mobile-panel" className="mobile-panel" data-open={open}>
         <nav className="shell" aria-label={labels.primary}>
           <ul>

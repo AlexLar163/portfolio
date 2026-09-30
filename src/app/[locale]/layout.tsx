@@ -7,6 +7,7 @@ import { routing, type Locale } from "@/i18n/routing";
 import { profile } from "@/data/profile";
 import { skills } from "@/data/skills";
 import { SITE_URL } from "@/lib/site";
+import { LEVEL_SCRIPT } from "@/motion/level";
 import "../globals.css";
 
 
@@ -95,7 +96,12 @@ export default async function LocaleLayout({
   };
 
   return (
-    <html lang={locale} className={fontClasses}>
+    // suppressHydrationWarning: el script de niveles agrega clases a <html> antes de hidratar.
+    <html lang={locale} className={fontClasses} suppressHydrationWarning>
+      <head>
+        {/* Niveles de motion antes del primer paint (DISENO-v2 §7.1): < 400 B, sin dependencias. */}
+        <script dangerouslySetInnerHTML={{ __html: LEVEL_SCRIPT }} />
+      </head>
       <body>
         <script
           type="application/ld+json"

@@ -86,6 +86,8 @@ export type Point = [number, number];
 export interface InfraNode {
   id: string;
   kind: "external" | "service" | "on-demand" | "boundary" | "strip" | "cloud";
+  /** Orden de aparición en la escena DevOps (DISENO-v2 §5.3, fase «armado»). */
+  group: "external" | "dns" | "frame" | "vps" | "caddy" | "docker" | "cloud";
   land: Box;
   port: Box;
   /** Nodos que no se seleccionan (fronteras). */
@@ -100,8 +102,8 @@ export interface InfraEdge {
   land: Point[];
   port: Point[];
   /** Posición de la etiqueta visible, si la tiene. */
-  labelLand?: { x: number; y: number; anchor: "start" | "end" };
-  labelPort?: { x: number; y: number; anchor: "start" | "end" };
+  labelLand?: { x: number; y: number; anchor: "start" | "middle" | "end" };
+  labelPort?: { x: number; y: number; anchor: "start" | "middle" | "end" };
 }
 
 export interface InfraRoute {
