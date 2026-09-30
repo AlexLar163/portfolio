@@ -54,7 +54,7 @@
   "profile": {
     "role": "Fullstack & DevOps Engineer",
     "lead": "Construyo la aplicación y el servidor donde corre: del frontend y la API a Docker, el proxy, el CI/CD y la automatización con agentes IA.",
-    "availability": "Disponible para proyectos freelance",
+    "availability": "Disponible para nuevos proyectos",
     "sheetLabel": "Ficha de Alex Largo",
     "now": "Ahora",
     "nowMain": "NTT DATA · Junior Engineer",
@@ -76,7 +76,6 @@
     "lead": "Proyectos reales para clientes que los usan todos los días.",
     "visit": "Ver sitio",
     "demoWon": "Ver el demo que ganó el proyecto",
-    "review": "Reseña 5★ en Workana",
     "published": "Publicado",
     "lighthouse": "Lighthouse",
     "infra": "Infra",
@@ -97,7 +96,14 @@
       "argentina-local-expert": {
         "country": "Argentina",
         "summary": "Landing y embudo de ventas en Systeme.io, con los leads entrando al CRM nativo de la plataforma.",
-        "stackValue": "Systeme.io · embudo · CRM de leads"
+        "stackValue": "Systeme.io · embudo · CRM de leads",
+        "review": {
+          "quote": "Mi experiencia con Alex ha sido muy positiva. Entregó el proyecto a tiempo y tal cual lo que le solicité. El trato es muy amable. Volvería a trabajar con él sin problema. Lo recomiendo.",
+          "author": "Elizabeth Mitchell",
+          "org": "Argentina Local Expert",
+          "rating": "Workana 5.0",
+          "project": "Proyecto: «Desarrollador Web para Personalizar y Completar Diseño de Página en Systeme.io»"
+        }
       },
       "diamante": {
         "summary": "App de anotación de béisbol. Proyecto ganado en Workana con un demo funcional; la fase 1 es una app móvil en React Native.",
@@ -215,6 +221,7 @@
           }
         ],
         "mediaAlt": [
+          "Tarjeta del droplet en appsMonitor: RAM libre 820 MB de 1,9 GB, disco al 37 % con 29,6 GB libres, carga de 0,09 en 1 minuto, 1 vCPU y 21 días de uptime",
           "Panel appsMonitor: lista de proyectos con su estado y controles para encender o apagar"
         ]
       },

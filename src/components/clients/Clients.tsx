@@ -98,8 +98,22 @@ export async function Clients() {
               {meta(cl)}
               <p className="card__summary">{t(`items.${cl.id}.summary`)}</p>
               <p className="tech t-data">{t(`items.${cl.id}.stackValue`)}</p>
-              {cl.review && (
-                <p className="t-small ink-2">{t("review")}</p>
+              {cl.review && t.has(`items.${cl.id}.review.quote`) && (
+                <figure className="review">
+                  <blockquote>
+                    <p>«{t(`items.${cl.id}.review.quote`)}»</p>
+                  </blockquote>
+                  <figcaption className="t-small">
+                    <span className="ink-2">
+                      {t(`items.${cl.id}.review.author`)} · {t(`items.${cl.id}.review.org`)} ·{" "}
+                      <span className="t-data">{t(`items.${cl.id}.review.rating`)}</span>
+                    </span>
+                    <span>{t(`items.${cl.id}.review.project`)}</span>
+                    {t.has(`items.${cl.id}.review.translated`) && (
+                      <span>{t(`items.${cl.id}.review.translated`)}</span>
+                    )}
+                  </figcaption>
+                </figure>
               )}
               <div className="card__actions">
                 {cl.url && (

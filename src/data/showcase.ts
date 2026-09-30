@@ -215,8 +215,8 @@ export const showcase: Showcase[] = [
     group: "nextjs",
     year: "2026",
     tech: ["Next.js", "Tailwind"],
-    // Deploy sin confirmar como propio: sin enlace hasta que Alex lo confirme.
-    status: "captures-only",
+    status: "live",
+    url: "https://landing-clinica-dental.vercel.app",
     media: { main: { slug: "clinica-aurora", key: "portada" } },
   },
   {

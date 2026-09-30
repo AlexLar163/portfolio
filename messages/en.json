@@ -54,7 +54,7 @@
   "profile": {
     "role": "Fullstack & DevOps Engineer",
     "lead": "I build the application and the server it runs on: from frontend and API to Docker, the proxy, CI/CD and automation with AI agents.",
-    "availability": "Available for freelance projects",
+    "availability": "Available for new projects",
     "sheetLabel": "Alex Largo at a glance",
     "now": "Now",
     "nowMain": "NTT DATA · Junior Engineer",
@@ -76,7 +76,6 @@
     "lead": "Real projects for clients who use them every day.",
     "visit": "Visit site",
     "demoWon": "See the demo that won the project",
-    "review": "5★ review on Workana",
     "published": "Launched",
     "lighthouse": "Lighthouse",
     "infra": "Infra",
@@ -97,7 +96,15 @@
       "argentina-local-expert": {
         "country": "Argentina",
         "summary": "Landing page and sales funnel on Systeme.io, with leads flowing into the platform's native CRM.",
-        "stackValue": "Systeme.io · funnel · lead CRM"
+        "stackValue": "Systeme.io · funnel · lead CRM",
+        "review": {
+          "quote": "My experience with Alex has been very positive. He delivered the project on time and exactly as I requested. He is very kind to work with. I would work with him again without hesitation. I recommend him.",
+          "author": "Elizabeth Mitchell",
+          "org": "Argentina Local Expert",
+          "rating": "Workana 5.0",
+          "project": "Project: «Desarrollador Web para Personalizar y Completar Diseño de Página en Systeme.io»",
+          "translated": "Translated from Spanish."
+        }
       },
       "diamante": {
         "summary": "Baseball scorekeeping app. Won on Workana with a working demo; phase 1 is a React Native mobile app.",
@@ -215,6 +222,7 @@
           }
         ],
         "mediaAlt": [
+          "Droplet card in appsMonitor: 820 MB of 1.9 GB RAM free, disk at 37% with 29.6 GB free, 1-minute load of 0.09, 1 vCPU and 21 days of uptime",
           "appsMonitor panel: project list with status and start/stop controls"
         ]
       },
