@@ -21,7 +21,16 @@ type Texts = {
   messagePlaceholder: string;
   copy: string;
   copied: string;
+  wireFrom: string;
+  wireTo: string;
 };
+
+type Phase = "idle" | "sending" | "ok" | "err";
+
+const EASE_IO = "cubic-bezier(0.65, 0, 0.35, 1)";
+const EASE_OUT = "cubic-bezier(0.16, 1, 0.3, 1)";
+/** Hasta dónde viaja el paquete mientras la acción del servidor no responde. */
+const WAIT_AT = 0.72;
 
 type Field = "name" | "email" | "message";
 
@@ -42,6 +51,40 @@ export function ContactForm({ t, email }: { t: Texts; email: string }) {
   const formRef = useRef<HTMLFormElement>(null);
   const messageRef = useRef<HTMLTextAreaElement>(null);
   const successRef = useRef<HTMLDivElement>(null);
+  const wireRef = useRef<HTMLDivElement>(null);
+  const [phase, setPhase] = useState<Phase>("idle");
+  // El estado de la acción al enviar: solo un estado NUEVO cierra el viaje.
+  const sentFrom = useRef<ContactState | undefined>(undefined);
+
+  /**
+   * Viaje del paquete por el cable (solo visual, v3): el envío real es la
+   * Server Action. Va hasta el 72 % mientras espera; con éxito llega al nodo
+   * «alex», con error vuelve. Cada tramo parte de donde está: interrumpible.
+   */
+  const travel = (to: number, ms: number, easing: string) => {
+    const wire = wireRef.current;
+    const pk = wire?.querySelector<HTMLElement>(".wire__pk");
+    const lit = wire?.querySelector<HTMLElement>(".wire__lit");
+    if (!wire || !pk || !lit) return Promise.resolve();
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const w = wire.clientWidth;
+    const from = new DOMMatrixReadOnly(getComputedStyle(pk).transform).m41 / (w || 1);
+    pk.getAnimations().forEach((a) => a.cancel());
+    lit.getAnimations().forEach((a) => a.cancel());
+    const opts: KeyframeAnimationOptions = { duration: reduce ? 0 : ms, easing, fill: "forwards" };
+    const a = pk.animate([{ transform: `translateX(${from * w}px)` }, { transform: `translateX(${to * w}px)` }], opts);
+    lit.animate([{ transform: `scaleX(${from})` }, { transform: `scaleX(${to})` }], opts);
+    return a.finished.then(() => undefined).catch(() => undefined);
+  };
+
+  useEffect(() => {
+    if (phase !== "sending" || pending || state === sentFrom.current) return;
+    if (state?.status === "success") {
+      travel(1, 220, EASE_OUT).then(() => setPhase("ok"));
+    } else if (state?.status === "error") {
+      travel(0, 320, EASE_OUT).then(() => setPhase("err"));
+    }
+  }, [phase, pending, state]);
 
   // «Pedirla»: precarga el mensaje solo si el campo está vacío y enfoca el textarea.
   useEffect(() => {
@@ -74,13 +117,49 @@ export function ContactForm({ t, email }: { t: Texts; email: string }) {
       return;
     }
     const data = new FormData(form);
+    sentFrom.current = state;
+    setPhase("sending");
+    travel(WAIT_AT, 420, EASE_IO);
     startTransition(() => action(data));
   };
 
-  if (state?.status === "success") {
+  const done = state?.status === "success";
+  // El cable del envío vive fuera del <form> (el botón lo une con `form=`): así
+  // sobrevive al cambio a «enviado» y el paquete termina su viaje a la vista.
+  const wire = (
+    <div className="send-row" data-phase={phase}>
+      {done ? (
+        <span className="wire__end wire__end--from t-data" aria-hidden>
+          {t.wireFrom}
+        </span>
+      ) : (
+        <button
+          type="submit"
+          form="contact-form"
+          className="btn btn--primary btn--lg form__submit magnetic"
+          disabled={pending}
+        >
+          {pending ? t.sending : t.send}
+        </button>
+      )}
+      <div className="wire" ref={wireRef} aria-hidden>
+        <i className="wire__lit" />
+        <i className="wire__pk" />
+      </div>
+      <span className="wire__end t-data" aria-hidden>
+        <i />
+        {t.wireTo}
+      </span>
+    </div>
+  );
+
+  if (done) {
     return (
-      <div ref={successRef} className="notice" tabIndex={-1} role="status">
-        <p>{t.success}</p>
+      <div className="cform">
+        <div ref={successRef} className="notice" tabIndex={-1} role="status">
+          <p>{t.success}</p>
+        </div>
+        {wire}
       </div>
     );
   }
@@ -103,7 +182,8 @@ export function ContactForm({ t, email }: { t: Texts; email: string }) {
     ) : null;
 
   return (
-    <form ref={formRef} className="form" action={action} onSubmit={onSubmit} noValidate>
+    <div className="cform">
+    <form id="contact-form" ref={formRef} className="form" action={action} onSubmit={onSubmit} noValidate>
       {serverFailed && (
         <div className="notice notice--error" role="alert">
           <p>
@@ -139,9 +219,8 @@ export function ContactForm({ t, email }: { t: Texts; email: string }) {
         <textarea {...fieldProps("message")} ref={messageRef} rows={8} required placeholder={t.messagePlaceholder} />
         {err("message")}
       </div>
-      <button type="submit" className="btn btn--primary btn--lg form__submit" disabled={pending}>
-        {pending ? t.sending : t.send}
-      </button>
     </form>
+    {wire}
+    </div>
   );
 }

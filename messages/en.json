@@ -961,7 +961,11 @@
     "baseValue": "Cuenca, Ecuador · UTC−5",
     "languages": "Languages",
     "languagesValue": "Spanish (native) · English B1",
-    "cvTitle": "Résumé"
+    "cvTitle": "Résumé",
+    "wire": {
+      "from": "you",
+      "to": "alex"
+    }
   },
   "footer": {
     "rights": "© 2026 Alex Largo · Fullstack & DevOps Engineer",

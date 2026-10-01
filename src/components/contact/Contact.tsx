@@ -19,14 +19,18 @@ export async function Contact() {
     "errEmail", "errMessage", "namePlaceholder", "emailPlaceholder", "messagePlaceholder",
     "copy", "copied",
   ] as const;
-  const texts = Object.fromEntries(keys.map((k) => [k, t(k)])) as Record<(typeof keys)[number], string>;
+  const texts = {
+    ...(Object.fromEntries(keys.map((k) => [k, t(k)])) as Record<(typeof keys)[number], string>),
+    wireFrom: t("wire.from"),
+    wireTo: t("wire.to"),
+  };
 
   return (
     <section id="contacto" aria-labelledby="contacto-title" className="section">
       <div className="shell">
         <div className="grid contact">
           <div className="contact__intro">
-            <h2 id="contacto-title" className="t-chapter">
+            <h2 id="contacto-title" className="t-chapter rail-title" data-rail>
               {t("title")}
             </h2>
             <p className="t-lead contact__lead">
@@ -80,7 +84,7 @@ export async function Contact() {
                       hrefLang={lang}
                       lang={lang}
                       download
-                      className="btn btn--secondary cv-dl"
+                      className="btn btn--secondary cv-dl magnetic"
                     >
                       <Download size={18} strokeWidth={1.5} aria-hidden />
                       <span>
