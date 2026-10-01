@@ -11,20 +11,38 @@ export type Task = (dt: number, now: number) => boolean;
 const tasks = new Set<Task>();
 let raf = 0;
 let last = 0;
+/** Dentro de frame(): un wake() de una tarea no abre otra cadena, solo pide seguir. */
+let inFrame = false;
+let again = false;
 
 function frame(now: number) {
-  raf = 0;
+  inFrame = true;
+  again = false;
   // dt en segundos, acotado: tras una pausa larga la física no da un salto.
   const dt = last ? Math.min(0.05, (now - last) / 1000) : 1 / 60;
   last = now;
   let busy = false;
-  for (const t of tasks) if (t(dt, now)) busy = true;
-  if (busy && !document.hidden) raf = requestAnimationFrame(frame);
-  else last = 0;
+  try {
+    for (const t of tasks) if (t(dt, now)) busy = true;
+  } finally {
+    inFrame = false;
+  }
+  // UNA sola reprogramación por frame, al final (QA v3: un wake() desde una
+  // tarea abría cadenas paralelas y frame() llegó a correr 115× por vsync).
+  if ((busy || again) && !document.hidden) raf = requestAnimationFrame(frame);
+  else {
+    raf = 0;
+    last = 0;
+  }
 }
 
 export function wake() {
-  if (raf || typeof window === "undefined" || document.hidden) return;
+  if (typeof window === "undefined" || document.hidden) return;
+  if (inFrame) {
+    again = true;
+    return;
+  }
+  if (raf) return;
   raf = requestAnimationFrame(frame);
 }
 
