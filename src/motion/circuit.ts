@@ -49,6 +49,9 @@ export function mountCircuit(animate: boolean): () => void {
   let mainTop = 0;
   let nodes: RailNode[] = [];
   let lastC = -1;
+  /** Resorte del paquete (solo con motion): al reconstruir se reubica en su y. */
+  let S: Spring | null = null;
+  let first = true;
   // Informe de incidente: posiciones en el documento, medidas en build (nunca
   // dentro del frame: leer rects tras escribir estilos forzaría layout).
   const incident = document.querySelector<HTMLElement>("[data-fill]");
@@ -127,19 +130,25 @@ export function mountCircuit(animate: boolean): () => void {
       html.style.setProperty("--rail-dx", `${Math.round(railX + mr.left - (hr.left + hp / 2))}px`);
     }
 
-    // Polilínea: baja recta y se desvía 45° dentro del propio carril a mitad de
-    // cada tramo largo (rasgo de pista de PCB). Siempre desciende: lenAtY es una
-    // búsqueda binaria sobre y.
+    // y del paquete ANTES de cambiar la geometría: al terminar se lo reubica
+    // ahí. Si no, su longitud quedaba igual sobre una pista nueva y el paquete
+    // saltaba 1–2 mil px al abrir un <details> (QA v3, r2).
+    const keepY = S && pts.length ? ptAtLen(S.x)[1] : null;
+
+    // Polilínea: baja recta y hace un desvío corto de 45° JUSTO DEBAJO de cada
+    // nodo (rasgo de pista de PCB), de largo fijo. Anclado al nodo de arriba,
+    // no a la mitad del tramo: si crece el contenido de abajo (un <details>),
+    // el desvío no se corre bajo el paquete. Siempre desciende (lenAtY binaria).
     const jog = narrow ? -6 : 22;
     const aj = Math.abs(jog);
+    const RUN = 120;
     // Arranca en el borde superior del <main>, bajo el LED de la marca del header.
     const p: Pt[] = [[railX, 0], [railX, raw[0].y]];
     for (let i = 1; i < raw.length; i++) {
       const y1 = raw[i - 1].y + 56;
       const y2 = raw[i].y - 56;
-      if (y2 - y1 > aj * 2 + 80) {
-        const ym = y1 + (y2 - y1) * 0.38;
-        p.push([railX, ym], [railX + jog, ym + aj], [railX + jog, y2 - aj], [railX, y2]);
+      if (y2 - y1 > aj * 2 + RUN + 40) {
+        p.push([railX, y1], [railX + jog, y1 + aj], [railX + jog, y1 + aj + RUN], [railX, y1 + aj * 2 + RUN]);
       }
       p.push([railX, raw[i].y]);
     }
@@ -208,8 +217,28 @@ export function mountCircuit(animate: boolean): () => void {
       const r = incident.getBoundingClientRect();
       inc = { top: r.top + window.scrollY, h: r.height || 1, steps: incSteps.map((li) => li.getBoundingClientRect().top + window.scrollY) };
     }
+    if (S && keepY !== null) {
+      // Misma y, nueva longitud; el destino lo recalcula el frame (sin salto).
+      const d0 = lenAtY(keepY) - S.x;
+      S.x += d0;
+      S.t += d0;
+    }
+    // Al montar, los titulares que ya están en la ventana se dan por vistos: el
+    // encendido por paquete es solo para lo que está fuera del primer viewport.
+    if (first && animate) {
+      for (const n of major) {
+        const top = n.sec?.querySelector("[data-rail]")?.getBoundingClientRect().top ?? Infinity;
+        if (n.sec && top < window.innerHeight) n.sec.setAttribute("data-shown", "");
+      }
+    }
+    first = false;
     if (!animate) paint(L);
-    else wake();
+    else {
+      // Mismo frame que la geometría nueva: lo encendido y el paquete no
+      // quedan un frame desfasados respecto de la pista.
+      if (S) paint(S.x);
+      wake();
+    }
   };
 
   const setOn = (n: RailNode, on: boolean) => {
@@ -235,16 +264,13 @@ export function mountCircuit(animate: boolean): () => void {
   };
 
   const offs: (() => void)[] = [];
-  let rt: number | undefined;
-  const ro = new ResizeObserver(() => {
-    window.clearTimeout(rt);
-    rt = window.setTimeout(build, 80);
-  });
+  // Sin debounce: el callback del ResizeObserver corre tras el layout y antes
+  // del paint, así que durante la apertura animada de un <details> la pista se
+  // recalcula en CADA frame y nunca muestra un nodo apuntando a una fila vieja.
+  // Las escrituras son sobre una capa absoluta: no cambian el tamaño de <main>.
+  const ro = new ResizeObserver(() => build());
   ro.observe(main);
-  offs.push(() => {
-    ro.disconnect();
-    window.clearTimeout(rt);
-  });
+  offs.push(() => ro.disconnect());
   document.fonts?.ready.then(() => build());
   build();
 
@@ -259,12 +285,13 @@ export function mountCircuit(animate: boolean): () => void {
 
   /* ─── Paquete + spotlight + imanes + progreso + incidente ─────────────── */
   const target = () => lenAtY(window.scrollY - mainTop + window.innerHeight * READ_LINE);
-  const S = new Spring(0, 0.32, 1);
+  const pkS = new Spring(0, 0.32, 1);
+  S = pkS;
   // Entrada: el paquete baja hasta la línea de lectura y enciende el hero. Si
   // se llega a media página (ancla, recarga), arranca cerca para no barrer todo.
   const t0 = target();
-  S.snap(Math.max(0, t0 - window.innerHeight * 0.6));
-  S.set(t0);
+  pkS.snap(Math.max(0, t0 - window.innerHeight * 0.6));
+  pkS.set(t0);
 
   const fine = finePointer();
   const spot = document.querySelector<HTMLElement>(".spotlight");
@@ -286,9 +313,9 @@ export function mountCircuit(animate: boolean): () => void {
   const task = (dt: number) => {
     const sy = window.scrollY;
     const vh = window.innerHeight;
-    S.set(target());
-    let busy = S.step(dt, 0.05);
-    paint(S.x);
+    pkS.set(target());
+    let busy = pkS.step(dt, 0.05);
+    paint(pkS.x);
 
     if (spot && spotIn) {
       let sx: number;
@@ -299,7 +326,7 @@ export function mountCircuit(animate: boolean): () => void {
         sx = mx.x;
         syy = my.x;
       } else {
-        const [px, py] = ptAtLen(S.x);
+        const [px, py] = ptAtLen(pkS.x);
         sx = px;
         syy = py + mainTop - sy;
       }
@@ -429,6 +456,9 @@ export function mountCircuit(animate: boolean): () => void {
     html.classList.remove("circuit-on");
     spot?.classList.remove("is-on");
     [base, lit, trail, nodeLayer].forEach((n) => n.remove());
-    main.querySelectorAll("[data-lit]").forEach((s) => s.removeAttribute("data-lit"));
+    main.querySelectorAll("[data-lit],[data-shown]").forEach((s) => {
+      s.removeAttribute("data-lit");
+      s.removeAttribute("data-shown");
+    });
   };
 }
