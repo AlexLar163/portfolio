@@ -82,7 +82,7 @@ function NodeShape({
   hot: boolean;
   selected: boolean;
   onHover: (id: string | null) => void;
-  onSelect: (id: string, scroll?: boolean) => void;
+  onSelect: (id: string, scroll?: boolean, kbd?: boolean) => void;
 }) {
   const b = node[o];
   // LED de estado (v3): parpadea cuando le llega un paquete.
@@ -96,7 +96,7 @@ function NodeShape({
   const onKey = (e: KeyboardEvent) => {
     if (e.key === "Enter" || e.key === " ") {
       e.preventDefault();
-      onSelect(node.id, true);
+      onSelect(node.id, true, true);
     }
   };
 
@@ -202,7 +202,7 @@ function Diagram({
   selected: string;
   svgRef: RefObject<SVGSVGElement | null>;
   onHover: (id: string | null) => void;
-  onSelect: (id: string, scroll?: boolean) => void;
+  onSelect: (id: string, scroll?: boolean, kbd?: boolean) => void;
 }) {
   const uid = useId().replace(/:/g, "");
   const vb = VIEWBOX[o];
@@ -398,7 +398,15 @@ export function InfraStage({
   // vista, así se ve el tráfico que se acaba de enviar (QA v3).
   const [sheet, setSheet] = useState(false);
   const sheetRef = useRef<HTMLDivElement>(null);
-  const lastNode = useRef<Element | null>(null);
+  const lastNode = useRef<SVGGElement | null>(null);
+  const sheetKbd = useRef(false);
+
+  /** Cierra la hoja y, si el foco estaba en ella (o se pide), vuelve al nodo que la abrió. */
+  const closeSheet = (returnFocus: boolean) => {
+    const inside = !!sheetRef.current?.contains(document.activeElement);
+    setSheet(false);
+    if (returnFocus || inside) lastNode.current?.focus({ preventScroll: true });
+  };
 
   /** Una sola columna con el diagrama vertical: el panel queda lejos, debajo. */
   const stacked = () => {
@@ -422,13 +430,16 @@ export function InfraStage({
   };
 
   /** `scroll` = acción explícita (clic, Enter, Espacio): además envía tráfico. */
-  const select = (id: string, scroll?: boolean) => {
+  const select = (id: string, scroll?: boolean, kbd?: boolean) => {
     setSelected(id);
     if (!scroll) return;
     flows.current.forEach((f) => f.send(id));
     if (stacked()) {
-      lastNode.current = portRef.current?.querySelector(`[data-node="${id}"]`) ?? null;
+      lastNode.current = portRef.current?.querySelector<SVGGElement>(`[data-node="${id}"]`) ?? null;
+      sheetKbd.current = !!kbd;
       setSheet(true);
+      // Ya abierta (otro nodo con Enter): el efecto no se repite, el foco va directo.
+      if (kbd && sheetRef.current) sheetRef.current.focus({ preventScroll: true });
     } else revealPanel();
   };
 
@@ -446,20 +457,23 @@ export function InfraStage({
         window.scrollBy({ top: nr.bottom - limit, behavior: reduce ? "auto" : "smooth" });
       }
     }
+    // Abierta con teclado: el foco pasa a la hoja (se lee su contenido). Con
+    // un toque se queda en el nodo. Nunca se atrapa: ver onSheetKey.
+    if (sheetKbd.current) el?.focus({ preventScroll: true });
     const svgWrap = stageRef.current?.querySelector(".stage-svg");
     const io = new IntersectionObserver(([e]) => {
-      if (!e.isIntersecting) setSheet(false);
+      if (!e.isIntersecting) closeSheet(false);
     });
     if (svgWrap) io.observe(svgWrap);
     const onKey = (e: globalThis.KeyboardEvent) => {
-      if (e.key === "Escape") setSheet(false);
+      if (e.key === "Escape") closeSheet(true);
     };
     // El diagrama vertical mide ~1800 px: si la persona sigue leyendo (media
     // pantalla de scroll desde donde se abrió), la hoja se retira sola.
     let y0: number | null = null;
     const t = window.setTimeout(() => (y0 = window.scrollY), 700);
     const onScroll = () => {
-      if (y0 !== null && Math.abs(window.scrollY - y0) > window.innerHeight * 0.5) setSheet(false);
+      if (y0 !== null && Math.abs(window.scrollY - y0) > window.innerHeight * 0.5) closeSheet(false);
     };
     document.addEventListener("keydown", onKey);
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -470,6 +484,21 @@ export function InfraStage({
       window.removeEventListener("scroll", onScroll);
     };
   }, [sheet, selected]);
+
+  // La hoja vive al final de <body> (portal: dentro del .shell, con contención
+  // de layout, position:fixed no sería relativa a la ventana). Para el orden de
+  // foco se comporta como si estuviera junto al nodo: Tab o Mayús+Tab al salir
+  // de ella devuelven el foco al nodo que la abrió, y de ahí sigue el flujo.
+  const onSheetKey = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key !== "Tab") return;
+    const close = sheetRef.current?.querySelector<HTMLElement>(".infra-sheet__close");
+    const leaving =
+      (!e.shiftKey && document.activeElement === close) || (e.shiftKey && document.activeElement === sheetRef.current);
+    if (leaving && lastNode.current) {
+      e.preventDefault();
+      lastNode.current.focus({ preventScroll: true });
+    }
+  };
 
   const sendRoute = (r: RouteId) => flows.current.forEach((f) => f.sendRoute(r));
 
@@ -561,10 +590,10 @@ export function InfraStage({
       {sheet &&
         createPortal(
           // No modal y sin aria-live: el panel (aria-live) ya anuncia el cambio.
-          <div className="infra-sheet" ref={sheetRef} role="region" aria-label={node.label}>
+          <div className="infra-sheet" ref={sheetRef} role="region" aria-label={node.label} tabIndex={-1} onKeyDown={onSheetKey}>
             <div className="infra-sheet__head">
               <p className="t-h3">{node.label}</p>
-              <button type="button" className="infra-sheet__close" aria-label={traffic.close} onClick={() => setSheet(false)}>
+              <button type="button" className="infra-sheet__close" aria-label={traffic.close} onClick={() => closeSheet(true)}>
                 <X size={18} strokeWidth={1.5} aria-hidden />
               </button>
             </div>
