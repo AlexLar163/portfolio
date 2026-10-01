@@ -51,6 +51,7 @@ export function ContactForm({ t, email }: { t: Texts; email: string }) {
   const formRef = useRef<HTMLFormElement>(null);
   const messageRef = useRef<HTMLTextAreaElement>(null);
   const successRef = useRef<HTMLDivElement>(null);
+  const errorRef = useRef<HTMLDivElement>(null);
   const wireRef = useRef<HTMLDivElement>(null);
   const [phase, setPhase] = useState<Phase>("idle");
   // El estado de la acción al enviar: solo un estado NUEVO cierra el viaje.
@@ -99,8 +100,12 @@ export function ContactForm({ t, email }: { t: Texts; email: string }) {
     return () => window.removeEventListener(DEMO_REQUEST_EVENT, onRequest);
   }, []);
 
+  // El botón queda deshabilitado mientras espera y el foco cae a <body>: se
+  // devuelve al aviso (éxito o error del servidor), nunca se pierde (QA v3).
   useEffect(() => {
     if (state?.status === "success") successRef.current?.focus();
+    else if (state?.status === "error" && (state.reason === "config" || state.reason === "send"))
+      errorRef.current?.focus();
   }, [state]);
 
   // Con JS se despacha a mano: un <form action> de React 19 vacía los campos al
@@ -185,7 +190,7 @@ export function ContactForm({ t, email }: { t: Texts; email: string }) {
     <div className="cform">
     <form id="contact-form" ref={formRef} className="form" action={action} onSubmit={onSubmit} noValidate>
       {serverFailed && (
-        <div className="notice notice--error" role="alert">
+        <div ref={errorRef} className="notice notice--error" role="alert" tabIndex={-1}>
           <p>
             {t.errorSend} <a className="link" href={`mailto:${email}`}>{email}</a>
           </p>
