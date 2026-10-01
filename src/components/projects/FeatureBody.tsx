@@ -6,6 +6,7 @@ import { Pause, Play } from "lucide-react";
 import type { Status } from "@/data/types";
 import { StatusBadge } from "@/components/ui/primitives";
 import { useTabs } from "@/components/media/tabs";
+import { TraceBox } from "@/components/ui/TraceBox";
 import { currentLevel, LEVEL_EVENT } from "@/motion/level";
 
 export type LayerImage = { src: string; w: number; h: number; position?: string; alt: string };
@@ -34,9 +35,10 @@ function Img({ img, sizes, className }: { img: LayerImage; sizes: string; classN
 }
 
 /**
- * Split de un producto destacado (DISENO-v2 §9): pasos a un lado, media fija al
- * otro. Qué paso está activo lo decide el scroll (IntersectionObserver, en todos
- * los niveles con motion) o, en estático, el tablist de respaldo.
+ * Producto destacado (DISENO-v2 §9, v3): pasos y media lado a lado, en flujo
+ * normal (nada queda fijo). El paso activo lo elige la persona: el tablist bajo
+ * la media (teclado y lectores) o un clic en el paso. Un paquete recorre la
+ * pista de los pasos hasta el activo (resorte en CSS, interrumpible).
  */
 export function FeatureBody({
   name,
@@ -73,35 +75,29 @@ export function FeatureBody({
   }, []);
   const tabs = useTabs(steps.length, active, go);
 
-  // Paso activo por scroll: el `li` que cruza la franja central (45–55 %).
+  // Con motion el video del paso corre solo (con su botón de pausa).
   useEffect(() => {
-    const root = rootRef.current;
-    if (!root) return;
-    let io: IntersectionObserver | undefined;
-    const sync = () => {
-      io?.disconnect();
-      io = undefined;
-      const level = currentLevel();
-      setAuto(level !== "none");
-      if (level === "none") return;
-      const items = Array.from(root.querySelectorAll<HTMLElement>(".feature__steps > li"));
-      io = new IntersectionObserver(
-        (entries) => {
-          for (const e of entries) {
-            if (e.isIntersecting) go(Number((e.target as HTMLElement).dataset.step));
-          }
-        },
-        { rootMargin: "-45% 0px -45% 0px" },
-      );
-      items.forEach((li) => io!.observe(li));
-    };
+    const sync = () => setAuto(currentLevel() !== "none");
     sync();
     window.addEventListener(LEVEL_EVENT, sync);
-    return () => {
-      io?.disconnect();
-      window.removeEventListener(LEVEL_EVENT, sync);
+    return () => window.removeEventListener(LEVEL_EVENT, sync);
+  }, []);
+
+  // Paquete de la pista de pasos: va a la altura del título activo.
+  useEffect(() => {
+    const track = rootRef.current?.querySelector<HTMLElement>(".feature__track");
+    if (!track) return;
+    const place = () => {
+      const li = track.querySelector<HTMLElement>(`.feature__steps > li[data-step="${active}"]`);
+      const title = li?.querySelector<HTMLElement>(".feature-step__title");
+      if (!li || !title) return;
+      track.style.setProperty("--pk-y", `${li.offsetTop + title.offsetTop + title.offsetHeight / 2}px`);
     };
-  }, [go]);
+    place();
+    const ro = new ResizeObserver(place);
+    ro.observe(track);
+    return () => ro.disconnect();
+  }, [active]);
 
   // El stage en vista (para no reproducir fuera de pantalla).
   useEffect(() => {
@@ -148,19 +144,32 @@ export function FeatureBody({
 
   return (
     <div className="feature__body" ref={rootRef} data-active-step={active}>
-      <ol className="feature__steps">
-        {steps.map((s, i) => (
-          <li key={s.id} data-step={i} data-current={i === active ? "" : undefined}>
-            <div className="feature-step">
-              <h4 className="feature-step__title">{s.title}</h4>
-              {s.body}
-            </div>
-          </li>
-        ))}
-      </ol>
+      <div className="feature__track">
+        <span className="feature__rail" aria-hidden />
+        <ol className="feature__steps">
+          {steps.map((s, i) => (
+            // El clic en el paso es un atajo de puntero: el control accesible es
+            // el tablist bajo la media (mismo estado, con flechas).
+            <li
+              key={s.id}
+              data-step={i}
+              data-current={i === active ? "" : undefined}
+              onClick={(e) => {
+                if (!(e.target as Element).closest("a")) go(i);
+              }}
+            >
+              <div className="feature-step">
+                <h4 className="feature-step__title">{s.title}</h4>
+                {s.body}
+              </div>
+            </li>
+          ))}
+        </ol>
+      </div>
 
       <div className="feature__stage">
-        <div className="frame feature__frame">
+        <div className="frame feature__frame" data-reveal>
+          <TraceBox pin={false} />
           <div className="frame__bar">
             <span className="frame__addr t-data-sm">{address}</span>
             <StatusBadge status={status.status} label={status.label} />

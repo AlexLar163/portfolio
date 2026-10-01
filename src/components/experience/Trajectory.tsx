@@ -60,7 +60,7 @@ export async function Trajectory() {
     <section id="experiencia" aria-labelledby="experiencia-title" className="section trajectory">
       <div className="shell">
         <header className="section-head">
-          <h2 id="experiencia-title" className="t-h2">
+          <h2 id="experiencia-title" className="t-h2 rail-title" data-rail>
             {t("title")}
           </h2>
         </header>

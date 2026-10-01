@@ -1,21 +1,21 @@
 "use client";
 
-import { useEffect, useId, useRef, useState, type KeyboardEvent, type ReactNode } from "react";
+import { useEffect, useId, useRef, useState, type KeyboardEvent, type ReactNode, type RefObject } from "react";
 import {
   DEFAULT_NODE,
   FRAME_LABEL,
   OUTSIDE_LABEL,
   TYPE,
   VIEWBOX,
-  STEP_NODES,
   edges,
   nodes,
   routes,
 } from "@/data/infra";
 import type { InfraEdge, InfraNode } from "@/data/types";
 import { roundedPath, wrapSegments } from "@/lib/diagram";
-import { mountCaptions } from "@/motion/lite/captions";
 import { currentLevel, LEVEL_EVENT } from "@/motion/level";
+import { mountTraffic, type RouteId, type Traffic } from "@/motion/traffic";
+import { PauseToggle } from "@/components/ui/PauseToggle";
 
 export type NodeText = {
   label: string;
@@ -39,18 +39,9 @@ export type DiagramText = {
 };
 
 type Orientation = "land" | "port";
-const TRACE_TOTAL = 1400 + 300; // --dur-trace + desfase del recorrido 2
 
-/**
- * Paquetes de tráfico vivo (DISENO-v2 §6.2). Nunca más de 5 a la vez.
- * Cada uno es una punta + una estela sobre un clon del `d` de su ruta.
- */
-const PACKETS: { of: string; d: number; delays: number[]; scheduled?: boolean }[] = [
-  { of: "route-1", d: 2.4, delays: [0, 1.3] },
-  { of: "route-2", d: 3.0, delays: [0.6] },
-  { of: "e9", d: 0.9, delays: [1.9] },
-  { of: "e12", d: 6.0, delays: [2.0], scheduled: true },
-];
+/** Rutas que se pueden disparar a mano desde los botones del pie (v3). */
+const SEND_ROUTES: RouteId[] = ["web", "bot", "deploy"];
 
 
 /** Nodos y aristas que se encienden al resaltar `id`. */
@@ -92,6 +83,8 @@ function NodeShape({
   onSelect: (id: string, scroll?: boolean) => void;
 }) {
   const b = node[o];
+  // LED de estado (v3): parpadea cuando le llega un paquete.
+  const led = { cx: b.x + b.w - 10, cy: b.y + 10 };
   const ty = TYPE[o];
   const budget = Math.floor((b.w - 24) / ty.charW);
   const lines = wrapSegments(text.sub, budget);
@@ -153,6 +146,7 @@ function NodeShape({
       <rect className="node__halo" x={b.x - 4} y={b.y - 4} width={b.w + 8} height={b.h + 8} rx={7} />
       <rect className="node__ring" x={b.x - 3} y={b.y - 3} width={b.w + 6} height={b.h + 6} rx={6} />
       <rect className="node__box" x={b.x} y={b.y} width={b.w} height={b.h} rx={4} />
+      {!isStrip && <circle className="node__led" cx={led.cx} cy={led.cy} r={3} />}
       {!isStrip && (
         <text className="t-label" x={b.x + 12} y={b.y + ty.labelY} fontSize={ty.label}>
           {label}
@@ -196,7 +190,7 @@ function Diagram({
   text,
   hot,
   selected,
-  trace,
+  svgRef,
   onHover,
   onSelect,
 }: {
@@ -204,7 +198,7 @@ function Diagram({
   text: DiagramText;
   hot: string | null;
   selected: string;
-  trace: "idle" | "run" | "done";
+  svgRef: RefObject<SVGSVGElement | null>;
   onHover: (id: string | null) => void;
   onSelect: (id: string, scroll?: boolean) => void;
 }) {
@@ -217,14 +211,6 @@ function Diagram({
   const vpsL = FRAME_LABEL.vps[o];
   const dkL = FRAME_LABEL.docker[o];
   const out = OUTSIDE_LABEL[o];
-
-  const pathOf = (id: string) => {
-    if (id.startsWith("route-")) {
-      const r = routes.find((x) => `route-${x.id}` === id)!;
-      return roundedPath(r[o]);
-    }
-    return roundedPath(edges.find((e) => e.id === id)![o]);
-  };
 
   const edgeLabel = (edge: InfraEdge) => {
     const pos = o === "land" ? edge.labelLand : edge.labelPort;
@@ -255,12 +241,12 @@ function Diagram({
 
   return (
     <svg
+      ref={svgRef}
       className={`dg infra__svg infra__svg--${o}`}
       viewBox={`0 0 ${vb.w} ${vb.h}`}
       role="group"
       aria-labelledby={`${uid}-t ${uid}-d`}
       data-hot={set ? "" : undefined}
-      data-trace={trace}
       data-orientation={o}
     >
       <title id={`${uid}-t`}>{text.title}</title>
@@ -356,21 +342,9 @@ function Diagram({
         />
       ))}
 
-      {/* Tráfico vivo: encima de las aristas, debajo de los nodos. */}
-      <g className="packets" aria-hidden="true">
-        {PACKETS.flatMap((p) =>
-          p.delays.map((delay, i) => {
-            const d = pathOf(p.of);
-            const style = { ["--d" as string]: `${p.d}s`, ["--delay" as string]: `${delay}s` };
-            return (
-              <g key={`${p.of}-${i}`} className={p.scheduled ? "packet-g packet-g--scheduled" : "packet-g"} data-packet={p.of}>
-                <path className="packet-trail" d={d} pathLength={1} style={style} />
-                <path className="packet" d={d} pathLength={1} style={style} />
-              </g>
-            );
-          }),
-        )}
-      </g>
+      {/* Tráfico vivo (v3): lo puebla src/motion/traffic.ts. Encima de las
+          aristas y debajo de los nodos, que lo tapan al cruzarlos. */}
+      <g className="packets" aria-hidden="true" />
 
       {/* Nodos */}
       {nodes
@@ -391,68 +365,40 @@ function Diagram({
   );
 }
 
-/** Centinelas del caption móvil: cada uno cubre desde su nodo hasta el siguiente. */
-function Sentinels({ stepIds }: { stepIds: string[] }) {
-  const H = VIEWBOX.port.h;
-  const ys = stepIds
-    .map((id, i) => ({ i, y: nodes.find((n) => n.id === STEP_NODES[id])?.port.y ?? 0 }))
-    .sort((a, b) => a.y - b.y);
-  return (
-    <div className="stage-sentinels" aria-hidden="true">
-      {ys.map((s, k) => {
-        const end = k + 1 < ys.length ? ys[k + 1].y : H;
-        return (
-          <span
-            key={s.i}
-            data-sentinel={s.i}
-            style={{ top: `${(s.y / H) * 100}%`, height: `${((end - s.y) / H) * 100}%` }}
-          />
-        );
-      })}
-    </div>
-  );
-}
-
 /**
- * Escena DevOps completa (DISENO-v2 §5): título, diagrama (dos composiciones),
- * pasos, panel de detalle y pie (CI + leyenda). El estado de resaltado y de
- * selección vive aquí; la escena GSAP solo lee el DOM y escribe estilos.
+ * Bloque DevOps (v3): título, diagrama (dos composiciones), panel de detalle,
+ * envío de tráfico y pie (CI + leyenda), en flujo normal: sin escena fija.
+ * El estado de resaltado y de selección vive aquí; el tráfico lo mueve
+ * src/motion/traffic.ts en el bucle compartido.
  */
 export function InfraStage({
   text,
   panelLabels,
   title,
   steps,
-  stepIds,
   foot,
+  traffic,
 }: {
   text: DiagramText;
   panelLabels: { facts: string; kind: Record<string, string> };
   title: ReactNode;
   steps: ReactNode;
-  stepIds: string[];
   foot: ReactNode;
+  traffic: { label: string; routes: Record<string, string>; pause: string; play: string };
 }) {
   const stageRef = useRef<HTMLDivElement>(null);
+  const landRef = useRef<SVGSVGElement>(null);
+  const portRef = useRef<SVGSVGElement>(null);
+  const flows = useRef<Traffic[]>([]);
   const [hot, setHot] = useState<string | null>(null);
   const [selected, setSelected] = useState<string>(DEFAULT_NODE);
-  const [trace, setTrace] = useState<"idle" | "run" | "done">("idle");
-  const picked = useRef(false);
-  const select = (id: string, scroll?: boolean) => {
-    picked.current = true;
-    setSelected(id);
-    if (scroll) revealPanel();
-  };
 
-  // Diagrama horizontal sin escena: el panel va debajo y el diagrama mide más
-  // que la ventana. Tras un clic o Enter, se trae el panel a la vista lo mínimo
-  // (block:"nearest"); con reduce, sin animar. En la escena y con el panel al
-  // lado (700–1119 px) no hace falta.
+  // Diagrama horizontal: el panel va debajo y el diagrama puede medir más que
+  // la ventana. Tras un clic o Enter, se trae el panel a la vista lo mínimo
+  // (block:"nearest"); con reduce, sin animar.
   const revealPanel = () => {
-    const stage = stageRef.current;
-    const panel = stage?.querySelector<HTMLElement>(".infra__panel");
-    if (!stage || !panel || stage.classList.contains("is-scene")) return;
-    if (getComputedStyle(panel).position === "sticky") return;
+    const panel = stageRef.current?.querySelector<HTMLElement>(".infra__panel");
+    if (!panel) return;
     requestAnimationFrame(() => {
       const r = panel.getBoundingClientRect();
       const vis = Math.max(0, Math.min(r.bottom, window.innerHeight) - Math.max(r.top, 0));
@@ -462,51 +408,34 @@ export function InfraStage({
     });
   };
 
-  // Trazo único de v1 al llegar al 40 % visible: solo es el respaldo de la
-  // composición horizontal sin escena (el CSS decide si se ve; §5.5.4).
-  useEffect(() => {
-    const el = stageRef.current?.querySelector<HTMLElement>(".stage-svg");
-    if (!el) return;
-    let t: number | undefined;
-    const io = new IntersectionObserver(
-      ([e]) => {
-        if (!e.isIntersecting) return;
-        const rootH = e.rootBounds?.height ?? window.innerHeight;
-        if (e.intersectionRatio < 0.4 && e.intersectionRect.height < rootH * 0.5) return;
-        io.disconnect();
-        if (currentLevel() === "none") {
-          setTrace("done");
-          return;
-        }
-        setTrace("run");
-        t = window.setTimeout(() => {
-          setTrace("done");
-          if (!picked.current) setSelected(DEFAULT_NODE);
-        }, TRACE_TOTAL);
-      },
-      { threshold: [0, 0.2, 0.4, 0.6] },
-    );
-    io.observe(el);
-    return () => {
-      io.disconnect();
-      window.clearTimeout(t);
-    };
-  }, []);
+  /** `scroll` = acción explícita (clic, Enter, Espacio): además envía tráfico. */
+  const select = (id: string, scroll?: boolean) => {
+    setSelected(id);
+    if (!scroll) return;
+    flows.current.forEach((f) => f.send(id));
+    revealPanel();
+  };
 
-  // Caption móvil con centinelas (sin GSAP). Se monta y desmonta con el nivel.
+  const sendRoute = (r: RouteId) => flows.current.forEach((f) => f.sendRoute(r));
+
+  // Tráfico: una instancia por composición (solo corre la que se ve). Se monta
+  // y desmonta con el nivel de motion; con reduce no hay paquetes.
   useEffect(() => {
-    const stage = stageRef.current;
-    if (!stage) return;
-    let off: (() => void) | undefined;
+    const section = stageRef.current?.closest<HTMLElement>("section");
+    const paused = () => !!section?.hasAttribute("data-paused");
     const sync = () => {
-      off?.();
-      off = currentLevel() === "lite" ? mountCaptions(stage) : undefined;
+      flows.current.forEach((f) => f.destroy());
+      flows.current = [];
+      if (currentLevel() === "none") return;
+      if (landRef.current) flows.current.push(mountTraffic(landRef.current, "land", paused));
+      if (portRef.current) flows.current.push(mountTraffic(portRef.current, "port", paused));
     };
     sync();
     window.addEventListener(LEVEL_EVENT, sync);
     return () => {
-      off?.();
       window.removeEventListener(LEVEL_EVENT, sync);
+      flows.current.forEach((f) => f.destroy());
+      flows.current = [];
     };
   }, []);
 
@@ -516,50 +445,62 @@ export function InfraStage({
   return (
     <div className="devops-stage" ref={stageRef}>
       {title}
-      {/* Diagrama + panel en su propio envoltorio: el panel sticky queda acotado a
-          él y nunca pisa el carril de CI ni la leyenda, que van afuera (re-QA). */}
       <div className="stage-body">
-      <div className="stage-diagram">
-        <div className="stage-svg">
-          {(["land", "port"] as const).map((o) => (
-            <div key={o} className={`dg-wrap dg-wrap--${o}`}>
-              <Diagram
-                o={o}
-                text={text}
-                hot={hot}
-                selected={selected}
-                trace={trace}
-                onHover={setHot}
-                onSelect={select}
-              />
-              {o === "port" && <Sentinels stepIds={stepIds} />}
+        <div className="stage-diagram">
+          <div className="stage-svg">
+            {(["land", "port"] as const).map((o) => (
+              <div key={o} className={`dg-wrap dg-wrap--${o}`}>
+                <Diagram
+                  o={o}
+                  text={text}
+                  hot={hot}
+                  selected={selected}
+                  svgRef={o === "land" ? landRef : portRef}
+                  onHover={setHot}
+                  onSelect={select}
+                />
+              </div>
+            ))}
+          </div>
+          {steps}
+        </div>
+        <aside id="infra-detail" className="infra__panel" aria-live="polite">
+          <div className="infra__panel-inner" key={selected}>
+            <div>
+              <h3 className="t-h3">
+                <span>{node.label}</span>
+                {kind && panelLabels.kind[kind] && (
+                  <span className="tag tag--demo t-small">{panelLabels.kind[kind]}</span>
+                )}
+              </h3>
+              <p className="t-small infra__hint">{text.hint}</p>
             </div>
-          ))}
-        </div>
-        {steps}
+            <p className="ink-2">{node.detail}</p>
+            <div>
+              <p className="t-small ink-3">{panelLabels.facts}</p>
+              <ul className="infra__facts t-data">
+                {node.facts.map((f) => (
+                  <li key={f}>{f}</li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </aside>
       </div>
-      <aside id="infra-detail" className="infra__panel" aria-live="polite">
-        <div className="infra__panel-inner" key={selected}>
-          <div>
-            <h3 className="t-h3">
-              <span>{node.label}</span>
-              {kind && panelLabels.kind[kind] && (
-                <span className="tag tag--demo t-small">{panelLabels.kind[kind]}</span>
-              )}
-            </h3>
-            <p className="t-small infra__hint">{text.hint}</p>
-          </div>
-          <p className="ink-2">{node.detail}</p>
-          <div>
-            <p className="t-small ink-3">{panelLabels.facts}</p>
-            <ul className="infra__facts t-data">
-              {node.facts.map((f) => (
-                <li key={f}>{f}</li>
-              ))}
-            </ul>
-          </div>
+      {/* Envío de tráfico + pausa del tráfico continuo (WCAG 2.2.2). Solo con motion. */}
+      <div className="stage-traffic" role="group" aria-labelledby="stage-traffic-label">
+        <p id="stage-traffic-label" className="t-small ink-3">
+          {traffic.label}
+        </p>
+        <div className="stage-traffic__btns">
+          {SEND_ROUTES.map((r) => (
+            <button key={r} type="button" className={`send-btn send-btn--${r}`} onClick={() => sendRoute(r)}>
+              <i aria-hidden />
+              {traffic.routes[r]}
+            </button>
+          ))}
+          <PauseToggle target=".devops" pauseLabel={traffic.pause} playLabel={traffic.play} />
         </div>
-      </aside>
       </div>
       {foot}
     </div>

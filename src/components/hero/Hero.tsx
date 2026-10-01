@@ -23,6 +23,19 @@ const CHAPTERS = [
   },
 ] as const;
 
+/** Palabras con índice para el encendido en cadena (el texto queda intacto para lectores). */
+function Words({ text, offset = 0, accent }: { text: string; offset?: number; accent?: string }) {
+  const words = text.split(" ");
+  return words.map((w, i) => (
+    <span key={i}>
+      <span className={`w${w === accent ? " w--acc" : ""}`} style={{ ["--i" as string]: i + offset }}>
+        {w}
+      </span>
+      {i < words.length - 1 ? " " : ""}
+    </span>
+  ));
+}
+
 export async function Hero() {
   const locale = (await getLocale()) as Locale;
   const other: Locale = locale === "es" ? "en" : "es";
@@ -34,9 +47,15 @@ export async function Hero() {
       <div className="shell">
         <div className="grid hero__grid">
           <div className="hero__main">
-            <h1 id="inicio-title">
-              <span className="t-display hero__name">{profile.name}</span>
-              <span className="t-role">{p("role")}</span>
+            {/* data-rail: el circuito pone aquí su primer nodo. Las palabras se
+                encienden en cadena cuando el paquete llega (v3); «DevOps» en acento. */}
+            <h1 id="inicio-title" data-rail>
+              <span className="t-display hero__name">
+                <Words text={profile.name} />
+              </span>
+              <span className="t-role">
+                <Words text={p("role")} offset={2} accent="DevOps" />
+              </span>
             </h1>
             <p className="t-lead hero__lead">{p("lead")}</p>
             <div className="hero__actions">
@@ -70,6 +89,7 @@ export async function Hero() {
                 return (
                   <li key={c.id} style={{ ["--i" as string]: i }}>
                     <ChapterRow
+                      i={i}
                       href={c.href}
                       title={t(`chapters.${c.id}.title`)}
                       sub={t(`chapters.${c.id}.sub`)}

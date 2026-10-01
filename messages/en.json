@@ -126,7 +126,7 @@
     "lead": "I run my own production server: 11 sites, automations and AI agents behind a single proxy. At NTT DATA, Kubernetes on AWS.",
     "diagramTitle": "Infrastructure of my own server and the clouds I operate",
     "diagramDesc": "Visitors and Telegram webhooks reach Caddy through DNS, and Caddy routes traffic into a Docker network with no public ports: on-demand WordPress with a shared MariaDB, the appsMonitor panel, n8n and the AI agent runner. Outside the VPS: Vercel, AWS and Cloudflare.",
-    "diagramHint": "Tap or focus a node to see what it does.",
+    "diagramHint": "Tap a node or press Enter: see what it does and send it traffic.",
     "outside": "Outside the VPS",
     "listSummary": "View the infrastructure as a list",
     "legendTitle": "Legend",
@@ -424,7 +424,13 @@
     "lanesTitle": "CI/CD pipelines",
     "tableSummary": "See the pipelines as a table",
     "pauseTraffic": "Pause the traffic",
-    "playTraffic": "Resume the traffic"
+    "playTraffic": "Resume the traffic",
+    "send": {
+      "label": "Send traffic along a route",
+      "web": "Web request",
+      "bot": "Telegram message",
+      "deploy": "Deploy"
+    }
   },
   "infra": {
     "frames": {

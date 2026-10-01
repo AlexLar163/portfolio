@@ -1,3 +1,4 @@
+import { TraceBox } from "@/components/ui/TraceBox";
 import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 import { capabilityGroups, pipelineRows } from "@/data/devops";
@@ -28,6 +29,7 @@ export async function CapabilityBento() {
       <h3 className="subhead">{t("bento.title")}</h3>
       <div className="bento">
         <section className="bento__cell bento__cell--a" data-reveal style={{ ["--i" as string]: 0 }} aria-labelledby="bento-panel">
+          <TraceBox i={0} />
           <h4 id="bento-panel" className="t-h3">
             {t("capabilities.panel.title")}
           </h4>
@@ -67,6 +69,7 @@ export async function CapabilityBento() {
         </section>
 
         <section className="bento__cell bento__cell--b" data-reveal style={{ ["--i" as string]: 1 }} aria-labelledby="bento-proxy">
+          <TraceBox i={1} />
           <h4 id="bento-proxy" className="t-h3">
             {t("capabilities.proxy.title")}
           </h4>
@@ -81,6 +84,7 @@ export async function CapabilityBento() {
         </section>
 
         <section className="bento__cell bento__cell--c" data-reveal style={{ ["--i" as string]: 2 }} aria-labelledby="bento-containers">
+          <TraceBox i={2} />
           <h4 id="bento-containers" className="t-h3">
             {t("capabilities.containers.title")}
           </h4>
@@ -103,6 +107,7 @@ export async function CapabilityBento() {
         </section>
 
         <section className="bento__cell bento__cell--d" data-reveal style={{ ["--i" as string]: 3 }} aria-labelledby="bento-automation">
+          <TraceBox i={3} />
           {flows && (
             <figure className="bento__media">
               <div className="capture capture--wide" data-overflow-ok>

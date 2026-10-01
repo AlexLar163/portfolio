@@ -69,16 +69,30 @@
   --s-9: 6rem;
   --s-10: 8rem;
 
-  /* El porcentaje se resuelve contra el contenedor, que no incluye la barra de scroll (regla 8). */
-  --gut: clamp(1rem, 4%, 3rem);
+  /* Margen lateral y carril del circuito (v3). Los dos los manda la VENTANA (son
+     el margen de página), y los hijos del .shell necesitan conocerlos para poner
+     el LED del header y el nodo del footer sobre la pista: por eso vw y no %.
+     Con barra de scroll clásica la diferencia es 4 % de 15 px = 0,6 px, y por
+     encima de 1200 px el clamp ya topó (regla 8: medido, no ignorado). */
+  --gut: clamp(1rem, 4vw, 3rem);
+  --trace: clamp(1rem, 3.4vw, 3rem);
+  /* x de la pista, medida desde el borde izquierdo del contenido del .shell. */
+  --rail-x: calc((var(--gut) + var(--trace)) / -2);
   --header-h: 56px;
 
   --dur-1: 120ms;
   --dur-2: 200ms;
   --dur-3: 320ms;
   --dur-trace: 1400ms;
-  /* Wipes de media y entradas de capítulo (marketing: puede pasar 300 ms). */
-  --dur-4: 700ms;
+  /* Entradas v3: 180–450 ms. --dur-4 (wipes de media) baja de 700 a 420 ms. */
+  --dur-4: 420ms;
+  /* Resorte (response .34 s, damping .78) muestreado en linear(): una transición
+     CSS que se retarga desde su valor actual, así que es interrumpible. */
+  --spring: linear(0, 0.065, 0.198, 0.355, 0.502, 0.64, 0.754, 0.844, 0.909, 0.956, 0.985, 1.003, 1.014, 1.018, 1.018, 1.017, 1.014, 1.011, 1.009, 1.006, 1.004, 1.003, 1.001, 1.001, 1);
+  --spring-dur: 480ms;
+  /* Retícula del lienzo: 22 px, punto apenas visible (decoración, no texto). */
+  --dot: #22282e;
+  --grid: 22px;
 
   /* Escala v2 (§2.2): la jerarquía sale del tamaño. cqi = ancho del .shell. */
   --t-display: clamp(3rem, 1.5rem + 8cqi, 9rem);
@@ -93,8 +107,11 @@
 
 /* ─── Reset propio (reglas 4 a 9 de layout-sin-cortes) ─────────────────── */
 
+/* Lienzo de puntos en toda la página (v3): anclado al documento, así el
+   spotlight (capa fija) puede alinear sus puntos con estos. */
 html {
-  background: var(--bg);
+  background: var(--bg) radial-gradient(circle at 1px 1px, var(--dot) 1.1px, transparent 1.6px) 0 0 /
+    var(--grid) var(--grid);
   color: var(--ink);
   scrollbar-color: var(--line-strong) var(--bg);
   accent-color: var(--accent);
@@ -300,16 +317,18 @@ section[id] {
 
 /* ─── Estructura ───────────────────────────────────────────────────────── */
 
+/* La izquierda suma el carril del circuito: la pista corre siempre dentro del
+   padding del .shell, nunca encima del contenido ni fuera de la página. */
 .shell {
   width: 100%;
-  max-width: calc(90rem + 2 * var(--gut));
+  max-width: calc(90rem + 2 * var(--gut) + var(--trace));
   margin-inline: auto;
-  padding-inline: var(--gut);
+  padding-inline: calc(var(--gut) + var(--trace)) var(--gut);
   container: shell / inline-size;
 }
 
 .shell--wide {
-  max-width: calc(105rem + 2 * var(--gut));
+  max-width: calc(105rem + 2 * var(--gut) + var(--trace));
 }
 
 .grid {
@@ -572,6 +591,7 @@ section[id] {
 /* min-width: reserva el ancho de «Alex Largo» en Archivo o en su respaldo, así
    el punto de disponibilidad no se corre cuando llega la fuente (CLS). */
 .brand {
+  position: relative;
   min-width: 5.5em;
   font-size: 1rem;
   font-weight: 600;
@@ -585,6 +605,19 @@ section[id] {
 
 .brand:hover {
   color: var(--accent-hi);
+}
+
+/* LED de la marca sobre la x de la pista (v3): el circuito «sale» de aquí. */
+.brand__led {
+  position: absolute;
+  left: calc(var(--rail-x) - 4px);
+  top: 50%;
+  width: 8px;
+  height: 8px;
+  margin-top: -4px;
+  border-radius: var(--r-1);
+  background: var(--live);
+  pointer-events: none;
 }
 
 /* Disponibilidad: estado real (v2 §3.2), punto --live. */
@@ -614,18 +647,40 @@ section[id] {
   }
 }
 
-/* Progreso de lectura: hairline de 1 px bajo el header (lo mueve la escena). */
+/* Progreso de lectura: hairline de 1 px bajo el header con un paquete a la
+   cabeza (v3). Lo mueve circuit.ts; sin motion no se muestra. */
 .read-progress {
   position: absolute;
   left: 0;
   right: 0;
   bottom: -1px;
   height: 1px;
-  background: var(--accent);
-  transform: scaleX(0);
-  transform-origin: 0 50%;
   opacity: 0;
   pointer-events: none;
+}
+
+.read-progress::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--accent);
+  transform: scaleX(var(--p, 0));
+  transform-origin: 0 50%;
+}
+
+.read-progress i {
+  /* left 0 y traslado hasta W − 5 (circuit.ts): nunca sale de la ventana. */
+  position: absolute;
+  left: 0;
+  top: -2px;
+  width: 5px;
+  height: 5px;
+  border-radius: 1px;
+  background: var(--color-accent-hi);
+}
+
+.circuit-on .read-progress {
+  opacity: 1;
 }
 
 .nav-desktop,
@@ -663,9 +718,10 @@ section[id] {
   background: var(--accent);
   transform: translateX(var(--x, 0));
   opacity: var(--o, 0);
+  /* Resorte (v3): viaja hasta la sección activa con un leve rebote. */
   transition:
-    transform var(--dur-2) var(--ease-out),
-    width var(--dur-2) var(--ease-out),
+    transform var(--spring-dur) var(--spring),
+    width var(--spring-dur) var(--spring),
     opacity var(--dur-2);
   pointer-events: none;
 }
@@ -800,19 +856,6 @@ section[id] {
   min-height: calc(100dvh - var(--header-h));
 }
 
-/* Lienzo de puntos de DevOps, enmascarado: fondo de la propia sección, sin 100vw. */
-.hero::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  background-image: radial-gradient(var(--line-strong) 1px, transparent 1.5px);
-  background-size: 24px 24px;
-  background-position: center top;
-  mask-image: radial-gradient(120% 90% at 70% 40%, #000 30%, transparent 75%);
-  pointer-events: none;
-}
-
 @media (max-height: 760px) {
   .hero {
     min-height: 0;
@@ -845,6 +888,7 @@ section[id] {
 }
 
 .hero__index ul {
+  position: relative;
   display: grid;
   gap: var(--s-3);
 }
@@ -925,6 +969,13 @@ section[id] {
   color: var(--accent);
 }
 
+/* Bus del índice (v3, desde 900 px de contenedor): una pista vertical en el
+   hueco entre columnas y un ramal a cada fila. Al hover/foco, un pulso viaja
+   por el ramal hasta la fila (finito: 320 ms, no necesita pausa). */
+.chapter__stub {
+  display: none;
+}
+
 @container shell (min-width: 37.5rem) {
   .hero__actions {
     flex-direction: row;
@@ -948,6 +999,74 @@ section[id] {
   .chapter {
     grid-template-columns: minmax(0, 10rem) minmax(0, 1fr) auto;
     gap: var(--s-5);
+  }
+
+  .hero__index ul::before {
+    content: "";
+    position: absolute;
+    left: calc(var(--s-5) * -1);
+    top: 2.5rem;
+    bottom: 2.5rem;
+    width: 1px;
+    background: var(--line-strong);
+  }
+
+  .chapter__stub {
+    display: block;
+    position: absolute;
+    left: calc(var(--s-5) * -1);
+    top: 50%;
+    width: var(--s-5);
+    height: 1px;
+    background: var(--line-strong);
+    pointer-events: none;
+  }
+
+  .chapter__stub::before {
+    content: "";
+    position: absolute;
+    left: -3px;
+    top: -3px;
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--bg);
+    border: 1px solid var(--line-strong);
+    transition:
+      background-color var(--dur-2),
+      border-color var(--dur-2);
+  }
+
+  .chapter__stub::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: -2px;
+    width: 5px;
+    height: 5px;
+    border-radius: 1px;
+    background: var(--accent);
+    opacity: 0;
+  }
+
+  .chapter:is(:hover, :focus-visible) .chapter__stub::before {
+    background: var(--accent);
+    border-color: var(--accent);
+  }
+
+  .motion-lite .chapter:is(:hover, :focus-visible) .chapter__stub::after {
+    animation: stub-pulse 320ms var(--ease-io) both;
+  }
+}
+
+@keyframes stub-pulse {
+  from {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(calc(var(--s-5) - 5px));
   }
 }
 
@@ -1150,7 +1269,7 @@ section[id] {
   background: var(--accent);
   transform: translateX(var(--ix, 0)) scaleX(var(--iw, 0));
   transform-origin: 0 50%;
-  transition: transform 240ms var(--ease-out);
+  transition: transform var(--spring-dur) var(--spring);
   pointer-events: none;
 }
 
@@ -1265,19 +1384,23 @@ section[id] {
 
 /* ─── Clientes ─────────────────────────────────────────────────────────── */
 
-/* Bloque (no grid): con sticky, el bloque contenedor de cada tarjeta tiene que
-   ser la pila entera; en una grilla cada tarjeta quedaría presa de su fila. */
+/* Un cliente por bloque, en flujo normal (v3: sin pila fija). */
 .client-card + .client-card {
   margin-top: var(--s-8);
 }
 
+/* v3: la tarjeta lleva borde y superficie en todos los anchos (antes solo
+   desde 900 px): el trazo del circuito la rodea y no puede rozar el texto. */
 .client-card {
   position: relative;
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: var(--s-5);
   min-width: 0;
+  padding: var(--s-4);
+  border: 1px solid var(--line);
   border-radius: var(--r-3);
+  background: var(--surface);
 }
 
 .client-card__media,
@@ -1320,17 +1443,6 @@ section[id] {
   object-position: top;
 }
 
-/* Velo de hundimiento (lo anima la escena; en reposo no se ve). */
-.client-card::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: var(--bg);
-  opacity: var(--veil, 0);
-  pointer-events: none;
-}
-
 @container shell (min-width: 56.25rem) {
   .client-card {
     grid-template-columns: repeat(12, minmax(0, 1fr));
@@ -1348,19 +1460,17 @@ section[id] {
   .client-card__text {
     grid-column: span 5;
   }
-}
 
-/* Stack de despliegues (v2 §8.1): un cliente por pantalla. */
-/* Tope de 40 rem: a 56 rem (844 px a 1440×900) quedaban ~185 px vacíos arriba y
-   abajo de la media (QA). */
-.motion-ok .client-card:not([data-stack="off"]) {
-  position: sticky;
-  top: calc(var(--header-h) + var(--s-4));
-  min-height: min(calc(100dvh - var(--header-h) - var(--s-6)), 40rem);
-}
+  /* La media alterna de lado: el ojo no lee cuatro veces el mismo molde. */
+  .client-card:nth-child(even) .client-card__media {
+    grid-column: 6 / span 7;
+    grid-row: 1;
+  }
 
-.motion-ok .client-card + .client-card {
-  margin-top: 30dvh;
+  .client-card:nth-child(even) .client-card__text {
+    grid-column: 1 / span 5;
+    grid-row: 1;
+  }
 }
 
 .review {
@@ -1396,17 +1506,7 @@ section[id] {
 }
 
 /* ─── DevOps ───────────────────────────────────────────────────────────── */
-.section--canvas {
-  /* Lienzo de puntos pintado en la propia sección (100 % de ancho): sin 100vw. */
-  background-color: var(--bg);
-  background-image: radial-gradient(var(--line-strong) 1px, transparent 1.5px);
-  background-size: 24px 24px;
-  background-position: center top;
-  border-block: 1px solid var(--line);
-}
-
-/* Escena «una petición de punta a punta» (v2 §5). Sin overflow en ningún
-   ancestro: rompería el sticky (regla 9). */
+/* Bloque DevOps (v3): en flujo normal, sin escena fija. */
 .devops-stage {
   display: grid;
   gap: var(--s-6);
@@ -1461,18 +1561,6 @@ section[id] {
   max-width: 420px;
 }
 
-.stage-sentinels {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-}
-
-.stage-sentinels span {
-  position: absolute;
-  left: 0;
-  right: 0;
-}
-
 /* Pasos: lista completa en estático (reduce, sin JS, ?motion=0). */
 .stage-steps {
   display: grid;
@@ -1514,29 +1602,6 @@ section[id] {
 @container shell (min-width: 70rem) {
   .stage-steps {
     grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
-}
-
-/* Móvil y tablet con motion: un solo paso visible, pegado al pie de la
-   ventana mientras el diagrama vertical pasa (v2 §5.6). */
-@container shell (max-width: 69.99rem) {
-  .motion-lite:not(.motion-ok) .stage-steps {
-    position: sticky;
-    bottom: var(--s-3);
-    z-index: 2;
-    grid-template-columns: minmax(0, 1fr);
-    grid-template-areas: "step";
-  }
-
-  .motion-lite:not(.motion-ok) .stage-steps li {
-    grid-area: step;
-    background: var(--raised);
-    border-color: var(--line-strong);
-    opacity: 0;
-  }
-
-  .motion-lite:not(.motion-ok) .stage-steps li[data-active] {
-    opacity: 1;
   }
 }
 
@@ -1670,7 +1735,28 @@ section[id] {
   flex: none;
 }
 
-/* 700 px de contenedor sin escena: diagrama vertical a la izquierda, panel a la derecha. */
+/* Móvil (v3): sin el caption fijo de la v2, la lista de pasos quedaba entre el
+   diagrama y el panel; un toque llevaba a seis pasos de distancia. El panel va
+   pegado debajo del diagrama, como en horizontal. */
+@container shell (max-width: 43.74rem) {
+  .stage-body .stage-diagram {
+    display: contents;
+  }
+
+  .stage-body .stage-svg {
+    order: 1;
+  }
+
+  .stage-body .infra__panel {
+    order: 2;
+  }
+
+  .stage-body .stage-steps {
+    order: 3;
+  }
+}
+
+/* 700 px de contenedor: diagrama vertical a la izquierda, panel a la derecha. */
 @container shell (min-width: 43.75rem) and (max-width: 69.99rem) {
   .stage-body {
     grid-template-columns: minmax(0, 26.25rem) minmax(0, 1fr);
@@ -1680,14 +1766,6 @@ section[id] {
   .stage-steps {
     grid-template-columns: minmax(0, 1fr);
   }
-
-  /* Sticky acotado a .stage-body (diagrama + panel): acompaña al diagrama
-     mientras se tocan nodos y no puede pisar el carril de CI ni la leyenda,
-     que quedan fuera del envoltorio. */
-  .infra__panel {
-    position: sticky;
-    top: calc(var(--header-h) + var(--s-4));
-  }
 }
 
 /* Horizontal desde 70 rem (1120 px): a 66 rem la subetiqueta de 13 u daba 11,4 px,
@@ -1695,19 +1773,19 @@ section[id] {
 /* Horizontal sin escena: el panel va pegado debajo del diagrama (antes de la
    lista de pasos), así un clic lo trae a la vista con un scroll mínimo. */
 @container shell (min-width: 70rem) {
-  html:not(.scene-devops) .stage-body .stage-diagram {
+  .stage-body .stage-diagram {
     display: contents;
   }
 
-  html:not(.scene-devops) .stage-body .stage-svg {
+  .stage-body .stage-svg {
     order: 1;
   }
 
-  html:not(.scene-devops) .stage-body .infra__panel {
+  .stage-body .infra__panel {
     order: 2;
   }
 
-  html:not(.scene-devops) .stage-body .stage-steps {
+  .stage-body .stage-steps {
     order: 3;
   }
 }
@@ -1725,115 +1803,6 @@ section[id] {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr) minmax(0, 1fr);
     column-gap: var(--s-6);
     align-items: start;
-  }
-}
-
-/* ── Escena fija (solo .motion-ok y desde 1280 de ancho; alto ≥ 700 ya lo pide .motion-ok): el alto se reserva en CSS
-   desde el primer paint, así nada se mueve cuando llega GSAP (CLS 0, v2 §7.1).
-   Top = header: con top 0 el header sticky tapaba los primeros 56 px del stage.
-   Umbral: con la tipografía de escena (todo ≥ 16 u) el diagrama necesita escala
-   ≥ 0,75 para el piso de 12 px: medido 11,7 px a 1280×760, 12,2 a 1366×768 y
-   13,3 a 1440×900; con el layout anterior 1024×700 o 1280×720 daban 6–9 px.
-   Con alto < 800 la escena va compacta (.is-compact: título a .42, leyenda
-   abajo). Debajo de 1280 de ancho: diagrama estático (≥ 12,8 px).
-   .scene-devops lo pone el script de <head> (y MotionRoot al redimensionar). ── */
-
-.scene-devops .devops-scene {
-  height: calc(100dvh * 4.2);
-}
-
-.scene-devops .devops-stage {
-  position: sticky;
-  top: var(--header-h);
-  height: calc(100dvh - var(--header-h));
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  grid-template-rows: auto minmax(0, 1fr) auto;
-  column-gap: var(--s-6);
-  row-gap: var(--s-4);
-  padding-block: var(--s-5);
-}
-
-.scene-devops .stage-body,
-.scene-devops .stage-diagram {
-  display: contents;
-}
-
-.scene-devops .stage-title {
-  grid-column: 1 / -1;
-  grid-row: 1;
-  transform-origin: 0 0;
-}
-
-.scene-devops .stage-svg {
-  grid-column: 1 / span 8;
-  grid-row: 2;
-  display: grid;
-  place-items: center;
-  min-height: 0;
-}
-
-/* El tamaño del diagrama sale del alto disponible, no de una constante (regla 1). */
-.scene-devops .dg-wrap--land {
-  display: block;
-  height: 100%;
-  min-height: 0;
-}
-
-.scene-devops .dg-wrap--port {
-  display: none;
-}
-
-.scene-devops .dg-wrap--land .infra__svg {
-  width: auto;
-  height: 100%;
-  max-width: 100%;
-}
-
-.scene-devops .stage-foot {
-  grid-column: 1 / span 8;
-  grid-row: 3;
-}
-
-/* Pasos y panel comparten celda, en la columna derecha: en la fila de abajo
-   (como pedía §5.2 para 1024–1279) el panel de «vivo» mide ~250 px y le quitaba
-   al diagrama la mitad de su alto a 1024×700. En reposo se ve el panel (estado
-   final); la escena decide qué se ve según el progreso. */
-.scene-devops .stage-steps,
-.scene-devops .devops-stage .infra__panel {
-  grid-column: 9 / -1;
-  grid-row: 2 / span 2;
-  align-self: center;
-  position: static;
-}
-
-.scene-devops .stage-steps {
-  grid-template-columns: minmax(0, 1fr);
-  grid-template-areas: "step";
-  opacity: 0;
-}
-
-.scene-devops .stage-steps li {
-  grid-area: step;
-  opacity: 0;
-}
-
-.scene-devops .stage-steps li[data-active] {
-  opacity: 1;
-}
-
-.scene-devops .infra__panel-inner {
-  grid-template-columns: minmax(0, 1fr);
-}
-
-@container shell (min-width: 74rem) {
-  .scene-devops .stage-svg,
-  .scene-devops .stage-foot {
-    grid-column: 1 / span 9;
-  }
-
-  .scene-devops .stage-steps,
-  .scene-devops .devops-stage .infra__panel {
-    grid-column: 10 / -1;
   }
 }
 
@@ -2015,78 +1984,6 @@ section[id] {
   transition-delay: 300ms, 0ms, 0ms;
 }
 
-/* Respaldo de v1 con motion y sin escena: el trazo corre una vez al entrar. */
-.motion-lite:not(.motion-ok) .dg[data-trace="idle"] .trace {
-  stroke-dashoffset: 1;
-}
-
-.motion-lite:not(.motion-ok) .dg[data-trace="run"] .trace {
-  stroke: var(--accent);
-}
-
-/* Tráfico vivo (v2 §6.2): dasharray sobre pathLength=1, sin JS de animación. */
-.packets {
-  display: none;
-}
-
-.motion-lite .packets {
-  display: inline;
-}
-
-.dg .packet {
-  fill: none;
-  stroke: var(--accent);
-  stroke-width: 2.5;
-  stroke-linecap: round;
-  stroke-dasharray: 0.02 1;
-  stroke-dashoffset: 0.02;
-  animation: pk-head var(--d) linear var(--delay) infinite;
-}
-
-.dg .packet-trail {
-  fill: none;
-  stroke: var(--accent-trail);
-  stroke-width: 2;
-  stroke-dasharray: 0.08 1;
-  stroke-dashoffset: 0.08;
-  animation: pk-trail var(--d) linear var(--delay) infinite;
-}
-
-.dg .packet-g--scheduled .packet {
-  stroke: var(--ink-2);
-  stroke-dasharray: 0.015 1;
-}
-
-.dg .packet-g--scheduled .packet-trail {
-  display: none;
-}
-
-@keyframes pk-head {
-  from {
-    stroke-dashoffset: 0.02;
-  }
-  to {
-    stroke-dashoffset: -1;
-  }
-}
-
-@keyframes pk-trail {
-  from {
-    stroke-dashoffset: 0.08;
-  }
-  to {
-    stroke-dashoffset: -0.94;
-  }
-}
-
-/* Fuera de pantalla, con la pestaña oculta o antes de «vivo» en la escena: quietos y ocultos. */
-.devops:not(.in-view) .packets path,
-.is-hidden .packets path,
-.devops-stage.is-scene:not(.is-live) .packets path {
-  animation-play-state: paused;
-  opacity: 0;
-}
-
 .infra-list {
   margin-top: var(--s-6);
 }
@@ -2184,8 +2081,6 @@ section[id] {
 @container shell (min-width: 56.25rem) {
   .incident__head {
     grid-column: span 4;
-    position: sticky;
-    top: calc(var(--header-h) + var(--s-6));
     align-self: start;
   }
 
@@ -2535,7 +2430,7 @@ section[id] {
 }
 
 /* ─── Proyectos ────────────────────────────────────────────────────────── */
-/* Destacados: split sticky por producto (v2 §9). */
+/* Destacados (v3): media y pasos lado a lado, en flujo normal. */
 .feature + .feature {
   margin-top: var(--s-10);
 }
@@ -2556,19 +2451,6 @@ section[id] {
   text-wrap: balance;
 }
 
-.mask,
-.mask__inner {
-  display: block;
-}
-
-/* La máscara solo recorta con la escena (el nombre sube desde abajo); el
-   padding deja lugar a los descendentes con line-height 1. */
-.motion-ok .mask {
-  overflow: clip;
-  padding-bottom: 0.14em;
-  margin-bottom: -0.14em;
-}
-
 .feature__line {
   max-width: 44rem;
 }
@@ -2580,6 +2462,36 @@ section[id] {
   min-width: 0;
 }
 
+/* Pista de pasos: un trazo vertical y un paquete que viaja (resorte CSS)
+   hasta el título del paso activo. */
+.feature__track {
+  position: relative;
+  min-width: 0;
+  padding-left: var(--s-6);
+}
+
+.feature__rail {
+  position: absolute;
+  left: 4px;
+  top: 0.5rem;
+  bottom: 0.5rem;
+  width: 1px;
+  background: var(--line-strong);
+}
+
+.feature__rail::after {
+  content: "";
+  position: absolute;
+  left: -4px;
+  top: -4px;
+  width: 9px;
+  height: 9px;
+  border-radius: var(--r-1);
+  background: var(--accent);
+  transform: translateY(calc(var(--pk-y, 1rem) - 0.5rem));
+  transition: transform var(--spring-dur) var(--spring);
+}
+
 .feature__steps {
   display: grid;
   gap: var(--s-6);
@@ -2587,8 +2499,29 @@ section[id] {
 }
 
 .feature__steps > li {
+  position: relative;
   min-width: 0;
-  transition: opacity var(--dur-2) ease;
+  cursor: pointer;
+}
+
+/* Contacto del paso con la pista: se enciende el activo. */
+.feature__steps > li::before {
+  content: "";
+  position: absolute;
+  left: calc(var(--s-6) * -1);
+  top: calc(var(--t-h2-minor) * 0.55 - 4px);
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--bg);
+  border: 1px solid var(--line-strong);
+  transition:
+    border-color var(--dur-2),
+    background-color var(--dur-2);
+}
+
+.feature__steps > li[data-current]::before {
+  border-color: var(--accent);
 }
 
 .feature-step {
@@ -2737,46 +2670,24 @@ section[id] {
   transform: scaleX(1);
 }
 
-/* Pestañas de respaldo: solo en estático con JS (reduce o ?motion=0). */
+/* Pestañas: el control accesible del paso (siempre, con JS). */
 .feature__tabs {
   display: none;
   justify-self: start;
 }
 
-.js:not(.motion-lite) .feature__tabs {
+.js .feature__tabs {
   display: inline-flex;
 }
 
 /* Paso inactivo: se apaga con un token de texto (ink-3, 6,1:1 sobre --bg), no
    con opacity (0,4 daba 2,47:1). */
-.motion-lite .feature__steps > li:not([data-current]) :is(.feature-step__title, p, li, .link) {
+.js .feature__steps > li:not([data-current]) :is(.feature-step__title, p, li, .link) {
   color: var(--ink-3);
 }
 
 .feature__steps :is(.feature-step__title, p, li, .link) {
   transition: color var(--dur-2) ease;
-}
-
-/* Móvil y tablet con motion: la media arriba y sticky corta, los pasos pasan debajo. */
-@container shell (max-width: 56.2499rem) {
-  .motion-lite .feature__stage {
-    position: sticky;
-    top: var(--header-h);
-    z-index: 2;
-    padding-block: var(--s-2);
-    background: var(--bg);
-  }
-
-  .motion-lite .feature__media {
-    aspect-ratio: auto;
-    height: min(56.25cqi, 34dvh);
-  }
-}
-
-@media (max-height: 640px) {
-  .motion-lite .feature__stage {
-    position: static;
-  }
 }
 
 @container shell (min-width: 56.25rem) {
@@ -2787,7 +2698,7 @@ section[id] {
     align-items: start;
   }
 
-  .feature__steps {
+  .feature__track {
     grid-column: 1 / span 5;
     grid-row: 1;
   }
@@ -2795,40 +2706,6 @@ section[id] {
   .feature__stage {
     grid-column: 6 / span 7;
     grid-row: 1;
-  }
-
-  .motion-ok .feature__steps {
-    gap: 0;
-  }
-
-  .motion-ok .feature__steps > li {
-    display: flex;
-    align-items: center;
-    min-height: 52dvh;
-  }
-
-  /* Con el alto de un paso por pantalla, el texto sube de escala. */
-  .motion-ok .feature-step {
-    font-size: 1.125rem;
-  }
-
-  .motion-ok .feature__stage {
-    position: sticky;
-    top: var(--header-h);
-    height: calc(100dvh - var(--header-h));
-    align-content: center;
-  }
-
-  /* El marco sale de su caja: ancho completo salvo que el alto no alcance. */
-  .motion-ok .feature__frame {
-    width: min(100%, calc((100dvh - var(--header-h) - 2 * var(--s-6) - 3rem) * 1.6));
-    justify-self: center;
-  }
-}
-
-@container shell (min-width: 74rem) {
-  .motion-ok .feature__steps > li {
-    min-height: 58dvh;
   }
 }
 
@@ -3542,7 +3419,7 @@ textarea.input {
   }
 }
 
-/* ─── Motion liviano (v2 bloque 2: CSS + IntersectionObserver, sin GSAP) ── */
+/* ─── Motion liviano (CSS + IntersectionObserver; v3 sin GSAP ni escenas) ── */
 
 /* Todo cuelga de .motion-lite (lo pone el script de <head>; nunca con reduce).
    Nada queda en opacity:0 por CSS salvo bajo .reveal-on, que pone el propio JS. */
@@ -3590,177 +3467,19 @@ html:not(.motion-lite) .pause-btn {
   margin-bottom: var(--s-5);
 }
 
-[data-paused] .packets path,
 [data-paused] .marquee__row {
   animation-play-state: paused;
 }
 
-/* Hero (v2 §4.3): se ve una vez por visita. El lead y los botones no se animan:
-   el lead es el LCP en móvil y nunca pasa por opacity 0. */
-.motion-lite .hero::before {
-  animation: fade-in 1200ms linear both;
-}
-
-.motion-lite .hero__index li {
-  --delay: calc(200ms + var(--i, 0) * 80ms);
-  animation: row-in var(--dur-4) var(--ease-out) both;
-  animation-delay: var(--delay);
-}
-
-.motion-lite .chapter__thumb {
-  animation: thumb-in var(--dur-4) var(--ease-out) both;
-  animation-delay: var(--delay, 0ms);
-}
-
-@keyframes row-in {
-  from {
-    clip-path: inset(0 100% 0 0);
-  }
-  to {
-    clip-path: inset(0);
-  }
-}
-
-@keyframes thumb-in {
-  from {
-    scale: 0.96;
-  }
-}
-
-/* El eje de ancho: el texto se pinta desde el primer frame (el LCP no espera). */
-@media (min-width: 768px) {
-  .motion-lite .hero__name {
-    animation: wdth-in 900ms var(--ease-out) both;
-  }
-}
-
-@keyframes wdth-in {
-  from {
-    font-variation-settings: "wdth" 62;
-  }
-  to {
-    font-variation-settings: "wdth" 78;
-  }
-}
-
-/* Recorridos del diagrama vertical dibujados con el scroll (v2 §5.6). */
-@supports (animation-timeline: view()) {
-  .motion-lite:not(.motion-ok) .infra__svg--port {
-    view-timeline: --diag block;
-  }
-
-  .motion-lite:not(.motion-ok) .infra__svg--port [data-route],
-  .motion-lite:not(.motion-ok) .infra__svg--port [data-edge-mask="e13"] {
-    stroke-dashoffset: 1;
-    animation: draw linear both;
-    animation-timeline: --diag;
-    transition: none;
-  }
-
-  .motion-lite:not(.motion-ok) .infra__svg--port [data-route="1"] {
-    animation-range: cover 10% cover 55%;
-  }
-
-  .motion-lite:not(.motion-ok) .infra__svg--port [data-route="2"] {
-    stroke: var(--accent);
-    animation-range: cover 35% cover 80%;
-  }
-
-  .motion-lite:not(.motion-ok) .infra__svg--port [data-edge-mask="e13"] {
-    animation-range: cover 75% cover 95%;
-  }
-
-  /* Incidente en móvil: la línea se llena con el scroll y cada nodo se enciende
-     al llegar a la mitad de la ventana. */
-  .motion-lite:not(.motion-ok) .incident__steps {
-    view-timeline: --incident block;
-  }
-
-  .motion-lite:not(.motion-ok) .incident__steps::after {
-    animation: fill-y linear both;
-    animation-timeline: --incident;
-    animation-range: cover 25% cover 65%;
-  }
-
-  .motion-lite:not(.motion-ok) .incident__steps li {
-    view-timeline: --step block;
-  }
-
-  .motion-lite:not(.motion-ok) .incident__steps li::before {
-    animation: node-on linear both;
-    animation-timeline: --step;
-    animation-range: cover 45% cover 50%;
-  }
-
-  /* Media de clientes en móvil: se abre desde un recorte con margen. */
-  .motion-lite:not(.motion-ok) .client-card__media {
-    animation: clip-in linear both;
-    animation-timeline: view();
-    animation-range: entry 0% entry 60%;
-  }
-}
-
-@keyframes draw {
-  from {
-    stroke-dashoffset: 1;
-  }
-  to {
-    stroke-dashoffset: 0;
-  }
-}
-
-@keyframes fill-y {
-  from {
-    transform: scaleY(0);
-  }
-  to {
-    transform: scaleY(1);
-  }
-}
-
-@keyframes node-on {
-  from {
-    background-color: var(--bg);
-  }
-  to {
-    background-color: var(--accent);
-  }
-}
-
-@keyframes clip-in {
-  from {
-    clip-path: inset(6% 6% 6% 6% round 8px);
-  }
-  to {
-    clip-path: inset(0 round 8px);
-  }
-}
-
-/* Destacados en móvil: el barrido es una transición CSS de 500 ms (v2 §9.3). */
-.motion-lite:not(.motion-ok) .layer[data-state="on"] {
-  transition-duration: 500ms, 0s;
-}
-
-/* Reveals de una vez (bento y carriles). */
-.reveal-on .bento__cell[data-reveal] {
-  transition:
-    opacity var(--dur-4) var(--ease-out),
-    scale var(--dur-4) var(--ease-out);
-  transition-delay: calc(var(--i, 0) * 60ms);
-}
-
-.reveal-on .bento__cell[data-reveal]:not(.is-in) {
-  opacity: 0;
-  scale: 0.97;
-}
-
+/* Carriles de CI/CD: los checks se encienden en cadena, como un pipeline que
+   corre (v3: 180 ms por chip). El estado oculto solo existe bajo .reveal-on. */
 .reveal-on .lane[data-reveal] .chip {
-  transition: border-color var(--dur-2) var(--ease-out);
-  transition-delay: calc(var(--l, 0) * 120ms + var(--i, 0) * 30ms);
+  transition: border-color 180ms var(--ease-out);
+  transition-delay: calc(var(--l, 0) * 90ms + var(--i, 0) * 60ms);
 }
 
 .reveal-on .lane[data-reveal] .chip__check {
-  transition: opacity var(--dur-2) var(--ease-out);
+  transition: opacity 180ms var(--ease-out);
   transition-delay: inherit;
 }
 
@@ -3837,7 +3556,7 @@ html:not(.motion-lite) .pause-btn {
   /* #2 Zoom de la imagen dentro de su marco. */
   .frame__img,
   .chapter__thumb img {
-    transition: scale 600ms var(--ease-out);
+    transition: scale 420ms var(--ease-out);
   }
 
   .motion-lite .demo-card:hover .frame__img,
@@ -3847,204 +3566,520 @@ html:not(.motion-lite) .pause-btn {
   }
 }
 
-/* ─── Escenas GSAP (v2 bloque 3, solo .motion-ok) ──────────────────────── */
+/* ─── Circuito (v3, dirección B) ──────────────────────────────────────── */
 
-/* Las clases .is-scene / .is-vivo / .is-live las pone la escena al montar y las
-   quita al revertir: sin GSAP rige el estado final de arriba. */
-.is-scene .dg .node,
-.is-scene .dg .edge,
-.is-scene .dg .edge-label {
-  transition: stroke var(--dur-2);
+/* Pista: capa absoluta del <main>, detrás del contenido (isolation + z −1),
+   sin eventos de puntero y recortada a su caja: nunca crea scroll lateral. */
+main#contenido {
+  position: relative;
+  isolation: isolate;
 }
 
-.is-scene .dg .node__box {
-  transition:
-    stroke 150ms,
-    fill 150ms;
-}
-
-.is-scene .dg .node.is-lit .node__box {
-  stroke: var(--accent);
-  fill: var(--accent-dim);
-}
-
-.is-scene .dg .trace {
-  stroke: var(--accent);
-  transition: stroke 300ms var(--ease-out);
-}
-
-.is-scene .dg .trace.is-rest {
-  stroke: var(--ink-3);
-}
-
-/* La fila del título mide el título YA encogido (lo mide la escena): el título
-   grande del intro se superpone a un diagrama que todavía no existe, y el
-   diagrama gana el alto que el título suelta. La leyenda sube a esa fila. */
-.devops-stage.is-scene {
-  grid-template-rows: var(--title-h, auto) minmax(0, 1fr) auto;
-}
-
-.devops-stage.is-scene .stage-lead {
-  max-width: 52rem;
-}
-
-/* Tipografía de escena: el diagrama se lee a escala ≥ 0,73 (1280×800, medido),
-   así que todo lo visible va a 17 u (≥ 12,4 px) y las subetiquetas de 13 u se
-   ocultan (sus datos están en los pasos y en el panel). La franja del host
-   muestra su nombre. */
-.devops-stage.is-scene .dg-wrap--land :is(.t-sub, .t-frame-sub) {
-  display: none;
-}
-
-.devops-stage.is-scene .dg-wrap--land :is(.t-label, .t-frame, .t-caption, .edge-label) {
-  font-size: 17px;
-}
-
-.devops-stage.is-scene .dg-wrap--land .t-strip-label,
-.devops-stage.is-scene .dg-wrap--land .node.is-lit .t-sub--scene {
-  display: inline;
-}
-
-/* Escena compacta (alto < 800): título a .42 y la fila de abajo solo con el
-   carril de CI (40 px). La leyenda sigue arriba a la derecha y desborda hacia
-   la columna de pasos, que por eso se alinea abajo. Medido a 1366×768: la
-   leyenda en la fila de abajo la subía a 140 px y el texto bajaba a 11,8 px. */
-.devops-stage.is-scene.is-compact .stage-steps,
-.devops-stage.is-scene.is-compact .infra__panel {
-  grid-row: 2;
-  align-self: end;
-}
-
-.devops-stage.is-scene.is-compact {
-  padding-block: var(--s-3);
-  row-gap: var(--s-3);
-}
-
-.devops-stage.is-scene .stage-ci {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: var(--s-2) var(--s-4);
-}
-
-.devops-stage.is-scene .stage-foot {
-  display: contents;
-}
-
-.devops-stage.is-scene .stage-ci {
-  grid-column: 1 / span 8;
-  grid-row: 3;
-}
-
-.devops-stage.is-scene .stage-foot__end {
-  grid-column: 9 / -1;
-  grid-row: 1;
-  align-self: start;
-  justify-content: flex-end;
-}
-
-.devops-stage.is-scene .stage-foot__end .legend {
-  justify-content: flex-end;
-  gap: var(--s-1) var(--s-4);
-}
-
-@container shell (min-width: 74rem) {
-  .devops-stage.is-scene .stage-ci {
-    grid-column: 1 / span 9;
-  }
-
-  .devops-stage.is-scene .stage-foot__end {
-    grid-column: 10 / -1;
-  }
-}
-
-/* Antes de «vivo» el diagrama se lee, no se toca (el foco sí: salta a «vivo»). */
-.devops-stage.is-scene:not(.is-vivo) .dg .node {
+.circuit {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: clip;
   pointer-events: none;
 }
 
-.devops-stage.is-scene .stage-steps {
+.circuit svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+
+.circuit path {
+  fill: none;
+  stroke-linejoin: round;
+  stroke-linecap: round;
+}
+
+.circuit .c-base {
+  stroke: #2a3036;
+  stroke-width: 2;
+}
+
+.circuit .c-lit {
+  stroke: rgb(255 139 61 / 0.45);
+  stroke-width: 2;
+}
+
+.circuit .c-trail {
+  stroke: var(--accent);
+  stroke-width: 2.5;
+}
+
+.circuit .c-node path {
+  stroke: #2a3036;
+  stroke-width: 2;
+  transition: stroke 300ms var(--ease-out);
+}
+
+.circuit .c-node circle {
+  fill: var(--bg);
+  stroke: #3a4148;
+  stroke-width: 2;
+  transition:
+    stroke 200ms var(--ease-out),
+    fill 200ms var(--ease-out);
+}
+
+.circuit .c-node.is-on path {
+  stroke: rgb(255 139 61 / 0.45);
+}
+
+.circuit .c-node.is-on circle {
+  stroke: var(--live);
+  fill: #1c3326;
+}
+
+/* El paquete: el único brillo de la página (es el dato que viaja). */
+.circuit__pk {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 10px;
+  height: 10px;
+  margin: -5px 0 0 -5px;
+  border-radius: 2px;
+  background: #ffd2b0;
+  box-shadow:
+    0 0 0 3px rgb(255 139 61 / 0.25),
+    0 0 14px 4px rgb(255 139 61 / 0.5);
+  opacity: 0;
+  will-change: transform;
+}
+
+.circuit-on .circuit__pk {
   opacity: 1;
-  transition: opacity 300ms, visibility 0s;
 }
 
-.devops-stage.is-scene.is-vivo .stage-steps {
+/* Estático (reduce, ?motion=0): la pista entera encendida, sin paquete. */
+.circuit-static .circuit .c-node path {
+  stroke: rgb(255 139 61 / 0.45);
+}
+
+/* Spotlight de cursor: 480 px fijos que se mueven solo con transform (cero
+   repintado); el patrón interno se corre para caer sobre la retícula. */
+.spotlight {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: -1;
+  width: 480px;
+  height: 480px;
+  overflow: hidden;
   opacity: 0;
-  visibility: hidden;
-  transition: opacity 300ms, visibility 0s 300ms;
+  pointer-events: none;
+  mask: radial-gradient(closest-side, #000 0, rgb(0 0 0 / 0.4) 55%, transparent 100%);
+  transition: opacity 300ms var(--ease-out);
+  will-change: transform;
 }
 
-.devops-stage.is-scene .infra__panel {
-  transition: opacity 300ms, visibility 0s;
+.spotlight i {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: calc(480px + var(--grid));
+  height: calc(480px + var(--grid));
+  background: radial-gradient(circle at 1px 1px, rgb(255 139 61 / 0.7) 1.2px, transparent 1.7px) 0 0 /
+    var(--grid) var(--grid);
+  will-change: transform;
 }
 
-.devops-stage.is-scene:not(.is-vivo) .infra__panel {
+.spotlight.is-on {
+  opacity: 1;
+}
+
+/* Titulares de sección: se encienden cuando el paquete llega a su nodo.
+   Apagados siguen en --ink-3 (6,1:1): nunca ilegibles si el JS no corre. */
+.rail-title::after {
+  content: "";
+  display: block;
+  width: 7.5rem;
+  height: 2px;
+  margin-top: var(--s-4);
+  background: linear-gradient(90deg, var(--accent), transparent);
+  transform-origin: 0 50%;
+}
+
+/* El apagado rige desde el primer paint (.motion-lite lo pone el script de
+   <head>): sin esto el titular se pintaba encendido, se apagaba al hidratar y
+   se volvía a encender. Failsafe: si el circuito no monta en 2,5 s, se
+   encienden solos (la animación deja de aplicar en cuanto llega .circuit-on). */
+.motion-lite .rail-title {
+  transition: color 300ms var(--ease-out);
+}
+
+.motion-lite section:not([data-lit]) .rail-title {
+  color: var(--ink-3);
+}
+
+.motion-lite .rail-title::after {
+  transition: transform 420ms var(--ease-out) 100ms;
+}
+
+.motion-lite section:not([data-lit]) .rail-title::after {
+  transform: scaleX(0);
+  transition-duration: 180ms;
+  transition-delay: 0ms;
+}
+
+html.motion-lite:not(.circuit-on) :is(.rail-title, .hero .w) {
+  animation: lit-failsafe 0s 2.5s both;
+}
+
+html.motion-lite:not(.circuit-on) .hero .w--acc {
+  animation-name: lit-failsafe-acc;
+}
+
+@keyframes lit-failsafe-acc {
+  to {
+    color: var(--accent);
+  }
+}
+
+html.motion-lite:not(.circuit-on) .rail-title::after {
+  animation: lit-failsafe-rule 0s 2.5s both;
+}
+
+@keyframes lit-failsafe {
+  to {
+    color: var(--ink);
+  }
+}
+
+@keyframes lit-failsafe-rule {
+  to {
+    transform: none;
+  }
+}
+
+/* Hero: las palabras se encienden en cadena (60 ms) al llegar el paquete;
+   «DevOps» queda en acento. Apagadas en --ink-3, nunca invisibles. */
+.hero .w {
+  display: inline-block;
+}
+
+.hero .w--acc {
+  color: var(--accent);
+}
+
+.motion-lite .hero .w {
+  transition: color 300ms var(--ease-out);
+  transition-delay: calc(var(--i, 0) * 60ms);
+}
+
+.motion-lite .hero:not([data-lit]) .w {
+  color: var(--ink-3);
+  transition-delay: 0ms;
+}
+
+/* Trazo alrededor de las tarjetas (TraceBox). */
+.tb {
+  position: absolute;
+  left: 0.75px;
+  top: 0.75px;
+  z-index: 2;
+  width: calc(100% - 1.5px);
+  height: calc(100% - 1.5px);
+  overflow: visible;
+  pointer-events: none;
+}
+
+.tb rect {
+  fill: none;
+  stroke: var(--accent);
+  stroke-width: 1.5;
+  stroke-dasharray: 1 1;
+  stroke-dashoffset: 1;
+}
+
+.tb__pw {
   opacity: 0;
-  visibility: hidden;
-  transition: opacity 150ms, visibility 0s 150ms;
 }
 
-.devops-stage.is-scene .stage-steps li {
-  transform: translateX(12px);
-  transition:
-    opacity 150ms,
-    transform 300ms var(--ease-out);
+.tb__hv {
+  transition: stroke-dashoffset 180ms var(--ease-out);
 }
 
-.devops-stage.is-scene .stage-steps li[data-active] {
-  transform: none;
-  transition:
-    opacity 300ms var(--ease-out),
-    transform 300ms var(--ease-out);
+/* Encendido: el trazo da la vuelta una vez cuando la tarjeta entra y se apaga. */
+.reveal-on [data-reveal].is-in > .tb .tb__pw {
+  animation: tb-power 900ms var(--ease-io) both;
+  animation-delay: calc(var(--i, 0) * 80ms);
 }
 
-.is-scene .chips--ci .chip {
-  border-color: var(--line-ui);
+@keyframes tb-power {
+  0% {
+    stroke-dashoffset: 1;
+    opacity: 1;
+  }
+  50% {
+    stroke-dashoffset: 0;
+    opacity: 1;
+  }
+  100% {
+    stroke-dashoffset: 0;
+    opacity: 0;
+  }
 }
 
-.is-scene .chips--ci .chip.is-on {
-  border-color: var(--accent);
+.motion-lite :is(.chapter, .client-card, .demo-card, .bento__cell):is(:hover, :focus-within) > .tb .tb__hv,
+.motion-lite .feature__body:has(.feature__stage:hover) .tb__hv {
+  stroke-dashoffset: 0;
+  transition: stroke-dashoffset 420ms var(--ease-io);
 }
 
-.is-scene .chips--ci .chip.is-done {
-  border-color: var(--line-strong);
+/* Sin motion, el trazo de hover aparece entero (estado final, sin animar). */
+html:not(.motion-lite) :is(.chapter, .client-card, .demo-card, .bento__cell):is(:hover, :focus-within) > .tb .tb__hv {
+  stroke-dashoffset: 0;
 }
 
-.is-scene .chips--ci .chip__check {
-  transition: opacity var(--dur-2);
+.tb-pin {
+  position: absolute;
+  left: 22px;
+  top: -4px;
+  z-index: 3;
+  width: 8px;
+  height: 8px;
+  border-radius: var(--r-1);
+  background: var(--line-strong);
+  transition: background-color var(--dur-2);
+  pointer-events: none;
 }
 
-.is-scene .chips--ci .chip:not(.is-on, .is-done) .chip__check {
-  opacity: 0;
+:is(.client-card, .demo-card, .bento__cell):is(:hover, :focus-within) > .tb-pin {
+  background: var(--accent);
 }
 
-/* Destacados: el progreso lo escribe el scrub (sin transición que lo retrase). */
-.feature.is-scene .feature__progress i {
+.client-card,
+.demo-card,
+.bento__cell,
+.feature__frame {
+  position: relative;
+}
+
+/* Diagrama DevOps: paquetes de tráfico (traffic.ts) y LED de cada nodo. */
+.dg .pk__core {
+  fill: var(--accent);
+}
+
+.dg .pk__halo {
+  fill: var(--accent);
+  opacity: 0.22;
+}
+
+.dg .pk--bot .pk__core,
+.dg .pk--bot .pk__halo {
+  fill: var(--live);
+}
+
+.dg :is(.pk--deploy, .pk--cron, .pk--cli, .pk--backup) :is(.pk__core, .pk__halo) {
+  fill: var(--ink-2);
+}
+
+.dg .node__led {
+  fill: var(--line-strong);
+  transition: fill 450ms var(--ease-out);
+}
+
+.dg .node.is-hit .node__led {
+  fill: var(--live);
   transition: none;
 }
 
-/* Capas con teléfono y la grilla de Vera se arman al activarse. */
-.motion-lite .layer[data-state="on"] .layer__phone {
-  animation: phone-up 800ms var(--ease-out) 100ms both;
+.dg .node.is-hit .node__box {
+  stroke: rgb(92 203 138 / 0.8);
+  transition: none;
 }
 
-.motion-lite .layer--grid[data-state="on"] .layer__tile {
-  animation: tile-in 600ms var(--ease-out) both;
-  animation-delay: calc(var(--i, 0) * 60ms);
+/* Con tráfico vivo los recorridos fijos sobran: los dibujan los paquetes. */
+.motion-lite .dg .trace {
+  opacity: 0;
 }
 
-@keyframes phone-up {
-  from {
-    opacity: 0;
-    translate: 0 48px;
-  }
+.stage-traffic {
+  display: grid;
+  gap: var(--s-2);
+  min-width: 0;
 }
 
-@keyframes tile-in {
-  from {
-    opacity: 0;
-    scale: 0.92;
-  }
+.stage-traffic__btns {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-2);
+}
+
+.send-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  min-height: 36px;
+  padding: var(--s-1) var(--s-3);
+  border: 1px solid var(--line-ui);
+  border-radius: 999px;
+  font-family: var(--font-mono);
+  font-size: 0.8125rem;
+  color: var(--ink-2);
+  background: var(--bg);
+  cursor: pointer;
+  transition:
+    color var(--dur-1),
+    border-color var(--dur-1),
+    scale 140ms var(--ease-out);
+}
+
+.send-btn:hover {
+  color: var(--ink);
+  border-color: var(--ink-3);
+}
+
+.send-btn:active {
+  scale: 0.96;
+}
+
+.send-btn i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--accent);
+}
+
+.send-btn--bot i {
+  background: var(--live);
+}
+
+.send-btn--deploy i {
+  background: var(--ink-2);
+}
+
+html:not(.motion-lite) .stage-traffic {
+  display: none;
+}
+
+/* Contacto: el mensaje viaja como paquete hasta el nodo «alex». */
+.cform {
+  display: grid;
+  gap: var(--s-5);
+}
+
+.send-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  row-gap: var(--s-3);
+  min-width: 0;
+}
+
+.send-row .form__submit {
+  width: auto;
+}
+
+.wire {
+  position: relative;
+  flex: 1 1 3rem;
+  min-width: 3rem;
+  height: 2px;
+  background: #2a3036;
+}
+
+.wire__lit {
+  position: absolute;
+  inset: 0;
+  background: var(--accent);
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+}
+
+.wire__pk {
+  position: absolute;
+  left: -5px;
+  top: -4px;
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  background: #ffd2b0;
+  box-shadow: 0 0 12px 3px rgb(255 139 61 / 0.55);
+  opacity: 0;
+}
+
+.send-row:is([data-phase="sending"], [data-phase="ok"]) .wire__pk {
+  opacity: 1;
+}
+
+.send-row[data-phase="ok"] .wire__pk {
+  opacity: 0;
+  transition: opacity 200ms var(--ease-out) 160ms;
+}
+
+.send-row[data-phase="err"] .wire__lit {
+  background: var(--danger);
+}
+
+.wire__end {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+  min-height: 40px;
+  padding: 0 var(--s-3);
+  border: 1px solid var(--line-ui);
+  border-radius: var(--r-3);
+  font-size: 0.8125rem;
+  color: var(--ink-2);
+  white-space: nowrap;
+  transition:
+    border-color var(--dur-2),
+    color var(--dur-2),
+    background-color var(--dur-2);
+}
+
+.wire__end i {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--line-strong);
+  transition: background-color var(--dur-2);
+}
+
+.send-row[data-phase="ok"] .wire__end:not(.wire__end--from) {
+  border-color: var(--live);
+  color: var(--live);
+  background: rgb(92 203 138 / 0.08);
+}
+
+.send-row[data-phase="ok"] .wire__end i {
+  background: var(--live);
+}
+
+.send-row[data-phase="err"] .wire__end:not(.wire__end--from) {
+  border-color: var(--danger);
+  color: var(--danger);
+}
+
+.wire__end--from {
+  color: var(--ink);
+  border-color: var(--line-strong);
+}
+
+/* Footer: la pista termina en un nodo sobre su borde superior. */
+.site-footer__inner {
+  position: relative;
+}
+
+.site-footer__inner::before {
+  content: "";
+  position: absolute;
+  left: calc(var(--rail-x) - 5px);
+  top: -6px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  border: 2px solid var(--line-strong);
+  background: var(--bg);
 }
 
 /* ─── Disclosures ──────────────────────────────────────────────────────── */

@@ -4,7 +4,6 @@ import type { MediaRef, Showcase } from "@/data/types";
 import { resolveImage, resolveVideo } from "@/lib/media";
 import { LabelTag, StatusBadge, TechList, TextLink } from "@/components/ui/primitives";
 import { mediaText } from "@/components/media/text";
-import { MotionScene } from "@/motion/MotionScene";
 import { FeatureBody, type FeatureLayer, type FeatureStep, type LayerImage } from "./FeatureBody";
 
 /** Los tres productos que se cuentan en partes (DISENO-v2 §9.1). */
@@ -101,7 +100,7 @@ export async function Featured() {
     <section id="proyectos" aria-labelledby="proyectos-title" className="section featured">
       <div className="shell">
         <header className="section-head">
-          <h2 id="proyectos-title" className="t-chapter">
+          <h2 id="proyectos-title" className="t-chapter rail-title" data-rail>
             {t("featuredTitle")}
           </h2>
           <p className="t-lead">{t("featuredLead")}</p>
@@ -117,9 +116,7 @@ export async function Featured() {
             <article key={p.id} className="feature" data-feature={p.id} aria-labelledby={`f-${p.id}`}>
               <header className="feature__head">
                 <h3 id={`f-${p.id}`} className="feature__name">
-                  <span className="mask" data-overflow-ok>
-                    <span className="mask__inner">{name}</span>
-                  </span>
+                  {name}
                 </h3>
                 <p className="meta t-small feature__meta">
                   <LabelTag label={p.label} text={l(p.label)} />
@@ -144,7 +141,6 @@ export async function Featured() {
           );
         })}
       </div>
-      <MotionScene name="featured" />
     </section>
   );
 }

@@ -2,10 +2,8 @@ import { getTranslations } from "next-intl/server";
 import { Check } from "lucide-react";
 import { listOrder, nodes, STEP_NODES } from "@/data/infra";
 import { incidentSteps, pipelineRows } from "@/data/devops";
-import { MotionScene } from "@/motion/MotionScene";
 import { InfraStage, type DiagramText, type NodeText } from "./InfraDiagram";
 import { CapabilityBento, CapabilitySheet, PipelineTable } from "./Capabilities";
-import { PauseToggle } from "@/components/ui/PauseToggle";
 
 type Step = { title: string; text: string; data: string };
 
@@ -73,36 +71,32 @@ export async function DevOps() {
 
   const stepIds = Object.keys(STEP_NODES);
   const steps = t.raw("steps") as Record<string, Step>;
-  // El lead se lee palabra por palabra en la escena: se parte aquí, no con SplitText.
-  const words = t("lead").split(" ");
 
   return (
-    <section id="devops" aria-labelledby="devops-title" className="section section--canvas devops" data-inview>
+    <section id="devops" aria-labelledby="devops-title" className="section devops" data-inview>
       <div className="shell shell--wide">
-        <div className="devops-scene">
+        <div className="devops-block">
           <InfraStage
             text={diagramText}
             panelLabels={{ facts: t("panelFacts"), kind: { "on-demand": t("legend.onDemand") } }}
-            stepIds={stepIds}
+            traffic={{
+              label: t("send.label"),
+              routes: { web: t("send.web"), bot: t("send.bot"), deploy: t("send.deploy") },
+              pause: t("pauseTraffic"),
+              play: t("playTraffic"),
+            }}
             title={
               <header key="title" className="stage-title">
-                <h2 id="devops-title" className="t-chapter">
+                <h2 id="devops-title" className="t-chapter rail-title" data-rail>
                   {t("title")}
                 </h2>
-                <p className="t-lead stage-lead">
-                  {words.map((w, i) => (
-                    <span key={i}>
-                      <span className="w">{w}</span>
-                      {i < words.length - 1 ? " " : ""}
-                    </span>
-                  ))}
-                </p>
+                <p className="t-lead stage-lead">{t("lead")}</p>
               </header>
             }
             steps={
               <ol key="steps" className="stage-steps" aria-label={t("stepsLabel")}>
-                {stepIds.map((id, i) => (
-                  <li key={id} data-step={id} data-active={i === 0 ? "" : undefined}>
+                {stepIds.map((id) => (
+                  <li key={id} data-step={id}>
                     <h3 className="step__title">{steps[id].title}</h3>
                     <p className="step__text">{steps[id].text}</p>
                     <p className="step__data t-data">{steps[id].data}</p>
@@ -120,7 +114,6 @@ export async function DevOps() {
                 </div>
                 <div className="stage-foot__end">
                   <Legend t={(k) => t(k)} />
-                  <PauseToggle target=".devops" pauseLabel={t("pauseTraffic")} playLabel={t("playTraffic")} />
                 </div>
               </div>
             }
@@ -154,7 +147,8 @@ export async function DevOps() {
             </h3>
             <p className="ink-2">{t("incident.lead")}</p>
           </header>
-          <ol className="incident__steps">
+          {/* data-fill: con motion, la línea se llena con el scroll (circuit.ts). */}
+          <ol className="incident__steps" data-fill>
             {incidentSteps.map((id) => (
               <li key={id}>
                 <h4>{t(`incident.steps.${id}.title`)}</h4>
@@ -189,7 +183,6 @@ export async function DevOps() {
           </ul>
         </div>
       </div>
-      <MotionScene name="devops" />
     </section>
   );
 }

@@ -7,8 +7,11 @@
  *                    sin JS, o si esto no corre, no queda nada invisible.
  *   .marquee__row  → la duración sale del ancho real a velocidad fija (px/s): si
  *                    se suman portadas, la cinta no acelera.
- *   .spot          → un único pointermove delegado escribe --mx/--my en el elemento.
+ *   .spot          → un único pointermove delegado escribe --mx/--my en el elemento,
+ *                    desde el bucle rAF compartido.
  */
+import { addTask, wake } from "../engine";
+
 const MARQUEE_PX_PER_S = 30;
 
 export function mountObserve(): () => void {
@@ -51,25 +54,27 @@ export function mountObserve(): () => void {
   offs.push(() => ro.disconnect());
 
   if (window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
-    let raf = 0;
+    // Pinta en el bucle compartido (engine.ts): un evento pendiente por frame.
     let last: PointerEvent | null = null;
     const paint = () => {
-      raf = 0;
       const e = last;
+      last = null;
       const el = e && (e.target as Element | null)?.closest?.<HTMLElement>(".spot");
-      if (!e || !el) return;
+      if (!e || !el) return false;
       const r = el.getBoundingClientRect();
       el.style.setProperty("--mx", `${e.clientX - r.left}px`);
       el.style.setProperty("--my", `${e.clientY - r.top}px`);
+      return false;
     };
+    const offTask = addTask(paint);
     const onMove = (e: PointerEvent) => {
       last = e;
-      if (!raf) raf = requestAnimationFrame(paint);
+      wake();
     };
     document.addEventListener("pointermove", onMove, { passive: true });
     offs.push(() => {
       document.removeEventListener("pointermove", onMove);
-      cancelAnimationFrame(raf);
+      offTask();
     });
   }
 

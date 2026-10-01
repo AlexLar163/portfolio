@@ -3,8 +3,10 @@
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { ArrowDownRight } from "lucide-react";
+import { TraceBox } from "@/components/ui/TraceBox";
 
 type Props = {
+  i: number;
   href: string;
   title: string;
   sub: string;
@@ -18,7 +20,7 @@ const HOVER_DELAY = 150;
  * Fila del índice de capítulos del hero (DISENO-v2 §4.1). El video del thumb solo
  * se pide con hover de puntero fino (lógica de MediaFrame v1): el LCP sigue siendo texto.
  */
-export function ChapterRow({ href, title, sub, image, video }: Props) {
+export function ChapterRow({ i, href, title, sub, image, video }: Props) {
   const videoRef = useRef<HTMLVideoElement>(null);
   const timer = useRef<number | undefined>(undefined);
   const [loaded, setLoaded] = useState(false);
@@ -48,6 +50,7 @@ export function ChapterRow({ href, title, sub, image, video }: Props) {
     <a
       href={href}
       className="chapter spot"
+      data-reveal
       onPointerEnter={onEnter}
       onPointerLeave={onLeave}
     >
@@ -85,6 +88,8 @@ export function ChapterRow({ href, title, sub, image, video }: Props) {
         <span className="chapter__sub t-data">{sub}</span>
       </span>
       <ArrowDownRight className="chapter__arrow" size={20} strokeWidth={1.5} aria-hidden />
+      <TraceBox i={i} pin={false} />
+      <span className="chapter__stub" aria-hidden />
     </a>
   );
 }

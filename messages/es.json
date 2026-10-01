@@ -125,7 +125,7 @@
     "lead": "Opero mi propio servidor en producción: 11 sitios, automatizaciones y agentes IA detrás de un solo proxy. En NTT DATA, Kubernetes sobre AWS.",
     "diagramTitle": "Infraestructura del servidor propio y nubes que opero",
     "diagramDesc": "Las visitas y los webhooks de Telegram entran por DNS a Caddy, que reparte el tráfico dentro de una red Docker sin puertos públicos: WordPress bajo demanda con MariaDB compartida, el panel appsMonitor, n8n y el runner de agentes IA. Fuera del VPS: Vercel, AWS y Cloudflare.",
-    "diagramHint": "Toca o enfoca un nodo para ver qué hace.",
+    "diagramHint": "Toca un nodo o pulsa Enter: ves qué hace y le envías tráfico.",
     "outside": "Fuera del VPS",
     "listSummary": "Ver la infraestructura como lista",
     "legendTitle": "Leyenda",
@@ -423,7 +423,13 @@
     "lanesTitle": "Pipelines de CI/CD",
     "tableSummary": "Ver los pipelines como tabla",
     "pauseTraffic": "Pausar el tráfico",
-    "playTraffic": "Reanudar el tráfico"
+    "playTraffic": "Reanudar el tráfico",
+    "send": {
+      "label": "Enviar tráfico por una ruta",
+      "web": "Petición web",
+      "bot": "Mensaje de Telegram",
+      "deploy": "Deploy"
+    }
   },
   "infra": {
     "frames": {

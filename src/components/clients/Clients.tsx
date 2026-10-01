@@ -7,11 +7,11 @@ import { MediaFrame } from "@/components/media/MediaFrame";
 import { GalleryFrame } from "@/components/media/GalleryFrame";
 import { gallerySlides, slideFrom } from "@/components/media/build";
 import { mediaText } from "@/components/media/text";
-import { MotionScene } from "@/motion/MotionScene";
+import { TraceBox } from "@/components/ui/TraceBox";
 
 /**
- * Clientes (DISENO-v2 §8): un cliente por pantalla. En desktop con motion las
- * tarjetas se apilan (sticky); en el resto fluyen en una columna.
+ * Clientes (DISENO-v2 §8, v3): un cliente por bloque, con media grande, en
+ * flujo normal (sin pila fija). En desktop la media alterna de lado.
  */
 export async function Clients() {
   const t = await getTranslations("clients");
@@ -45,14 +45,14 @@ export async function Clients() {
     <section id="clientes" aria-labelledby="clientes-title" className="section clients">
       <div className="shell">
         <header className="section-head">
-          <h2 id="clientes-title" className="t-chapter">
+          <h2 id="clientes-title" className="t-chapter rail-title" data-rail>
             {t("title")}
           </h2>
           <p className="t-lead">{t("lead")}</p>
         </header>
 
         <div className="client-stack">
-          {clients.map((cl) => {
+          {clients.map((cl, i) => {
             const k = `items.${cl.id}`;
             const hasReview = !!cl.review && t.has(`${k}.review.quote`);
             return (
@@ -60,8 +60,10 @@ export async function Clients() {
                 key={cl.id}
                 className="client-card spot"
                 data-client={cl.id}
+                data-reveal
                 aria-labelledby={`client-${cl.id}`}
               >
+                <TraceBox i={i % 2} />
                 <div className="client-card__media">{media(cl)}</div>
                 <div className="client-card__text">
                   <div>
@@ -134,7 +136,6 @@ export async function Clients() {
           })}
         </div>
       </div>
-      <MotionScene name="clients" />
     </section>
   );
 }

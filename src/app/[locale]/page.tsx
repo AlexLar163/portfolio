@@ -9,9 +9,8 @@ import { Trajectory } from "@/components/experience/Trajectory";
 import { Contact } from "@/components/contact/Contact";
 import { SiteFooter } from "@/components/SiteFooter";
 import { MotionRoot } from "@/motion/MotionRoot";
-import { MotionScene } from "@/motion/MotionScene";
 
-// Orden v2 (DISENO-v2 §3): Header → Hero → DevOps → Clientes → Destacados →
+// Orden v2 (DISENO-v2 §3, se mantiene en v3): Header → Hero → DevOps → Clientes → Destacados →
 // Más demos + Otros → Trayectoria → Contacto (+CV) → Footer.
 // Si Alex prefiere Clientes antes que DevOps, se invierten esas dos líneas.
 export default async function Home({ params }: { params: Promise<{ locale: string }> }) {
@@ -25,8 +24,17 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
         {t("skip")}
       </a>
       <MotionRoot />
+      {/* Spotlight de cursor sobre la retícula (v3 «Circuito»): capa fija, solo transform. */}
+      <div className="spotlight" aria-hidden="true" data-overflow-ok>
+        <i />
+      </div>
       <SiteHeader />
       <main id="contenido">
+        {/* Pista del circuito: la dibuja src/motion/circuit.ts detrás del contenido. */}
+        <div className="circuit" aria-hidden="true" data-overflow-ok>
+          <svg focusable="false" />
+          <span className="circuit__pk" />
+        </div>
         <Hero />
         <DevOps />
         <Clients />
@@ -36,7 +44,6 @@ export default async function Home({ params }: { params: Promise<{ locale: strin
         <Contact />
       </main>
       <SiteFooter />
-      <MotionScene name="chrome" />
     </>
   );
 }

@@ -92,7 +92,9 @@ export function HeaderBar({ sections, cv, availability, labels, name }: Props) {
     <header ref={headerRef} className="site-header" data-scrolled="false">
       <div className="shell">
         <div className="site-header__bar">
+          {/* El LED cae sobre la x de la pista del circuito: la pista «sale» de aquí. */}
           <a href="#inicio" className="brand" aria-label={labels.home}>
+            <i className="brand__led" aria-hidden />
             {name}
           </a>
           <p className="availability" title={availability.full}>
@@ -114,7 +116,7 @@ export function HeaderBar({ sections, cv, availability, labels, name }: Props) {
             </ul>
           </nav>
           <LocaleSwitch label={labels.lang} />
-          <a href={cv.href} className="btn btn--secondary btn--sm header-cv" download>
+          <a href={cv.href} className="btn btn--secondary btn--sm header-cv magnetic" download>
             {cv.label}
           </a>
           <button
@@ -130,7 +132,10 @@ export function HeaderBar({ sections, cv, availability, labels, name }: Props) {
           </button>
         </div>
       </div>
-      <div className="read-progress" aria-hidden />
+      {/* Progreso de lectura con su paquete a la cabeza (lo mueve circuit.ts). */}
+      <div className="read-progress" aria-hidden>
+        <i />
+      </div>
       <div id="mobile-panel" className="mobile-panel" data-open={open}>
         <nav className="shell" aria-label={labels.primary}>
           <ul>

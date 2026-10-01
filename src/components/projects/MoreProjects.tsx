@@ -1,3 +1,4 @@
+import { TraceBox } from "@/components/ui/TraceBox";
 import Image from "next/image";
 import { ArrowUpRight } from "lucide-react";
 import { getTranslations } from "next-intl/server";
@@ -58,7 +59,7 @@ export async function MoreProjects() {
     <section id="mas-proyectos" data-nav="proyectos" aria-labelledby="mas-title" className="section more">
       <div className="shell">
         <header className="section-head">
-          <h2 id="mas-title" className="t-h2">
+          <h2 id="mas-title" className="t-h2 rail-title" data-rail>
             {t("moreTitle")}
           </h2>
           <p className="projects-note t-small">
@@ -73,11 +74,12 @@ export async function MoreProjects() {
         </header>
 
         <ul className="demo-row">
-          {demos.map((p) => {
+          {demos.map((p, i) => {
             const name = nameOf(p);
             return (
               <li key={p.id}>
-                <article className="demo-card spot" aria-labelledby={`d-${p.id}`}>
+                <article className="demo-card spot" data-reveal aria-labelledby={`d-${p.id}`}>
+                  <TraceBox i={i} />
                   <div className="demo-card__media">
                     <MediaFrame
                       name={name}

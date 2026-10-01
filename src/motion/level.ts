@@ -1,49 +1,34 @@
 /**
- * Niveles de motion (DISENO-v2 §7.1). Se deciden antes del primer paint con un
- * script inline en <head>; MotionRoot los mantiene al cambiar la ventana.
+ * Nivel de motion. Se decide antes del primer paint con un script inline en
+ * <head>; MotionRoot lo mantiene si cambia la preferencia del sistema.
  *
- *   (ninguno)     reduce, sin JS o ?motion=0 → estado final estático
- *   .motion-lite  móvil, tablet, ventanas bajas → CSS + IntersectionObserver
- *   .motion-ok    desktop con puntero fino ≥ 1024×700 → además GSAP
+ *   (ninguno)     reduce, sin JS o ?motion=0 → estado final estático completo
+ *   .motion-lite  hay motion: circuito, paquetes, resortes (lenguaje «Circuito»)
  *
- * `.js` se agrega siempre que hay JS (los controles que solo sirven con JS, como
- * las pestañas de respaldo de Destacados, cuelgan de esa clase).
+ * `.js` se agrega siempre que hay JS (los controles que solo sirven con JS
+ * cuelgan de esa clase). El nombre `motion-lite` se conserva de la v2: desde la
+ * v3 no hay otro nivel (sin GSAP, sin escenas fijas).
  */
-export const MOTION_OK_QUERY =
-  "(min-width:1024px) and (min-height:700px) and (hover:hover) and (pointer:fine)";
-
-/** La escena DevOps pide además 1280 de ancho: debajo el texto del diagrama baja de 12 px. */
-export const SCENE_DEVOPS_QUERY = `${MOTION_OK_QUERY} and (min-width:1280px)`;
-
 export const REDUCE_QUERY = "(prefers-reduced-motion: reduce)";
 
-export const SCENE_SIZE_QUERY = "(min-width:1280px)";
+/** Puntero fino: imanes, spotlight de cursor y trazos al hover. */
+export const FINE_QUERY = "(hover: hover) and (pointer: fine)";
 
-export const LEVEL_SCRIPT = `(()=>{const d=document.documentElement,c=d.classList,m=q=>matchMedia(q).matches;c.add('js');if(/[?&]motion=0\\b/.test(location.search)||m('${REDUCE_QUERY}'))return;c.add('motion-lite');if(m('${MOTION_OK_QUERY}')){c.add('motion-ok');m('${SCENE_SIZE_QUERY}')&&c.add('scene-devops')}})()`;
+export const LEVEL_SCRIPT = `(()=>{const c=document.documentElement.classList;c.add('js');if(/[?&]motion=0\\b/.test(location.search)||matchMedia('${REDUCE_QUERY}').matches)return;c.add('motion-lite')})()`;
 
-export type MotionLevel = "none" | "lite" | "ok";
+export type MotionLevel = "none" | "lite";
 
-/** Nivel actual según la ventana y el parámetro ?motion=0. */
+/** Nivel según la preferencia del sistema y el parámetro ?motion=0. */
 export function computeLevel(): MotionLevel {
   if (typeof window === "undefined") return "none";
   const q = new URLSearchParams(window.location.search).get("motion");
   if (q === "0" || window.matchMedia(REDUCE_QUERY).matches) return "none";
-  // Si GSAP no llegó (red), el desktop se queda en el nivel liviano: estado final estático.
-  if (gsapFailed) return "lite";
-  return window.matchMedia(MOTION_OK_QUERY).matches ? "ok" : "lite";
-}
-
-let gsapFailed = false;
-export const GSAP_FAILED_EVENT = "portfolio:gsap-failed";
-export function markGsapFailed() {
-  gsapFailed = true;
-  window.dispatchEvent(new Event(GSAP_FAILED_EVENT));
+  return "lite";
 }
 
 export function currentLevel(): MotionLevel {
   if (typeof document === "undefined") return "none";
-  const c = document.documentElement.classList;
-  return c.contains("motion-ok") ? "ok" : c.contains("motion-lite") ? "lite" : "none";
+  return document.documentElement.classList.contains("motion-lite") ? "lite" : "none";
 }
 
 export const LEVEL_EVENT = "portfolio:motion-level";
