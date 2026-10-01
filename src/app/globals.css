@@ -3743,76 +3743,36 @@ main#contenido {
   transform-origin: 0 50%;
 }
 
-/* El apagado rige desde el primer paint (.motion-lite lo pone el script de
-   <head>): sin esto el titular se pintaba encendido, se apagaba al hidratar y
-   se volvía a encender. Failsafe (6 s: el circuito se monta tras `load` y en reposo): si no monta, se
-   encienden solos (la animación deja de aplicar en cuanto llega .circuit-on). */
-.motion-lite .rail-title {
+/* Encendido por paquete SOLO fuera del primer viewport (QA v3, r2): a CPU 4×
+   y 4G lento el H1 quedaba gris ~2 s y se leía como deshabilitado. Sin
+   .circuit-on nada se apaga; al montar, lo que ya está en la ventana queda
+   [data-shown] (circuit.ts) y lo de abajo, que nadie ve, se apaga hasta que
+   el paquete llega: no hay destello visible. El hero nunca se apaga. */
+.circuit-on .rail-title {
   transition: color 300ms var(--ease-out);
 }
 
-.motion-lite section:not([data-lit]) .rail-title {
+.circuit-on section:not([data-lit]):not([data-shown]) .rail-title {
   color: var(--ink-3);
 }
 
-.motion-lite .rail-title::after {
+.circuit-on .rail-title::after {
   transition: transform 420ms var(--ease-out) 100ms;
 }
 
-.motion-lite section:not([data-lit]) .rail-title::after {
+.circuit-on section:not([data-lit]):not([data-shown]) .rail-title::after {
   transform: scaleX(0);
   transition-duration: 180ms;
   transition-delay: 0ms;
 }
 
-html.motion-lite:not(.circuit-on) :is(.rail-title, .hero .w) {
-  animation: lit-failsafe 0s 6s both;
-}
-
-html.motion-lite:not(.circuit-on) .hero .w--acc {
-  animation-name: lit-failsafe-acc;
-}
-
-@keyframes lit-failsafe-acc {
-  to {
-    color: var(--accent);
-  }
-}
-
-html.motion-lite:not(.circuit-on) .rail-title::after {
-  animation: lit-failsafe-rule 0s 6s both;
-}
-
-@keyframes lit-failsafe {
-  to {
-    color: var(--ink);
-  }
-}
-
-@keyframes lit-failsafe-rule {
-  to {
-    transform: none;
-  }
-}
-
-/* Hero: las palabras se encienden en cadena (60 ms) al llegar el paquete;
-   «DevOps» queda en acento. Apagadas en --ink-3, nunca invisibles. */
+/* Hero: pintado encendido desde el primer frame; «DevOps» en acento. */
 .hero .w {
   display: inline-block;
 }
 
 .hero .w--acc {
   color: var(--accent);
-}
-
-.motion-lite .hero .w {
-  transition: color 300ms var(--ease-out);
-  transition-delay: calc(var(--i, 0) * 60ms);
-}
-
-.motion-lite .hero:not([data-lit]) .w {
-  color: var(--ink-3);
-  transition-delay: 0ms;
 }
 
 /* Trazo alrededor de las tarjetas (TraceBox). */
