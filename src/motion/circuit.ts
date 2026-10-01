@@ -24,7 +24,8 @@ const READ_LINE = 0.52;
 const TRAIL = 72;
 
 type Pt = [number, number];
-type RailNode = { el: HTMLElement; sec: HTMLElement; x: number; y: number; len: number; g: SVGGElement };
+/** Nodo de sección (enciende su titular) o ramal de una tarjeta (enciende su pin). */
+type RailNode = { sec?: HTMLElement; card?: HTMLElement; len: number; g: SVGGElement };
 
 export function mountCircuit(animate: boolean): () => void {
   const main = document.querySelector<HTMLElement>("main#contenido");
@@ -47,6 +48,7 @@ export function mountCircuit(animate: boolean): () => void {
   let L = 0;
   let mainTop = 0;
   let nodes: RailNode[] = [];
+  let lastC = -1;
   // Informe de incidente: posiciones en el documento, medidas en build (nunca
   // dentro del frame: leer rects tras escribir estilos forzaría layout).
   const incident = document.querySelector<HTMLElement>("[data-fill]");
@@ -113,31 +115,35 @@ export function mountCircuit(animate: boolean): () => void {
       };
     });
 
-    // Polilínea: baja recta, se desvía 45° a mitad de cada tramo largo (rasgo de
-    // pista de PCB) y, si dos secciones tienen distinto margen (shell ancho), el
-    // desvío la lleva de una columna a la otra. Siempre desciende: lenAtY es
-    // una búsqueda binaria sobre y.
-    const jog = narrow ? -6 : 22;
-    // Arranca en el borde superior del <main>, bajo el LED de la marca del header.
-    const p: Pt[] = [[raw[0].x, 0], [raw[0].x, raw[0].y]];
-    for (let i = 1; i < raw.length; i++) {
-      const a = raw[i - 1];
-      const b = raw[i];
-      const y1 = a.y + 56;
-      const y2 = b.y - 56;
-      const dx = b.x - a.x;
-      if (Math.abs(dx) > 1) {
-        const mid = (y1 + y2) / 2;
-        p.push([a.x, mid - Math.abs(dx) / 2], [b.x, mid + Math.abs(dx) / 2]);
-      } else if (y2 - y1 > Math.abs(jog) * 2 + 80) {
-        const aj = Math.abs(jog);
-        const ym = y1 + (y2 - y1) * 0.38;
-        p.push([a.x, ym], [a.x + jog, ym + aj], [a.x + jog, y2 - aj], [b.x, y2]);
-      }
-      p.push([b.x, b.y]);
+    // Carril en x FIJA: la del shell con menos margen (el ancho de DevOps). Con
+    // una x por sección la pista se desviaba de columna en mitad de DevOps y a
+    // ≥ 1700 px bajaba por x=216 cruzando el bento y los carriles (QA v3).
+    const railX = Math.min(...raw.map((r) => r.x));
+    // El LED del header y el nodo del footer (CSS, --rail-x) se corren lo mismo.
+    const hs = document.querySelector<HTMLElement>(".site-header .shell");
+    if (hs) {
+      const hr = hs.getBoundingClientRect();
+      const hp = parseFloat(getComputedStyle(hs).paddingLeft) || 0;
+      html.style.setProperty("--rail-dx", `${Math.round(railX + mr.left - (hr.left + hp / 2))}px`);
     }
-    const lastRaw = raw[raw.length - 1];
-    p.push([lastRaw.x, Math.min(mr.height, lastRaw.y + 160)]);
+
+    // Polilínea: baja recta y se desvía 45° dentro del propio carril a mitad de
+    // cada tramo largo (rasgo de pista de PCB). Siempre desciende: lenAtY es una
+    // búsqueda binaria sobre y.
+    const jog = narrow ? -6 : 22;
+    const aj = Math.abs(jog);
+    // Arranca en el borde superior del <main>, bajo el LED de la marca del header.
+    const p: Pt[] = [[railX, 0], [railX, raw[0].y]];
+    for (let i = 1; i < raw.length; i++) {
+      const y1 = raw[i - 1].y + 56;
+      const y2 = raw[i].y - 56;
+      if (y2 - y1 > aj * 2 + 80) {
+        const ym = y1 + (y2 - y1) * 0.38;
+        p.push([railX, ym], [railX + jog, ym + aj], [railX + jog, y2 - aj], [railX, y2]);
+      }
+      p.push([railX, raw[i].y]);
+    }
+    p.push([railX, Math.min(mr.height, raw[raw.length - 1].y + 160)]);
     pts = p;
     cum = [0];
     for (let i = 1; i < pts.length; i++)
@@ -151,29 +157,52 @@ export function mountCircuit(animate: boolean): () => void {
     lit.style.strokeDasharray = `${L} ${L}`;
     trail.style.strokeDasharray = `${TRAIL} ${L + TRAIL}`;
 
-    // Nodos + ramal hasta el titular. Se reusan los <g> si la cantidad no cambió.
-    const prevOn = nodes.map((n) => n.g.classList.contains("is-on"));
-    if (nodeLayer.childNodes.length !== raw.length) {
-      nodeLayer.replaceChildren(
-        ...raw.map(() => {
-          const g = document.createElementNS(SVG, "g");
-          g.setAttribute("class", "c-node");
-          g.append(document.createElementNS(SVG, "path"), document.createElementNS(SVG, "circle"));
-          return g;
-        }),
-      );
-    }
-    const gs = Array.from(nodeLayer.children) as SVGGElement[];
-    nodes = raw.map((r, i) => {
-      const g = gs[i];
+    // Tarjetas cableadas: solo las que arrancan en el borde del contenido (la
+    // primera de cada fila) reciben un ramal hasta su pin; las demás no llevan
+    // pin, así ningún ramal cruza otra tarjeta.
+    const cards = Array.from(main.querySelectorAll<HTMLElement>(".tb-pin"))
+      .map((pin) => pin.parentElement)
+      .filter((c): c is HTMLElement => !!c && c.getClientRects().length > 0);
+    const wired = cards.flatMap((card) => {
+      const sh = card.closest<HTMLElement>(".shell");
+      if (!sh) return [];
+      const shr = sh.getBoundingClientRect();
+      const cl = shr.left + (parseFloat(getComputedStyle(sh).paddingLeft) || 0);
+      const cr = card.getBoundingClientRect();
+      const on = Math.abs(cr.left - cl) < 3;
+      card.toggleAttribute("data-wired", on);
+      return on ? [{ card, x: cr.left - mr.left, y: Math.round(cr.top - mr.top + 22) }] : [];
+    });
+
+    const mk = (cls: string) => {
+      const g = document.createElementNS(SVG, "g");
+      g.setAttribute("class", cls);
+      g.append(document.createElementNS(SVG, "path"), document.createElementNS(SVG, "circle"));
+      return g;
+    };
+    const xAt = (y: number) => ptAtLen(lenAtY(y))[0];
+    const major: RailNode[] = raw.map((r) => {
+      const g = mk("c-node");
       const [br, c] = g.children as unknown as [SVGPathElement, SVGCircleElement];
-      br.setAttribute("d", `M${r.x + 7} ${r.y} H${Math.max(r.x + 9, r.contentX - 10)}`);
-      c.setAttribute("cx", String(r.x));
+      br.setAttribute("d", `M${railX + 6} ${r.y} H${Math.max(railX + 9, r.contentX - 10)}`);
+      c.setAttribute("cx", String(railX));
       c.setAttribute("cy", String(r.y));
       c.setAttribute("r", "5");
-      if (prevOn[i]) g.classList.add("is-on");
-      return { el: r.el, sec: r.sec, x: r.x, y: r.y, len: lenAtY(r.y), g };
+      return { sec: r.sec, len: lenAtY(r.y), g };
     });
+    const minor: RailNode[] = wired.map((w) => {
+      const g = mk("c-node c-node--wire");
+      const [br, c] = g.children as unknown as [SVGPathElement, SVGCircleElement];
+      const x0 = xAt(w.y);
+      br.setAttribute("d", `M${x0} ${w.y} H${Math.max(x0 + 4, w.x - 4)}`); // termina en el pin (−4 px), sin entrar en la tarjeta
+      c.setAttribute("cx", String(x0));
+      c.setAttribute("cy", String(w.y));
+      c.setAttribute("r", "2.5");
+      return { card: w.card, len: lenAtY(w.y), g };
+    });
+    nodeLayer.replaceChildren(...major.map((n) => n.g), ...minor.map((n) => n.g));
+    nodes = [...major, ...minor];
+    lastC = -1;
     barW = bar?.clientWidth ?? 0;
     if (incident) {
       const r = incident.getBoundingClientRect();
@@ -186,11 +215,13 @@ export function mountCircuit(animate: boolean): () => void {
   const setOn = (n: RailNode, on: boolean) => {
     if (n.g.classList.contains("is-on") === on) return;
     n.g.classList.toggle("is-on", on);
-    n.sec.toggleAttribute("data-lit", on);
-    if (on) n.sec.setAttribute("data-powered", "");
+    n.card?.toggleAttribute("data-wire-on", on);
+    if (n.sec) {
+      n.sec.toggleAttribute("data-lit", on);
+      if (on) n.sec.setAttribute("data-powered", "");
+    }
   };
 
-  let lastC = -1;
   const paint = (c: number) => {
     if (Math.abs(c - lastC) < 0.05) return;
     lastC = c;

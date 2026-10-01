@@ -93,6 +93,10 @@
   /* Retícula del lienzo: 22 px, punto apenas visible (decoración, no texto). */
   --dot: #22282e;
   --grid: 22px;
+  /* Pista del circuito: pendiente = --line-ui (3,2:1 sobre --bg; el gris de
+     1,44:1 de la primera versión no se veía) y recorrida en acento. */
+  --rail-idle: var(--line-ui);
+  --rail-lit: rgb(255 139 61 / 0.6);
 
   /* Escala v2 (§2.2): la jerarquía sale del tamaño. cqi = ancho del .shell. */
   --t-display: clamp(3rem, 1.5rem + 8cqi, 9rem);
@@ -610,7 +614,9 @@ section[id] {
 /* LED de la marca sobre la x de la pista (v3): el circuito «sale» de aquí. */
 .brand__led {
   position: absolute;
-  left: calc(var(--rail-x) - 4px);
+  /* --rail-dx: corrimiento hasta la x fija de la pista (circuit.ts); 0 hasta
+     ~1580 px, donde todos los shells comparten margen. */
+  left: calc(var(--rail-x) - 4px + var(--rail-dx, 0px));
   top: 50%;
   width: 8px;
   height: 8px;
@@ -1613,6 +1619,8 @@ section[id] {
 .infra__panel {
   align-self: start;
   min-width: 0;
+  /* scrollIntoView nunca deja el título del panel bajo el header. */
+  scroll-margin-block: calc(var(--header-h) + var(--s-3)) var(--s-3);
   padding: var(--s-5);
   background: var(--surface);
   border: 1px solid var(--line);
@@ -1770,6 +1778,14 @@ section[id] {
 
   .stage-steps {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* Restaurado (QA v3, regresión de a962f13): el panel acompaña al diagrama
+     vertical mientras se tocan nodos. Acotado a .stage-body, no pisa el pie.
+     Es el único sticky de contenido que queda: no fija ni retiene el scroll. */
+  .infra__panel {
+    position: sticky;
+    top: calc(var(--header-h) + var(--s-4));
   }
 }
 
@@ -3602,13 +3618,15 @@ main#contenido {
   stroke-linecap: round;
 }
 
+/* Presencia (QA v3): el gris de 2 px casi no se veía a 1440. Pendiente en un
+   gris que se lee y lo ya recorrido en acento. */
 .circuit .c-base {
-  stroke: #2a3036;
+  stroke: var(--rail-idle);
   stroke-width: 2;
 }
 
 .circuit .c-lit {
-  stroke: rgb(255 139 61 / 0.45);
+  stroke: var(--rail-lit);
   stroke-width: 2;
 }
 
@@ -3618,14 +3636,14 @@ main#contenido {
 }
 
 .circuit .c-node path {
-  stroke: #2a3036;
+  stroke: var(--rail-idle);
   stroke-width: 2;
   transition: stroke 300ms var(--ease-out);
 }
 
 .circuit .c-node circle {
   fill: var(--bg);
-  stroke: #3a4148;
+  stroke: var(--line-ui);
   stroke-width: 2;
   transition:
     stroke 200ms var(--ease-out),
@@ -3633,7 +3651,21 @@ main#contenido {
 }
 
 .circuit .c-node.is-on path {
-  stroke: rgb(255 139 61 / 0.45);
+  stroke: var(--rail-lit);
+}
+
+/* Ramal de tarjeta: más fino, con una soldadura en la pista. */
+.circuit .c-node--wire path {
+  stroke-width: 1.5;
+}
+
+.circuit .c-node--wire circle {
+  stroke-width: 1.5;
+}
+
+.circuit .c-node--wire.is-on circle {
+  stroke: var(--accent);
+  fill: var(--accent);
 }
 
 .circuit .c-node.is-on circle {
@@ -3664,7 +3696,7 @@ main#contenido {
 
 /* Estático (reduce, ?motion=0): la pista entera encendida, sin paquete. */
 .circuit-static .circuit .c-node path {
-  stroke: rgb(255 139 61 / 0.45);
+  stroke: var(--rail-lit);
 }
 
 /* Spotlight de cursor: 480 px fijos que se mueven solo con transform (cero
@@ -3713,7 +3745,7 @@ main#contenido {
 
 /* El apagado rige desde el primer paint (.motion-lite lo pone el script de
    <head>): sin esto el titular se pintaba encendido, se apagaba al hidratar y
-   se volvía a encender. Failsafe: si el circuito no monta en 2,5 s, se
+   se volvía a encender. Failsafe (6 s: el circuito se monta tras `load` y en reposo): si no monta, se
    encienden solos (la animación deja de aplicar en cuanto llega .circuit-on). */
 .motion-lite .rail-title {
   transition: color 300ms var(--ease-out);
@@ -3734,7 +3766,7 @@ main#contenido {
 }
 
 html.motion-lite:not(.circuit-on) :is(.rail-title, .hero .w) {
-  animation: lit-failsafe 0s 2.5s both;
+  animation: lit-failsafe 0s 6s both;
 }
 
 html.motion-lite:not(.circuit-on) .hero .w--acc {
@@ -3748,7 +3780,7 @@ html.motion-lite:not(.circuit-on) .hero .w--acc {
 }
 
 html.motion-lite:not(.circuit-on) .rail-title::after {
-  animation: lit-failsafe-rule 0s 2.5s both;
+  animation: lit-failsafe-rule 0s 6s both;
 }
 
 @keyframes lit-failsafe {
@@ -3843,19 +3875,27 @@ html:not(.motion-lite) :is(.chapter, .client-card, .demo-card, .bento__cell):is(
   stroke-dashoffset: 0;
 }
 
+/* Pin: el contacto de la tarjeta con su ramal de la pista. Solo existe en las
+   tarjetas cableadas (circuit.ts marca [data-wired]): sin ramal no hay pin. */
 .tb-pin {
+  display: none;
   position: absolute;
-  left: 22px;
-  top: -4px;
+  left: -4px;
+  top: 18px;
   z-index: 3;
   width: 8px;
   height: 8px;
   border-radius: var(--r-1);
-  background: var(--line-strong);
+  background: var(--line-ui);
   transition: background-color var(--dur-2);
   pointer-events: none;
 }
 
+[data-wired] > .tb-pin {
+  display: block;
+}
+
+[data-wire-on] > .tb-pin,
 :is(.client-card, .demo-card, .bento__cell):is(:hover, :focus-within) > .tb-pin {
   background: var(--accent);
 }
@@ -3964,6 +4004,71 @@ html:not(.motion-lite) :is(.chapter, .client-card, .demo-card, .bento__cell):is(
 
 html:not(.motion-lite) .stage-traffic {
   display: none;
+}
+
+/* Hoja inferior del diagrama en móvil (no modal): el detalle del nodo tocado
+   sin mover la página hasta el panel. Scrollea en su propia caja (regla 7). */
+.infra-sheet {
+  position: fixed;
+  left: var(--s-2);
+  right: var(--s-2);
+  bottom: calc(var(--s-2) + env(safe-area-inset-bottom, 0px));
+  z-index: 45;
+  display: grid;
+  gap: var(--s-2);
+  max-width: 32rem;
+  max-height: 42dvh;
+  margin-inline: auto;
+  padding: var(--s-4);
+  overflow: auto;
+  overscroll-behavior: contain;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-3);
+  background: var(--raised);
+  box-shadow: var(--shadow-pop);
+}
+
+.motion-lite .infra-sheet {
+  animation: sheet-in 220ms var(--ease-out) both;
+}
+
+@keyframes sheet-in {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+}
+
+.infra-sheet__head {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: var(--s-3);
+  min-width: 0;
+}
+
+.infra-sheet__head .t-h3 {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.infra-sheet__close {
+  flex: none;
+  display: inline-grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  margin: -6px -6px 0 0;
+  border: 1px solid var(--line-ui);
+  border-radius: var(--r-2);
+  color: var(--ink);
+  background: transparent;
+  cursor: pointer;
+  transition: border-color var(--dur-1);
+}
+
+.infra-sheet__close:hover {
+  border-color: var(--ink-3);
 }
 
 /* Contacto: el mensaje viaja como paquete hasta el nodo «alex». */
@@ -4078,7 +4183,7 @@ html:not(.motion-lite) .stage-traffic {
 .site-footer__inner::before {
   content: "";
   position: absolute;
-  left: calc(var(--rail-x) - 5px);
+  left: calc(var(--rail-x) - 5px + var(--rail-dx, 0px));
   top: -6px;
   width: 10px;
   height: 10px;

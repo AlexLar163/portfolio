@@ -423,6 +423,7 @@
     "lanesTitle": "Pipelines de CI/CD",
     "tableSummary": "Ver los pipelines como tabla",
     "pauseTraffic": "Pausar el tráfico",
+    "sheetClose": "Cerrar el detalle",
     "playTraffic": "Reanudar el tráfico",
     "send": {
       "label": "Enviar tráfico por una ruta",

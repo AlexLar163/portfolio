@@ -83,6 +83,7 @@ export async function DevOps() {
               label: t("send.label"),
               routes: { web: t("send.web"), bot: t("send.bot"), deploy: t("send.deploy") },
               pause: t("pauseTraffic"),
+              close: t("sheetClose"),
               play: t("playTraffic"),
             }}
             title={

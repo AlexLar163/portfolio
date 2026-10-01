@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useId, useRef, useState, type KeyboardEvent, type ReactNode, type RefObject } from "react";
+import { createPortal } from "react-dom";
+import { X } from "lucide-react";
 import {
   DEFAULT_NODE,
   FRAME_LABEL,
@@ -384,7 +386,7 @@ export function InfraStage({
   title: ReactNode;
   steps: ReactNode;
   foot: ReactNode;
-  traffic: { label: string; routes: Record<string, string>; pause: string; play: string };
+  traffic: { label: string; routes: Record<string, string>; pause: string; play: string; close: string };
 }) {
   const stageRef = useRef<HTMLDivElement>(null);
   const landRef = useRef<SVGSVGElement>(null);
@@ -392,13 +394,24 @@ export function InfraStage({
   const flows = useRef<Traffic[]>([]);
   const [hot, setHot] = useState<string | null>(null);
   const [selected, setSelected] = useState<string>(DEFAULT_NODE);
+  // Hoja inferior no modal (móvil): el detalle aparece sin sacar el nodo de
+  // vista, así se ve el tráfico que se acaba de enviar (QA v3).
+  const [sheet, setSheet] = useState(false);
+  const sheetRef = useRef<HTMLDivElement>(null);
+  const lastNode = useRef<Element | null>(null);
 
-  // Diagrama horizontal: el panel va debajo y el diagrama puede medir más que
-  // la ventana. Tras un clic o Enter, se trae el panel a la vista lo mínimo
-  // (block:"nearest"); con reduce, sin animar.
+  /** Una sola columna con el diagrama vertical: el panel queda lejos, debajo. */
+  const stacked = () => {
+    const body = stageRef.current?.querySelector<HTMLElement>(".stage-body");
+    return !!body && getComputedStyle(body).gridTemplateColumns.trim().split(/\s+/).length === 1 && !!portRef.current?.getClientRects().length;
+  };
+
+  // Tras un clic o Enter, se trae el panel a la vista lo mínimo
+  // (block:"nearest", con scroll-margin bajo el header); con reduce, sin
+  // animar. Si es sticky (900–1250 px) ya acompaña al diagrama: no se mueve.
   const revealPanel = () => {
     const panel = stageRef.current?.querySelector<HTMLElement>(".infra__panel");
-    if (!panel) return;
+    if (!panel || getComputedStyle(panel).position === "sticky") return;
     requestAnimationFrame(() => {
       const r = panel.getBoundingClientRect();
       const vis = Math.max(0, Math.min(r.bottom, window.innerHeight) - Math.max(r.top, 0));
@@ -413,8 +426,50 @@ export function InfraStage({
     setSelected(id);
     if (!scroll) return;
     flows.current.forEach((f) => f.send(id));
-    revealPanel();
+    if (stacked()) {
+      lastNode.current = portRef.current?.querySelector(`[data-node="${id}"]`) ?? null;
+      setSheet(true);
+    } else revealPanel();
   };
+
+  // Con la hoja abierta: si tapa el nodo tocado, la página sube lo justo; se
+  // cierra con Esc o cuando el diagrama sale de la vista.
+  useEffect(() => {
+    if (!sheet) return;
+    const el = sheetRef.current;
+    const nodeEl = lastNode.current;
+    if (el && nodeEl) {
+      const nr = nodeEl.getBoundingClientRect();
+      const limit = el.getBoundingClientRect().top - 12;
+      if (nr.bottom > limit) {
+        const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+        window.scrollBy({ top: nr.bottom - limit, behavior: reduce ? "auto" : "smooth" });
+      }
+    }
+    const svgWrap = stageRef.current?.querySelector(".stage-svg");
+    const io = new IntersectionObserver(([e]) => {
+      if (!e.isIntersecting) setSheet(false);
+    });
+    if (svgWrap) io.observe(svgWrap);
+    const onKey = (e: globalThis.KeyboardEvent) => {
+      if (e.key === "Escape") setSheet(false);
+    };
+    // El diagrama vertical mide ~1800 px: si la persona sigue leyendo (media
+    // pantalla de scroll desde donde se abrió), la hoja se retira sola.
+    let y0: number | null = null;
+    const t = window.setTimeout(() => (y0 = window.scrollY), 700);
+    const onScroll = () => {
+      if (y0 !== null && Math.abs(window.scrollY - y0) > window.innerHeight * 0.5) setSheet(false);
+    };
+    document.addEventListener("keydown", onKey);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      io.disconnect();
+      window.clearTimeout(t);
+      document.removeEventListener("keydown", onKey);
+      window.removeEventListener("scroll", onScroll);
+    };
+  }, [sheet, selected]);
 
   const sendRoute = (r: RouteId) => flows.current.forEach((f) => f.sendRoute(r));
 
@@ -503,6 +558,25 @@ export function InfraStage({
         </div>
       </div>
       {foot}
+      {sheet &&
+        createPortal(
+          // No modal y sin aria-live: el panel (aria-live) ya anuncia el cambio.
+          <div className="infra-sheet" ref={sheetRef} role="region" aria-label={node.label}>
+            <div className="infra-sheet__head">
+              <p className="t-h3">{node.label}</p>
+              <button type="button" className="infra-sheet__close" aria-label={traffic.close} onClick={() => setSheet(false)}>
+                <X size={18} strokeWidth={1.5} aria-hidden />
+              </button>
+            </div>
+            <p className="t-small ink-2">{node.detail}</p>
+            <ul className="infra__facts t-data">
+              {node.facts.map((f) => (
+                <li key={f}>{f}</li>
+              ))}
+            </ul>
+          </div>,
+          document.body,
+        )}
     </div>
   );
 }

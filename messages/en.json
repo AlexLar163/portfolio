@@ -424,6 +424,7 @@
     "lanesTitle": "CI/CD pipelines",
     "tableSummary": "See the pipelines as a table",
     "pauseTraffic": "Pause the traffic",
+    "sheetClose": "Close the details",
     "playTraffic": "Resume the traffic",
     "send": {
       "label": "Send traffic along a route",
