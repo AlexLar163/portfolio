@@ -819,10 +819,15 @@ section[id] {
 
 /* Ancho fijo: con min-width el cambio de la mono de respaldo a JetBrains movía
    el header (CLS 0,00012 medido con red lenta). */
+/* Y alineado a la izquierda con sangría fija: centrado, el texto se corría
+   una fracción de píxel al llegar la fuente (CLS 0,0000166, medido en v2 y
+   v3). Con el inicio fijo no hay desplazamiento; 0,675rem centra 2 caracteres
+   de JetBrains Mono (0,6 em c/u a 12 px) en 36 px. */
 .locale button {
   width: 2.25rem;
   height: 26px;
-  padding-inline: 0;
+  padding-inline: 0.675rem 0;
+  text-align: left;
   border-radius: var(--r-1);
   font-family: var(--font-mono);
   font-size: 0.75rem;
