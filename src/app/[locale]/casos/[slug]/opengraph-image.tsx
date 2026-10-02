@@ -1,3 +1,4 @@
+import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { caseBySlug } from "@/data/cases";
 import { OG_SIZE, renderOg } from "@/lib/og";
@@ -10,8 +11,9 @@ export default async function OpengraphImage({ params }: { params: Promise<{ loc
   const { locale, slug } = await params;
   const t = await getTranslations({ locale, namespace: "cases" });
   const def = caseBySlug(slug);
+  if (!def) notFound();
   return renderOg({
-    eyebrow: `${t("ui.cases")} · ${def ? t(`ui.kind.${def.kind}`) : ""}`,
+    eyebrow: `${t("ui.cases")} · ${t(`ui.kind.${def.kind}`)}`,
     title: t(`items.${slug}.title`),
     sub: "Alex Largo · Fullstack & DevOps Engineer",
     nodes: t.raw(`items.${slug}.og`) as string[],

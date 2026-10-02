@@ -153,7 +153,7 @@
         },
         "rebuild": {
           "title": "Rebuild from scratch",
-          "text": "The server was rebuilt from scratch with the same hardening applied."
+          "text": "The server was rebuilt from scratch with reinforced hardening."
         },
         "harden": {
           "title": "Hardening and credential rotation",
@@ -1029,8 +1029,8 @@
       "backHome": "Back to home",
       "viewCase": "View case study",
       "illustrative": "Illustrative diagram, sample data.",
-      "pauseFlow": "Pause the traffic",
-      "playFlow": "Resume the traffic",
+      "pauseFlow": "Pause animation",
+      "playFlow": "Resume animation",
       "kind": {
         "client": "Real client",
         "demo": "Demo project",
@@ -1146,7 +1146,7 @@
           "The bot is a pure state machine inside the app; n8n is only the channel between Telegram and the API."
         ],
         "pieces": [
-          "Next.js 16 on Vercel: landing, /app/* app, public booking and /api/bot/* API",
+          "Next.js 16 on Vercel: landing, `/app/*` app, public booking and `/api/bot/*` API",
           "Postgres on Neon with Drizzle ORM (serverless driver in production)",
           "n8n: bot, reminders, public booking and waitlist flows",
           "Caddy in front of n8n, filtering Telegram's subnets",
@@ -1179,7 +1179,7 @@
           },
           {
             "title": "A public demo that resets itself",
-            "text": "A daily Vercel cron (07:00 UTC) calls an endpoint with Bearer CRON_SECRET and restores only the demo location to its seed. Why: anyone can log in and edit without leaving it broken.",
+            "text": "A daily Vercel cron (07:00 UTC) calls an endpoint with `Bearer CRON_SECRET` and restores only the demo location to its seed. Why: anyone can log in and edit without leaving it broken.",
             "tradeoff": "whatever a visitor does is wiped that night."
           },
           {
@@ -1245,13 +1245,13 @@
         "name": "Vera",
         "title": "Vera: a WhatsApp receptionist for service businesses",
         "subtitle": "WhatsApp receptionist: n8n flows ready to plug into an AI agent",
-        "summary": "A WhatsApp-style mockup shows how Vera would serve a barbershop, a takeaway kitchen, a dental clinic and a garage, and how each record lands in the business's system. Behind it, four n8n flows that talk to the WhatsApp Cloud API and an AI agent.",
+        "summary": "A WhatsApp-style mockup shows how Vera would serve a barbershop, a takeaway kitchen, a dental clinic and a garage, and how each record lands in the business's system. Behind it, four n8n flows set up to talk to the WhatsApp Cloud API and an AI agent.",
         "context": [
           "Service businesses get the same WhatsApp questions all day: prices, hours, bookings, orders, “is my car ready?”. Answering by hand eats into service time; a bot that makes up prices or talks over the staff is worse. Each industry changes what can be done by chat."
         ],
         "solution": [
           "Two pieces. The mockup: a scripted demo (no backend, no language model) that walks through each industry and moves from the chat to the business's screen —calendar, patient record, work-order board or kitchen ticket— with the new record highlighted.",
-          "The n8n flows: the main flow receives Meta's webhook, loads the industry preset, applies an anti-abuse guard, asks the agent and runs at most one tool against the business API; plus a sub-flow that transcribes voice notes, reminders every 15 minutes using approved templates, and status-change notifications."
+          "The n8n flows: the main flow receives Meta's webhook, loads the industry preset, applies an anti-abuse guard, is set up to ask the agent and run at most one tool against the business API; plus a sub-flow that transcribes voice notes, reminders every 15 minutes using approved templates, and status-change notifications."
         ],
         "pieces": [
           "WhatsApp Cloud API (Meta): inbound webhook and templates",
@@ -1261,12 +1261,12 @@
           "Per-industry JSON presets (prompt, tools, copy, templates)"
         ],
         "flow": [
-          "A message (text or voice note) arrives via the WhatsApp webhook",
-          "n8n normalizes it, loads the industry preset and runs the anti-abuse guard",
-          "The agent replies, requests a tool, or hands off to a person",
-          "If it requested a tool, n8n calls the business API and returns the result",
-          "The agent writes the final reply and it goes out on WhatsApp",
-          "Every 15 min, reminders go out with “Confirm” / “Change”"
+          "The flow receives the message (text or voice note) via the WhatsApp webhook",
+          "n8n normalizes it, loads the industry preset and applies the anti-abuse guard",
+          "The flow hands the message to the agent, which is set up to reply, request a tool or hand off to a person",
+          "If the agent requests a tool, n8n calls the business API and returns the result",
+          "The flow sends the agent's final reply out on WhatsApp",
+          "Every 15 min, the reminders flow sends templates with “Confirm” / “Change”"
         ],
         "decisions": [
           {
@@ -1324,7 +1324,8 @@
           "n8n",
           "AI agent",
           "Business API"
-        ]
+        ],
+        "flowTitle": "How the flow is designed (tested against mock servers)"
       },
       "pipeline-ia": {
         "name": "AI agent automation pipeline",
@@ -1385,7 +1386,6 @@
         "results": [
           "Runs 24/7 on a 1 vCPU / 2 GB VPS",
           "Worst case for a hung job: from 25 to ~8 minutes",
-          "221 cases processed and stored as of 8-Sep-2026",
           "Rotated logs (10 MB × 3) and n8n history capped at 7 days / 5,000 runs",
           "Restored the same day after the 8-Sep incident, with its database intact"
         ],
@@ -1465,7 +1465,7 @@
     },
     "impact": [
       "Everything on the VPS went down: the automation pipeline, n8n, the control panel and the demo sites.",
-      "No client production site ran on that machine.",
+      "No production site was affected.",
       "No n8n data loss: its database was rescued intact.",
       "Two personal deployments that existed only as builds copied to the server could not be rescued."
     ],
@@ -1490,7 +1490,7 @@
     "timeline": [
       {
         "when": "7-Sep 22:55:58 → 22:56:09",
-        "what": "Seven failed attempts on wp-login.php, preceded by automated probing of other routes",
+        "what": "Seven failed attempts on `wp-login.php`, preceded by automated probing of other routes",
         "phase": "intrusion"
       },
       {
@@ -1537,7 +1537,7 @@
       },
       {
         "when": "8-Sep 17:20 – 17:22",
-        "what": "n8n database rescued (integrity_check = ok) along with config that wasn't in git",
+        "what": "n8n database rescued (`integrity_check = ok`) along with config that wasn't in git",
         "phase": "recovery"
       },
       {
@@ -1569,7 +1569,7 @@
       }
     ],
     "detection": "No alert caught it: the machine sat at 100 % for about 12 hours before anyone noticed. The alert that did exist reported the symptom (service down), not the cause.",
-    "cause": "The staging site's wp-login.php was exposed to the internet with no rate limit on login attempts, and the site had an administrator account with a predictable name and a weak password. Seven attempts were enough. There was no vulnerability in our own code, WordPress core or the project's plugins.",
+    "cause": "The staging site's `wp-login.php` was exposed to the internet with no rate limit on login attempts, and the site had an administrator account with a predictable name and a weak password. Seven attempts were enough. There was no vulnerability in our own code, WordPress core or the project's plugins.",
     "factors": [
       "All twelve sites shared a single database user with rights over all twelve databases.",
       "No container had a memory limit: one site ate the whole machine's RAM and took n8n down with it.",
@@ -1597,7 +1597,7 @@
       },
       {
         "before": "Plugins could be uploaded and installed from the admin",
-        "after": "DISALLOW_FILE_MODS and DISALLOW_FILE_EDIT on; automatic minor core updates"
+        "after": "`DISALLOW_FILE_MODS` and `DISALLOW_FILE_EDIT` on; automatic minor core updates"
       },
       {
         "before": "Administrator account with a predictable name",
@@ -1605,7 +1605,7 @@
       }
     ],
     "appliedLater": [
-      "Rate limit on wp-login.php",
+      "Rate limit on `wp-login.php`",
       "Load and disk alerts",
       "After two memory-related outages (13 and 15 September): the panel requires at least 400 MB free and load below 2 before starting a site, with at most 2 running",
       "The agent runner gained an inactivity watchdog"
@@ -1640,7 +1640,7 @@
         "status": "done"
       },
       {
-        "text": "DISALLOW_FILE_MODS on the sites",
+        "text": "`DISALLOW_FILE_MODS` on the sites",
         "status": "done"
       },
       {
@@ -1653,7 +1653,7 @@
         "status": "done"
       },
       {
-        "text": "Rate limit on wp-login.php",
+        "text": "Rate limit on `wp-login.php`",
         "status": "done"
       },
       {
@@ -1691,6 +1691,8 @@
       "Containment",
       "Recovery",
       "Hardening"
-    ]
+    ],
+    "ogTitle": "Incident response: brute-force intrusion on the VPS",
+    "ogEyebrow": "Postmortem · 8 September 2026"
   }
 }

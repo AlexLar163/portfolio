@@ -8,8 +8,11 @@ import { PostmortemPage } from "@/components/cases/PostmortemPage";
 
 type Params = { params: Promise<{ locale: string; slug: string }> };
 
-export const dynamicParams = false;
-
+/**
+ * Páginas estáticas para los slugs del contenido. Un slug desconocido se
+ * resuelve con notFound() explícito (404 del idioma): con dynamicParams=false
+ * Next dejaba «NoFallbackError» en el log de cada petición (QA).
+ */
 export function generateStaticParams() {
   return routing.locales.map((locale) => ({ locale, slug: POSTMORTEM_SLUG }));
 }

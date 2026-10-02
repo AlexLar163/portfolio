@@ -4528,6 +4528,38 @@ html:not(.motion-lite) .stage-traffic {
 
 .case-fig {
   min-width: 0;
+  container: casefig / inline-size;
+}
+
+/* Vista móvil aparte: debajo del marco si la figura es angosta, al lado si es ancha. */
+.case-fig__row {
+  display: grid;
+  gap: var(--s-4);
+  align-items: end;
+}
+
+.case-fig__phone {
+  width: min(12rem, 60%);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--r-3);
+  background: var(--surface);
+  overflow: clip;
+}
+
+.case-fig__phone img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+@container casefig (min-width: 40rem) {
+  .case-fig--phone .case-fig__row {
+    grid-template-columns: minmax(0, 1fr) 10rem;
+  }
+
+  .case-fig__phone {
+    width: 100%;
+  }
 }
 
 .case-fig__cap {
@@ -4547,10 +4579,9 @@ html:not(.motion-lite) .stage-traffic {
   }
 }
 
-@container shell (min-width: 56.25rem) {
-  .case-figs--3 {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
+/* Tres figuras (Turnia: landing, app y bot): una por fila, con su teléfono al lado. */
+.case-figs--3 {
+  max-width: 64rem;
 }
 
 /* Arquitectura: el flujo (7 de 12) junto a las piezas. */
@@ -5152,4 +5183,84 @@ html:not(.motion-lite) .flow__pk {
 
 .feature__note {
   margin-top: var(--s-2);
+}
+
+/* Identificadores (wp-login.php, DISALLOW_FILE_MODS…): no se parten; el
+   contenedor se reacomoda (las tablas del postmortem se apilan en angosto). */
+:is(.case-hero, .sub-section) code {
+  padding: 0 0.25em;
+  border-radius: var(--r-1);
+  background: var(--raised);
+  font-family: var(--font-mono);
+  font-size: 0.875em;
+  color: var(--ink);
+  white-space: nowrap;
+  overflow-wrap: normal;
+}
+
+/* Tablas del postmortem en angosto: cada fila es una tarjeta; los encabezados
+   pasan a rótulos (data-label). Los roles ARIA explícitos conservan la
+   semántica de tabla aunque cambie el display. */
+@container shell (max-width: 37.49rem) {
+  .pm-table thead {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+
+  .pm-table,
+  .pm-table tbody,
+  .pm-table tr,
+  .pm-table td {
+    display: block;
+  }
+
+  .pm-table tr {
+    padding-block: var(--s-3);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .pm-table td {
+    padding: 0;
+    border: 0;
+  }
+
+  .pm-table td + td {
+    margin-top: var(--s-2);
+  }
+
+  .pm-table td[data-label]::before {
+    content: attr(data-label);
+    display: block;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    color: var(--ink-3);
+  }
+
+  .pm-actions tr {
+    display: grid;
+    grid-template-columns: 2rem minmax(0, 1fr);
+    column-gap: 0;
+  }
+
+  .pm-actions td {
+    grid-column: 2;
+  }
+
+  .pm-actions td.pm-actions__n {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    width: auto;
+  }
+
+  .pm-actions td + td {
+    margin-top: 0;
+  }
+
+  .pm-actions td:last-child {
+    margin-top: var(--s-2);
+  }
 }

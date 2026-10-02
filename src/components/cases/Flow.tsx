@@ -1,5 +1,6 @@
 import { PauseToggle } from "@/components/ui/PauseToggle";
 import { FlowMotion } from "./FlowMotion";
+import { Ticks } from "./Ticks";
 
 /**
  * Diagrama de flujo de un caso (4–7 pasos), en el lenguaje del diagrama DevOps:
@@ -40,7 +41,9 @@ export function Flow({
                 <span className="flow__n t-data" aria-hidden="true">
                   {String(i + 1).padStart(2, "0")}
                 </span>
-                <p>{s}</p>
+                <p>
+                  <Ticks text={s} />
+                </p>
               </div>
             </li>
           ))}

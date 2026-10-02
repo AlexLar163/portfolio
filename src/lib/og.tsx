@@ -44,7 +44,8 @@ export async function renderOg({
   const hot = accent ?? nodes[nodes.length - 1];
   // Títulos largos (casos) bajan de cuerpo para caber en dos líneas.
   // El cuerpo grande es el de la home, idéntico al aprobado.
-  const long = title.length > 28;
+  // Las subpáginas (con rótulo) usan siempre el cuerpo de caso: mismo tamaño en las 10.
+  const long = !!eyebrow || title.length > 28;
   const t = long ? { size: 68, lh: 1.05, ls: -2, sub: 34 } : { size: 104, lh: 1, ls: -3, sub: 44 };
 
   return new ImageResponse(

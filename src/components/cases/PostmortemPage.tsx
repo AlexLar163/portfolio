@@ -1,6 +1,7 @@
 import { getTranslations } from "next-intl/server";
 import { ArrowLeft, CircleCheck, Clock, ShieldAlert, type LucideIcon } from "lucide-react";
 import { Breadcrumb, SubPage, SubSection } from "./SubPage";
+import { Ticks } from "./Ticks";
 
 type Phase = "intrusion" | "detection" | "containment" | "recovery" | "hardening";
 type ActionStatus = "done" | "pending" | "accepted";
@@ -42,7 +43,9 @@ const STATUS_ICON: Record<ActionStatus, LucideIcon> = {
 const List = ({ items, className = "card__list" }: { items: string[]; className?: string }) => (
   <ul className={className}>
     {items.map((x) => (
-      <li key={x}>{x}</li>
+      <li key={x}>
+        <Ticks text={x} />
+      </li>
     ))}
   </ul>
 );
@@ -113,7 +116,9 @@ export async function PostmortemPage({ locale }: { locale: string }) {
                   <time className="t-data pm-event__when">{e.when}</time>
                   <span className="pm-phase t-small">{ui.phases[e.phase]}</span>
                 </p>
-                <p className="pm-event__what">{e.what}</p>
+                <p className="pm-event__what">
+                  <Ticks text={e.what} />
+                </p>
               </li>
             ))}
           </ol>
@@ -125,7 +130,9 @@ export async function PostmortemPage({ locale }: { locale: string }) {
               <h3 className="subhead">{ui.detection}</h3>
               <p>{pm.detection}</p>
               <h3 className="subhead pm-gap">{ui.cause}</h3>
-              <p>{pm.cause}</p>
+              <p>
+                <Ticks text={pm.cause} />
+              </p>
             </div>
             <div>
               <h3 className="subhead">{ui.factors}</h3>
@@ -145,18 +152,22 @@ export async function PostmortemPage({ locale }: { locale: string }) {
         <SubSection id="hardening" title={ui.hardening}>
           <h3 className="subhead">{ui.hardeningVerified}</h3>
           <div className="table-wrap pm-table-wrap">
-            <table className="pm-table">
-              <thead>
-                <tr>
-                  <th scope="col">{ui.before}</th>
-                  <th scope="col">{ui.after}</th>
+            <table className="pm-table" role="table">
+              <thead role="rowgroup">
+                <tr role="row">
+                  <th role="columnheader" scope="col">{ui.before}</th>
+                  <th role="columnheader" scope="col">{ui.after}</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody role="rowgroup">
                 {pm.hardening.map((r) => (
-                  <tr key={r.before}>
-                    <td className="ink-2">{r.before}</td>
-                    <td>{r.after}</td>
+                  <tr key={r.before} role="row">
+                    <td role="cell" className="ink-2" data-label={ui.before}>
+                      <Ticks text={r.before} />
+                    </td>
+                    <td role="cell" data-label={ui.after}>
+                      <Ticks text={r.after} />
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -206,24 +217,26 @@ export async function PostmortemPage({ locale }: { locale: string }) {
 
         <SubSection id="acciones" title={ui.actions}>
           <div className="table-wrap pm-table-wrap">
-            <table className="pm-table pm-actions">
-              <thead>
-                <tr>
-                  <th scope="col" className="pm-actions__n">
+            <table className="pm-table pm-actions" role="table">
+              <thead role="rowgroup">
+                <tr role="row">
+                  <th role="columnheader" scope="col" className="pm-actions__n">
                     #
                   </th>
-                  <th scope="col">{ui.action}</th>
-                  <th scope="col">{ui.status}</th>
+                  <th role="columnheader" scope="col">{ui.action}</th>
+                  <th role="columnheader" scope="col">{ui.status}</th>
                 </tr>
               </thead>
-              <tbody>
+              <tbody role="rowgroup">
                 {pm.actions.map((a, i) => {
                   const Icon = STATUS_ICON[a.status];
                   return (
-                    <tr key={a.text} data-status={a.status}>
-                      <td className="t-data ink-3 pm-actions__n">{i + 1}</td>
-                      <td>{a.text}</td>
-                      <td>
+                    <tr key={a.text} role="row" data-status={a.status}>
+                      <td role="cell" className="t-data ink-3 pm-actions__n">{i + 1}</td>
+                      <td role="cell">
+                        <Ticks text={a.text} />
+                      </td>
+                      <td role="cell">
                         <span className="pm-status t-small">
                           <Icon size={16} strokeWidth={2} aria-hidden />
                           {ui.statuses[a.status]}

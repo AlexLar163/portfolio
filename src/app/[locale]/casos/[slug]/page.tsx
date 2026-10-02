@@ -8,9 +8,11 @@ import { CasePage } from "@/components/cases/CasePage";
 
 type Params = { params: Promise<{ locale: string; slug: string }> };
 
-/** Solo los slugs del contenido; cualquier otro es 404. */
-export const dynamicParams = false;
-
+/**
+ * Páginas estáticas para los slugs del contenido. Un slug desconocido se
+ * resuelve con notFound() explícito (404 del idioma): con dynamicParams=false
+ * Next dejaba «NoFallbackError» en el log de cada petición (QA).
+ */
 export function generateStaticParams() {
   return routing.locales.flatMap((locale) => CASE_SLUGS.map((slug) => ({ locale, slug })));
 }

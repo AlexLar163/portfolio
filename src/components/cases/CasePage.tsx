@@ -1,3 +1,4 @@
+import Image from "next/image";
 import { getTranslations } from "next-intl/server";
 import { ArrowLeft, ArrowRight, Check } from "lucide-react";
 import { caseHref, cases, type CaseDef, type CaseFigure } from "@/data/cases";
@@ -11,6 +12,7 @@ import { slideFrom } from "@/components/media/build";
 import { mediaText } from "@/components/media/text";
 import { Breadcrumb, SubPage, SubSection } from "./SubPage";
 import { Flow } from "./Flow";
+import { Ticks } from "./Ticks";
 
 export type CaseText = {
   name: string;
@@ -70,35 +72,43 @@ export async function CasePage({ def, locale }: { def: CaseDef; locale: string }
   const caption = (ref: MediaRef) => item.figures?.[ref.key] ?? item.name;
 
   /** Una figura del caso: el mismo marco que la home (barra con dirección), con su pie. */
+  /**
+   * Una figura del caso: el mismo marco que la home (barra con dirección), con su pie.
+   * La vista móvil NO va superpuesta (a 390 px medía 73×158 y no se leía, QA):
+   * es un teléfono aparte, al lado del marco cuando la figura es ancha y debajo
+   * cuando es angosta (container query de `.case-fig`).
+   */
   const figure = (f: CaseFigure, i: number, sizes: string = SIZES.half) => {
     const img = resolveImage(f.ref);
     if (!img) return null;
     const inset = resolveImage(f.inset);
     const alt = caption(f.ref);
     return (
-      <figure key={`${f.ref.key}-${i}`} className="case-fig">
-        <MediaFrame
-          name={item.name}
-          address={address}
-          sizes={sizes}
-          placeholder={item.name}
-          labels={m.labels}
-          slides={[
-            {
-              id: f.ref.key,
-              image: { src: img.src, w: img.w, h: img.h, fit: img.fit, alt },
-              inset: inset && {
-                src: inset.src,
-                w: inset.w,
-                h: inset.h,
-                fit: inset.fit,
-                alt: f.inset ? caption(f.inset) : m.alt.altMobile(item.name),
-              },
-            },
-          ]}
-        />
+      <figure key={`${f.ref.key}-${i}`} className={`case-fig${inset ? " case-fig--phone" : ""}`}>
+        <div className="case-fig__row">
+          <MediaFrame
+            name={item.name}
+            address={address}
+            sizes={sizes}
+            placeholder={item.name}
+            labels={m.labels}
+            slides={[{ id: f.ref.key, image: { src: img.src, w: img.w, h: img.h, fit: img.fit, alt } }]}
+          />
+          {inset && f.inset && (
+            <div className="case-fig__phone">
+              <Image
+                src={inset.src}
+                alt={caption(f.inset)}
+                width={inset.w}
+                height={inset.h}
+                sizes="(min-width: 900px) 160px, 192px"
+              />
+            </div>
+          )}
+        </div>
         <figcaption className="case-fig__cap t-small">
           {alt}
+          {inset && f.inset && <span> · {caption(f.inset)}</span>}
           {f.illustrative && <span className="case-fig__note"> · {ui.illustrative}</span>}
         </figcaption>
       </figure>
@@ -183,7 +193,9 @@ export async function CasePage({ def, locale }: { def: CaseDef; locale: string }
           <div className={`grid case-split${def.context?.length ? "" : " case-split--text"}`}>
             <div className="case-prose">
               {item.context.map((p) => (
-                <p key={p}>{p}</p>
+                <p key={p}>
+                  <Ticks text={p} />
+                </p>
               ))}
             </div>
             {def.context?.map((f, i) => figure(f, i))}
@@ -193,12 +205,14 @@ export async function CasePage({ def, locale }: { def: CaseDef; locale: string }
         <SubSection id="solucion" title={ui.solution}>
           <div className="case-prose case-prose--wide">
             {item.solution.map((p) => (
-              <p key={p}>{p}</p>
+              <p key={p}>
+                <Ticks text={p} />
+              </p>
             ))}
           </div>
           {def.solution && def.solution.length > 0 && (
             <div className={`case-figs case-figs--${Math.min(def.solution.length, 3)}`}>
-              {def.solution.map((f, i) => figure(f, i, def.solution!.length > 2 ? SIZES.third : SIZES.half))}
+              {def.solution.map((f, i) => figure(f, i, def.solution!.length > 2 ? SIZES.feature : SIZES.half))}
             </div>
           )}
         </SubSection>
@@ -217,7 +231,9 @@ export async function CasePage({ def, locale }: { def: CaseDef; locale: string }
               <h3 className="subhead">{ui.pieces}</h3>
               <ul className="card__list">
                 {item.pieces.map((p) => (
-                  <li key={p}>{p}</li>
+                  <li key={p}>
+                    <Ticks text={p} />
+                  </li>
                 ))}
               </ul>
             </div>
@@ -233,9 +249,11 @@ export async function CasePage({ def, locale }: { def: CaseDef; locale: string }
                 </span>
                 <div className="decision__body">
                   <h3 className="t-h3">{d.title}</h3>
-                  <p className="ink-2">{d.text}</p>
+                  <p className="ink-2">
+                    <Ticks text={d.text} />
+                  </p>
                   <p className="decision__trade t-small">
-                    <span className="decision__tag">{ui.tradeoff}</span> {d.tradeoff}
+                    <span className="decision__tag">{ui.tradeoff}</span> <Ticks text={d.tradeoff} />
                   </p>
                 </div>
               </li>
@@ -250,7 +268,9 @@ export async function CasePage({ def, locale }: { def: CaseDef; locale: string }
                 {item.results.map((r) => (
                   <li key={r}>
                     <Check className="case-results__check" size={16} strokeWidth={2} aria-hidden />
-                    <span>{r}</span>
+                    <span>
+                      <Ticks text={r} />
+                    </span>
                   </li>
                 ))}
               </ul>
