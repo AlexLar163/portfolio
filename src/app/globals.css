@@ -21,6 +21,8 @@
   --color-accent-ink: #1a0d04;
   --color-live: #5ccb8a;
   --color-danger: #ff7a70;
+  /* Ámbar de «degradado» (Estado en vivo): entre --live y --danger, 9,9:1 sobre --bg. */
+  --color-warn: #e8b04b;
   --font-sans: var(--font-archivo), ui-sans-serif, system-ui, sans-serif;
   --font-mono: var(--font-jbmono), ui-monospace, SFMono-Regular, Menlo, monospace;
   --radius-1: 2px;
@@ -50,6 +52,7 @@
   --accent-ink: var(--color-accent-ink);
   --live: var(--color-live);
   --danger: var(--color-danger);
+  --warn: var(--color-warn);
   --accent-dim: var(--color-accent-dim);
   --accent-trail: var(--color-accent-trail);
   --accent-spot: var(--color-accent-spot);
@@ -2026,6 +2029,176 @@ section[id] {
 
 .infra-list li p {
   color: var(--ink-2);
+}
+
+/* Estado en vivo: medición real (/api/status). Filas de altura fija por
+   estructura: «midiendo» y «medido» ocupan lo mismo (sin CLS). Sin JS no hay
+   medición: el bloque no se muestra. */
+.live {
+  margin-top: var(--s-8);
+}
+
+html:not(.js) .live {
+  display: none;
+}
+
+.live__head {
+  display: grid;
+  gap: var(--s-2);
+  max-width: 68ch;
+  margin-bottom: var(--s-5);
+}
+
+.live__title {
+  display: flex;
+  align-items: center;
+  gap: var(--s-2);
+  margin-bottom: 0;
+}
+
+.live__beacon,
+.live__led {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--line-ui);
+  transition: background-color var(--dur-2) var(--ease-out);
+}
+
+.live[data-live="ready"] .live__beacon {
+  background: var(--live);
+}
+
+.live__meta {
+  display: grid;
+  gap: 2px;
+  color: var(--ink-3);
+}
+
+.live__summary {
+  color: var(--ink-2);
+}
+
+.live__list {
+  display: grid;
+  border-top: 1px solid var(--line);
+}
+
+.live__site {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) minmax(5.5rem, auto);
+  grid-template-areas:
+    "led name state"
+    "led host ms";
+  align-items: baseline;
+  gap: 2px var(--s-3);
+  min-width: 0;
+  padding-block: var(--s-3);
+  border-bottom: 1px solid var(--line);
+}
+
+.live__led {
+  grid-area: led;
+  align-self: center;
+}
+
+.live__name {
+  grid-area: name;
+  min-width: 0;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.live__host {
+  grid-area: host;
+  min-width: 0;
+  color: var(--ink-3);
+  overflow-wrap: anywhere;
+}
+
+.live__state {
+  grid-area: state;
+  display: grid;
+  justify-items: end;
+  color: var(--ink-3);
+}
+
+.live__label {
+  grid-area: 1 / 1;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-1);
+  white-space: nowrap;
+  visibility: hidden;
+}
+
+.live__label[data-on] {
+  visibility: visible;
+}
+
+.live__label svg {
+  flex: none;
+}
+
+.live__ms {
+  grid-area: ms;
+  justify-self: end;
+  color: var(--ink-2);
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}
+
+.live__site[data-state="ok"] .live__led {
+  background: var(--live);
+}
+
+.live__site[data-state="ok"] .live__state {
+  color: var(--live);
+}
+
+.live__site[data-state="degraded"] .live__led {
+  background: var(--warn);
+}
+
+.live__site[data-state="degraded"] .live__state {
+  color: var(--warn);
+}
+
+.live__site[data-state="down"] .live__led {
+  background: var(--danger);
+}
+
+.live__site[data-state="down"] .live__state {
+  color: var(--danger);
+}
+
+/* Midiendo: el LED respira mientras llega la medición (segundos, no un bucle eterno). */
+.motion-lite .live__site[data-state="pending"] .live__led {
+  animation: live-wait 900ms var(--ease-io) infinite alternate;
+}
+
+[data-paused] .live__led {
+  animation-play-state: paused;
+}
+
+@keyframes live-wait {
+  to {
+    background-color: var(--ink-3);
+  }
+}
+
+@container shell (min-width: 56.25rem) {
+  .live__list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--s-7);
+    border-top: 0;
+  }
+
+  /* Filete superior de la primera fila sin sumar alto: hermanas de igual medida. */
+  .live__site:nth-child(-n + 2) {
+    box-shadow: inset 0 1px var(--line);
+  }
 }
 
 /* Informe de incidente: título fijo a la izquierda y una línea que se llena. */

@@ -1,9 +1,11 @@
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { Check } from "lucide-react";
 import { listOrder, nodes, STEP_NODES } from "@/data/infra";
 import { incidentSteps, pipelineRows } from "@/data/devops";
+import { statusSites } from "@/data/status";
 import { InfraStage, type DiagramText, type NodeText } from "./InfraDiagram";
 import { CapabilityBento, CapabilitySheet, PipelineTable } from "./Capabilities";
+import { LiveStatus, type LiveText } from "./LiveStatus";
 
 type Step = { title: string; text: string; data: string };
 
@@ -49,6 +51,9 @@ function Chips({ items, className = "" }: { items: string[]; className?: string 
 export async function DevOps() {
   const t = await getTranslations("devops");
   const inf = await getTranslations("infra");
+  const locale = await getLocale();
+  const { hosts, ...live } = t.raw("live") as LiveText & { hosts: Record<string, string> };
+  const liveSites = statusSites.map((s) => ({ id: s.id, name: s.name, host: hosts[s.host] }));
 
   const nodeText = Object.fromEntries(
     nodes
@@ -139,6 +144,9 @@ export async function DevOps() {
             </ol>
           </div>
         </details>
+
+        {/* Estado en vivo: medición real de los sitios públicos (/api/status). */}
+        <LiveStatus text={live} sites={liveSites} locale={locale} />
 
         {/* Respuesta a incidente: sin nombre de cliente */}
         <article className="grid incident" aria-labelledby="incident-title">

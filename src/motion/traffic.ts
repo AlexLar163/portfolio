@@ -1,6 +1,8 @@
 import { edges, VIEWBOX } from "@/data/infra";
+import { statusSites } from "@/data/status";
 import type { Point } from "@/data/types";
 import { addTask, wake } from "./engine";
+import { onStatus } from "./live";
 
 /**
  * Tráfico vivo del diagrama DevOps (v3 «Circuito»), en el bucle compartido.
@@ -39,11 +41,23 @@ const GAP: Record<RouteId, [number, number]> = {
 /** Velocidad en px de pantalla por segundo: igual a cualquier escala del SVG. */
 const SPEED = 420;
 const MAX_AMBIENT = 7;
+
+/**
+ * Latencia REAL (bloque «Estado en vivo», /api/status): la ruta de un sitio
+ * medido (`route` en src/data/status.ts) corre más rápido y más seguido cuanto
+ * menos tarda el sitio, y si está caído no nace tráfico ambiente por ella.
+ * A LIVE_REF_MS va a SPEED (factor 1); escala log2, acotada para que se lea.
+ */
+const LIVE_REF_MS = 400;
+const LIVE_MIN = 0.6;
+const LIVE_MAX = 1.4;
+const liveRate = (ms: number) =>
+  Math.min(LIVE_MAX, Math.max(LIVE_MIN, 1 + 0.35 * Math.log2(LIVE_REF_MS / Math.max(ms, 1))));
 const SVG = "http://www.w3.org/2000/svg";
 
 type Orientation = "land" | "port";
 type Route = { pts: Point[]; cum: number[]; len: number; hits: { id: string; d: number }[] };
-type Packet = { r: Route; g: SVGGElement; d: number; hit: number; manual: boolean };
+type Packet = { r: Route; g: SVGGElement; d: number; hit: number; manual: boolean; v: number };
 
 function onSegment(p: Point, a: Point, b: Point) {
   const cross = (b[0] - a[0]) * (p[1] - a[1]) - (b[1] - a[1]) * (p[0] - a[0]);
@@ -115,6 +129,21 @@ export function mountTraffic(svg: SVGSVGElement, o: Orientation, paused: () => b
   let visible = false;
   let scale = 1;
   const next: Partial<Record<RouteId, number>> = {};
+  /** Factor de velocidad/cadencia por ruta según la medición real; sin dato, 1. */
+  const rate: Partial<Record<RouteId, number>> = {};
+  /** Rutas cuyo sitio medido está caído: sin tráfico ambiente. */
+  const dark = new Set<RouteId>();
+  const offLive = onStatus((p) => {
+    for (const site of statusSites) {
+      if (!site.route) continue;
+      const r = p.sites.find((s) => s.id === site.id);
+      dark.delete(site.route);
+      delete rate[site.route];
+      if (!r) continue;
+      if (r.state === "down" || r.ms === null) dark.add(site.route);
+      else rate[site.route] = liveRate(r.ms);
+    }
+  });
 
   const measure = () => {
     const w = svg.getBoundingClientRect().width;
@@ -161,7 +190,7 @@ export function mountTraffic(svg: SVGSVGElement, o: Orientation, paused: () => b
     const [x, y] = r.pts[0];
     g.setAttribute("transform", `translate(${x} ${y})`);
     layer.appendChild(g);
-    packets.push({ r, g, d: 0, hit: 0, manual });
+    packets.push({ r, g, d: 0, hit: 0, manual, v: rate[id] ?? 1 });
     wake();
   };
 
@@ -184,8 +213,9 @@ export function mountTraffic(svg: SVGSVGElement, o: Orientation, paused: () => b
       for (const id of Object.keys(GAP) as RouteId[]) {
         if (next[id] === undefined) next[id] = now + Math.random() * GAP[id][0];
         if (now >= next[id]! && ambient < MAX_AMBIENT) {
-          spawn(id, false);
-          next[id] = now + GAP[id][0] + Math.random() * (GAP[id][1] - GAP[id][0]);
+          if (!dark.has(id)) spawn(id, false);
+          const k = 1 / (rate[id] ?? 1);
+          next[id] = now + (GAP[id][0] + Math.random() * (GAP[id][1] - GAP[id][0])) * k;
         }
       }
     }
@@ -193,7 +223,7 @@ export function mountTraffic(svg: SVGSVGElement, o: Orientation, paused: () => b
     for (let i = packets.length - 1; i >= 0; i--) {
       const p = packets[i];
       if (frozen && !p.manual) continue;
-      p.d += step;
+      p.d += step * p.v;
       const [x, y] = ptAt(p.r, Math.min(p.d, p.r.len));
       p.g.setAttribute("transform", `translate(${x.toFixed(1)} ${y.toFixed(1)})`);
       while (p.hit < p.r.hits.length && p.d >= p.r.hits[p.hit].d) flash(p.r.hits[p.hit++].id);
@@ -225,6 +255,7 @@ export function mountTraffic(svg: SVGSVGElement, o: Orientation, paused: () => b
     },
     destroy: () => {
       off();
+      offLive();
       io.disconnect();
       timers.forEach((t) => window.clearTimeout(t));
       packets.forEach((p) => p.g.remove());

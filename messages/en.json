@@ -431,6 +431,31 @@
       "web": "Web request",
       "bot": "Telegram message",
       "deploy": "Deploy"
+    },
+    "live": {
+      "title": "Live status",
+      "lead": "Real measurement from the portfolio server: one GET request to each public site, refreshed at most every 5 minutes. Latency is time to first byte. The diagram’s “Web request” route runs at the measured latency of Bitácora, the site this VPS serves.",
+      "listLabel": "Measured sites",
+      "summary": "{up} of {total} sites responding",
+      "pending": "Measuring…",
+      "noData": "No data right now",
+      "ageNow": "Measured under 1 min ago",
+      "ageMin": "Measured {n} min ago",
+      "ageHour": "Measured {n} h ago",
+      "states": {
+        "ok": "Up",
+        "degraded": "Degraded",
+        "down": "Down",
+        "pending": "Measuring",
+        "nodata": "No data"
+      },
+      "hosts": {
+        "vercel": "Vercel",
+        "vps": "Own VPS · Caddy",
+        "aws": "AWS EC2",
+        "shared": "Shared hosting",
+        "systeme": "Systeme.io"
+      }
     }
   },
   "infra": {

@@ -430,6 +430,31 @@
       "web": "Petición web",
       "bot": "Mensaje de Telegram",
       "deploy": "Deploy"
+    },
+    "live": {
+      "title": "Estado en vivo",
+      "lead": "Medición real desde el servidor del portfolio: una petición GET a cada sitio público, renovada como máximo cada 5 minutos. La latencia es hasta el primer byte. La ruta «Petición web» del diagrama corre a la latencia medida de Bitácora, el sitio que sirve este VPS.",
+      "listLabel": "Sitios medidos",
+      "summary": "{up} de {total} sitios responden",
+      "pending": "Midiendo…",
+      "noData": "Sin datos ahora",
+      "ageNow": "Medido hace menos de 1 min",
+      "ageMin": "Medido hace {n} min",
+      "ageHour": "Medido hace {n} h",
+      "states": {
+        "ok": "Vivo",
+        "degraded": "Degradado",
+        "down": "Caído",
+        "pending": "Midiendo",
+        "nodata": "Sin datos"
+      },
+      "hosts": {
+        "vercel": "Vercel",
+        "vps": "VPS propio · Caddy",
+        "aws": "AWS EC2",
+        "shared": "Hosting compartido",
+        "systeme": "Systeme.io"
+      }
     }
   },
   "infra": {
