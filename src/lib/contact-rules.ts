@@ -14,10 +14,12 @@ export const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
 
 /** Campo trampa (honeypot): nombre neutro para que el autocompletado no lo llene. */
 export const HONEYPOT_FIELD = "contact_hp";
-/** Milisegundos entre que el formulario se montó y el envío (lo mide el cliente). */
-export const ELAPSED_FIELD = "fill_ms";
-/** Menos que esto entre montar el formulario y enviarlo = bot. */
+/** Sello de tiempo firmado por el servidor (src/lib/contact-stamp.ts). */
+export const STAMP_FIELD = "contact_stamp";
+/** Antigüedad mínima del sello al enviar: menos = bot. */
 export const MIN_FILL_MS = 3000;
+/** Antigüedad máxima del sello: más = sello reutilizado o robado. */
+export const MAX_STAMP_AGE_MS = 2 * 60 * 60_000;
 
 export function checkFields(v: Record<Field, string>): Partial<Record<Field, FieldError>> {
   const e: Partial<Record<Field, FieldError>> = {};

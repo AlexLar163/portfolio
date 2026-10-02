@@ -2,7 +2,14 @@
 
 import { headers } from "next/headers";
 import { Resend } from "resend";
-import { checkFields, ELAPSED_FIELD, HONEYPOT_FIELD, MIN_FILL_MS } from "@/lib/contact-rules";
+import {
+  checkFields,
+  HONEYPOT_FIELD,
+  MAX_STAMP_AGE_MS,
+  MIN_FILL_MS,
+  STAMP_FIELD,
+} from "@/lib/contact-rules";
+import { signStamp, stampAge } from "@/lib/contact-stamp";
 
 export type ContactState = {
   status: "idle" | "success" | "error";
@@ -13,32 +20,53 @@ export type ContactState = {
  * Rate limit por IP en memoria (best effort): cada instancia del servidor
  * lleva su propia cuenta y se pierde al reciclarse. Frena una ráfaga, no un
  * ataque distribuido; para eso haría falta un almacén compartido.
+ *   normal → con sello firmado válido (navegador con JS)
+ *   strict → sin sello (sin JS, o un bot que lo omite)
  */
-const RATE_WINDOW_MS = 10 * 60_000;
-const RATE_MAX = 5;
+const RATE = {
+  normal: { windowMs: 10 * 60_000, max: 5 },
+  strict: { windowMs: 60 * 60_000, max: 2 },
+} as const;
 const RATE_KEYS_MAX = 1000;
 const hits = new Map<string, number[]>();
 
-function limited(ip: string, now: number) {
-  const recent = (hits.get(ip) ?? []).filter((t) => now - t < RATE_WINDOW_MS);
-  if (recent.length >= RATE_MAX) {
-    hits.set(ip, recent);
+function limited(key: string, now: number, { windowMs, max }: { windowMs: number; max: number }) {
+  const recent = (hits.get(key) ?? []).filter((t) => now - t < windowMs);
+  if (recent.length >= max) {
+    hits.set(key, recent);
     return true;
   }
   recent.push(now);
-  hits.set(ip, recent);
+  hits.set(key, recent);
   // Tope de memoria: se olvidan las IP más viejas (Map conserva el orden de alta).
   while (hits.size > RATE_KEYS_MAX) hits.delete(hits.keys().next().value!);
   return false;
 }
 
+/**
+ * IP del visitante. En Vercel, `x-vercel-forwarded-for` y `x-real-ip` los pone
+ * el borde y el cliente no puede falsificarlos (Vercel sobrescribe además
+ * `x-forwarded-for`; docs «Request headers»). Fuera de Vercel, el ÚLTIMO salto
+ * de `x-forwarded-for` es el que agregó el proxy más cercano; el primero lo
+ * escribe quien quiera.
+ */
 async function clientIp() {
   const h = await headers();
-  return h.get("x-forwarded-for")?.split(",")[0]?.trim() || h.get("x-real-ip") || "unknown";
+  const vercel = h.get("x-vercel-forwarded-for")?.split(",")[0]?.trim();
+  if (vercel) return vercel;
+  const real = h.get("x-real-ip")?.trim();
+  if (real) return real;
+  const hops = (h.get("x-forwarded-for") ?? "").split(",").map((x) => x.trim()).filter(Boolean);
+  return hops[hops.length - 1] ?? "unknown";
 }
 
 /** Sin saltos de línea ni controles en el asunto (encabezado del correo). */
 const oneLine = (s: string) => s.replace(/[\u0000-\u001f\u007f]+/g, " ").trim();
+
+/** Sello firmado que el formulario pide al primer foco (ver src/lib/contact-stamp.ts). */
+export async function issueContactStamp(): Promise<string> {
+  return signStamp();
+}
 
 export async function sendContact(
   _prev: ContactState,
@@ -50,12 +78,18 @@ export async function sendContact(
     console.info("[contact] descartado: campo trampa lleno");
     return { status: "success" };
   }
-  // 2) Tiempo mínimo de llenado. Lo mide el cliente (reloj monotónico, sin
-  //    desfase con el servidor); sin JS no llega y no se juzga.
-  const elapsed = Number(formData.get(ELAPSED_FIELD));
-  if (formData.has(ELAPSED_FIELD) && (!Number.isFinite(elapsed) || elapsed < MIN_FILL_MS)) {
-    console.info("[contact] descartado: enviado en menos de", MIN_FILL_MS, "ms");
-    return { status: "success" };
+  // 2) Sello firmado: con JS siempre llega. Si llega, tiene que ser válido y
+  //    tener entre 3 s y 2 h; si no llega (sin JS o un bot que lo omite), el
+  //    envío sigue pero con el rate limit estricto.
+  const now = Date.now();
+  const stamp = formData.get(STAMP_FIELD);
+  const stamped = typeof stamp === "string" && stamp.length > 0;
+  if (stamped) {
+    const age = stampAge(stamp, now);
+    if (age === null || age < MIN_FILL_MS || age > MAX_STAMP_AGE_MS) {
+      console.info("[contact] descartado: sello", age === null ? "inválido" : `de ${age} ms`);
+      return { status: "success" };
+    }
   }
 
   const name = String(formData.get("name") || "").trim();
@@ -67,8 +101,9 @@ export async function sendContact(
     return { status: "error", reason: "invalid" };
   }
 
-  // 4) Rate limit por IP.
-  if (limited(await clientIp(), Date.now())) {
+  // 4) Rate limit por IP (más estricto sin sello).
+  const tier = stamped ? "normal" : "strict";
+  if (limited(`${tier}:${await clientIp()}`, now, RATE[tier])) {
     return { status: "error", reason: "rate" };
   }
 

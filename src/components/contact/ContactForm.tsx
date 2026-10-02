@@ -1,12 +1,14 @@
 "use client";
 
 import { startTransition, useActionState, useEffect, useRef, useState, type FormEvent } from "react";
-import { sendContact, type ContactState } from "@/app/actions/contact";
+import { issueContactStamp, sendContact, type ContactState } from "@/app/actions/contact";
 import { DEMO_REQUEST_EVENT } from "@/components/projects/DemoRequestLink";
 import {
   checkFields,
   CONTACT_MAX,
-  ELAPSED_FIELD,
+  MAX_STAMP_AGE_MS,
+  MIN_FILL_MS,
+  STAMP_FIELD,
   HONEYPOT_FIELD,
   type Field,
   type FieldError,
@@ -61,11 +63,39 @@ export function ContactForm({ t, email }: { t: Texts; email: string }) {
   const [phase, setPhase] = useState<Phase>("idle");
   // El estado de la acción al enviar: solo un estado NUEVO cierra el viaje.
   const sentFrom = useRef<ContactState | undefined>(undefined);
-  /** Cuándo se montó el formulario (reloj monotónico): antiespam por tiempo de llenado. */
-  const mountedAt = useRef(0);
-  useEffect(() => {
-    mountedAt.current = performance.now();
-  }, []);
+  /**
+   * Sello firmado por el servidor (antiespam por tiempo, src/lib/contact-stamp.ts):
+   * se pide al primer foco dentro del formulario. `at` es el reloj local de
+   * cuando llegó, para saber si ya tiene los 3 s mínimos o si caducó.
+   */
+  const stamp = useRef<{ token: string; at: number } | null>(null);
+  const stampReq = useRef<Promise<void> | null>(null);
+  const [stamping, setStamping] = useState(false);
+  const requestStamp = () => {
+    stampReq.current ??= issueContactStamp()
+      .then((token) => {
+        stamp.current = { token, at: Date.now() };
+      })
+      .catch(() => {
+        // Sin sello el envío sigue (el servidor aplica el límite estricto).
+      })
+      .finally(() => {
+        stampReq.current = null;
+      });
+    return stampReq.current;
+  };
+  /** Un sello válido al enviar: si falta o está por caducar se pide otro, y se espera a que cumpla los 3 s. */
+  const ensureStamp = async () => {
+    if (!stamp.current || Date.now() - stamp.current.at > MAX_STAMP_AGE_MS - 20 * 60_000) {
+      stamp.current = null;
+      await requestStamp();
+    }
+    const s = stamp.current;
+    if (!s) return null;
+    const wait = MIN_FILL_MS + 150 - (Date.now() - s.at);
+    if (wait > 0) await new Promise((r) => window.setTimeout(r, wait));
+    return s.token;
+  };
 
   /**
    * Viaje del paquete por el cable (solo visual, v3): el envío real es la
@@ -120,8 +150,9 @@ export function ContactForm({ t, email }: { t: Texts; email: string }) {
   // Con JS se despacha a mano: un <form action> de React 19 vacía los campos al
   // terminar la acción, y un envío fallido no puede costarle el mensaje a nadie.
   // Sin JS sigue funcionando el `action` del formulario.
-  const onSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    if (stamping || pending) return;
     const form = e.currentTarget;
     const found = validate(form);
     setErrors(found);
@@ -131,10 +162,13 @@ export function ContactForm({ t, email }: { t: Texts; email: string }) {
       return;
     }
     const data = new FormData(form);
-    data.set(ELAPSED_FIELD, String(Math.round(performance.now() - mountedAt.current)));
     sentFrom.current = state;
     setPhase("sending");
     travel(WAIT_AT, 420, EASE_IO);
+    setStamping(true);
+    const token = await ensureStamp();
+    setStamping(false);
+    if (token) data.set(STAMP_FIELD, token);
     startTransition(() => action(data));
   };
 
@@ -152,9 +186,9 @@ export function ContactForm({ t, email }: { t: Texts; email: string }) {
           type="submit"
           form="contact-form"
           className="btn btn--primary btn--lg form__submit magnetic"
-          disabled={pending}
+          disabled={pending || stamping}
         >
-          {pending ? t.sending : t.send}
+          {pending || stamping ? t.sending : t.send}
         </button>
       )}
       <div className="wire" ref={wireRef} aria-hidden>
@@ -201,7 +235,17 @@ export function ContactForm({ t, email }: { t: Texts; email: string }) {
 
   return (
     <div className="cform">
-    <form id="contact-form" ref={formRef} className="form" action={action} onSubmit={onSubmit} noValidate>
+    <form
+      id="contact-form"
+      ref={formRef}
+      className="form"
+      action={action}
+      onSubmit={onSubmit}
+      onFocus={() => {
+        if (!stamp.current) requestStamp();
+      }}
+      noValidate
+    >
       {serverFailed && (
         <div ref={errorRef} className="notice notice--error" role="alert" tabIndex={-1}>
           <p>
