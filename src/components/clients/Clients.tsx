@@ -1,4 +1,6 @@
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
+import { ArrowRight } from "lucide-react";
+import { caseBySlug, caseHref } from "@/data/cases";
 import { clients } from "@/data/clients";
 import type { Client } from "@/data/types";
 import { SIZES, SLOT } from "@/lib/media";
@@ -18,6 +20,8 @@ export async function Clients() {
   const s = await getTranslations("status");
   const c = await getTranslations("common");
   const m = await mediaText();
+  const cu = await getTranslations("cases.ui");
+  const locale = await getLocale();
 
   const media = (cl: Client) => {
     const frame = {
@@ -119,6 +123,13 @@ export async function Clients() {
                   )}
 
                   <div className="card__actions">
+                    {caseBySlug(cl.id) && (
+                      <a className="link case-cta" href={caseHref(locale, cl.id)}>
+                        {cu("viewCase")}
+                        <span className="sr-only">: {cl.name}</span>
+                        <ArrowRight className="link__icon" strokeWidth={1.5} aria-hidden />
+                      </a>
+                    )}
                     {cl.url && (
                       <TextLink href={cl.url} external newTabLabel={m.newTab}>
                         {t("visit")}

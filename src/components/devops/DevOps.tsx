@@ -1,8 +1,9 @@
 import { getLocale, getTranslations } from "next-intl/server";
-import { Check } from "lucide-react";
+import { ArrowRight, Check } from "lucide-react";
 import { listOrder, nodes, STEP_NODES } from "@/data/infra";
 import { incidentSteps, pipelineRows } from "@/data/devops";
 import { statusSites } from "@/data/status";
+import { postmortemHref } from "@/data/cases";
 import { InfraStage, type DiagramText, type NodeText } from "./InfraDiagram";
 import { CapabilityBento, CapabilitySheet, PipelineTable } from "./Capabilities";
 import { LiveStatus, type LiveText } from "./LiveStatus";
@@ -52,6 +53,7 @@ export async function DevOps() {
   const t = await getTranslations("devops");
   const inf = await getTranslations("infra");
   const locale = await getLocale();
+  const cases = await getTranslations("cases.ui");
   const { hosts, ...live } = t.raw("live") as LiveText & { hosts: Record<string, string> };
   const liveSites = statusSites.map((s) => ({ id: s.id, name: s.name, host: hosts[s.host] }));
 
@@ -155,6 +157,12 @@ export async function DevOps() {
               {t("incident.title")}
             </h3>
             <p className="ink-2">{t("incident.lead")}</p>
+            <p className="incident__more">
+              <a className="link case-cta" href={postmortemHref(locale)}>
+                {cases("postmortemLink")}
+                <ArrowRight className="link__icon" strokeWidth={1.5} aria-hidden />
+              </a>
+            </p>
           </header>
           {/* data-fill: con motion, la línea se llena con el scroll (circuit.ts). */}
           <ol className="incident__steps" data-fill>

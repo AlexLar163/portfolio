@@ -1,4 +1,6 @@
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
+import { ArrowRight } from "lucide-react";
+import { caseBySlug, caseHref } from "@/data/cases";
 import { featured } from "@/data/showcase";
 import type { MediaRef, Showcase } from "@/data/types";
 import { resolveImage, resolveVideo } from "@/lib/media";
@@ -17,6 +19,8 @@ export async function Featured() {
   const l = await getTranslations("labels");
   const c = await getTranslations("common");
   const m = await mediaText();
+  const cu = await getTranslations("cases.ui");
+  const locale = await getLocale();
 
   const img = (ref: MediaRef, alt: string): LayerImage | undefined => {
     const r = resolveImage(ref);
@@ -124,6 +128,15 @@ export async function Featured() {
                   <TechList items={p.tech} />
                 </p>
                 <p className="feature__line t-lead">{t(`items.${p.id}.summary`)}</p>
+                {caseBySlug(p.id) && (
+                  <p className="feature__case">
+                    <a className="link case-cta" href={caseHref(locale, p.id)}>
+                      {cu("viewCase")}
+                      <span className="sr-only">: {name}</span>
+                      <ArrowRight className="link__icon" strokeWidth={1.5} aria-hidden />
+                    </a>
+                  </p>
+                )}
               </header>
               <FeatureBody
                 name={name}
@@ -137,6 +150,8 @@ export async function Featured() {
                   tabs: c("gallery", { name }),
                 }}
               />
+              {/* Imágenes de un diseño anterior del pipeline (CASOS.md R3): se publican con este pie. */}
+              {caseBySlug(p.id)?.heroIllustrative && <p className="t-small ink-3 feature__note">{cu("illustrative")}</p>}
             </article>
           );
         })}
