@@ -991,7 +991,9 @@
     "wire": {
       "from": "you",
       "to": "alex"
-    }
+    },
+    "errRate": "Several messages arrived in a row from your connection. Wait a few minutes or email me directly at",
+    "errTooLong": "That is too long: the limit is {max} characters."
   },
   "footer": {
     "rights": "© 2026 Alex Largo · Fullstack & DevOps Engineer",

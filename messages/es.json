@@ -990,7 +990,9 @@
     "wire": {
       "from": "tú",
       "to": "alex"
-    }
+    },
+    "errRate": "Llegaron varios mensajes seguidos desde tu conexión. Espera unos minutos o escríbeme directo a",
+    "errTooLong": "Es demasiado largo: el máximo es {max} caracteres."
   },
   "footer": {
     "rights": "© 2026 Alex Largo · Fullstack & DevOps Engineer",

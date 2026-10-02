@@ -17,10 +17,12 @@ export async function Contact() {
   const keys = [
     "name", "email", "message", "send", "sending", "success", "errorSend", "errName",
     "errEmail", "errMessage", "namePlaceholder", "emailPlaceholder", "messagePlaceholder",
-    "copy", "copied",
+    "copy", "copied", "errRate",
   ] as const;
   const texts = {
     ...(Object.fromEntries(keys.map((k) => [k, t(k)])) as Record<(typeof keys)[number], string>),
+    // Plantilla con {max}: la completa el formulario según el campo.
+    errTooLong: t.raw("errTooLong") as string,
     wireFrom: t("wire.from"),
     wireTo: t("wire.to"),
   };

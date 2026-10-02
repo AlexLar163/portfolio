@@ -3,6 +3,14 @@
 import { startTransition, useActionState, useEffect, useRef, useState, type FormEvent } from "react";
 import { sendContact, type ContactState } from "@/app/actions/contact";
 import { DEMO_REQUEST_EVENT } from "@/components/projects/DemoRequestLink";
+import {
+  checkFields,
+  CONTACT_MAX,
+  ELAPSED_FIELD,
+  HONEYPOT_FIELD,
+  type Field,
+  type FieldError,
+} from "@/lib/contact-rules";
 import { CopyEmail } from "./CopyEmail";
 
 type Texts = {
@@ -16,6 +24,9 @@ type Texts = {
   errName: string;
   errEmail: string;
   errMessage: string;
+  errRate: string;
+  /** «… máximo {max} caracteres» */
+  errTooLong: string;
   namePlaceholder: string;
   emailPlaceholder: string;
   messagePlaceholder: string;
@@ -32,22 +43,16 @@ const EASE_OUT = "cubic-bezier(0.16, 1, 0.3, 1)";
 /** Hasta dónde viaja el paquete mientras la acción del servidor no responde. */
 const WAIT_AT = 0.72;
 
-type Field = "name" | "email" | "message";
-
-// Mismas reglas que la acción del servidor (src/app/actions/contact.ts).
-const EMAIL_RE = /^[^@\s]+@[^@\s]+\.[^@\s]+$/;
-function validate(f: HTMLFormElement): Partial<Record<Field, true>> {
-  const v = (k: Field) => String(new FormData(f).get(k) ?? "").trim();
-  const e: Partial<Record<Field, true>> = {};
-  if (v("name").length < 2) e.name = true;
-  if (!EMAIL_RE.test(v("email"))) e.email = true;
-  if (v("message").length < 5) e.message = true;
-  return e;
+// Mismas reglas que la acción del servidor (src/lib/contact-rules.ts).
+function validate(f: HTMLFormElement): Partial<Record<Field, FieldError>> {
+  const d = new FormData(f);
+  const v = (k: Field) => String(d.get(k) ?? "").trim();
+  return checkFields({ name: v("name"), email: v("email"), message: v("message") });
 }
 
 export function ContactForm({ t, email }: { t: Texts; email: string }) {
   const [state, action, pending] = useActionState<ContactState, FormData>(sendContact, null);
-  const [errors, setErrors] = useState<Partial<Record<Field, true>>>({});
+  const [errors, setErrors] = useState<Partial<Record<Field, FieldError>>>({});
   const formRef = useRef<HTMLFormElement>(null);
   const messageRef = useRef<HTMLTextAreaElement>(null);
   const successRef = useRef<HTMLDivElement>(null);
@@ -56,6 +61,11 @@ export function ContactForm({ t, email }: { t: Texts; email: string }) {
   const [phase, setPhase] = useState<Phase>("idle");
   // El estado de la acción al enviar: solo un estado NUEVO cierra el viaje.
   const sentFrom = useRef<ContactState | undefined>(undefined);
+  /** Cuándo se montó el formulario (reloj monotónico): antiespam por tiempo de llenado. */
+  const mountedAt = useRef(0);
+  useEffect(() => {
+    mountedAt.current = performance.now();
+  }, []);
 
   /**
    * Viaje del paquete por el cable (solo visual, v3): el envío real es la
@@ -104,8 +114,7 @@ export function ContactForm({ t, email }: { t: Texts; email: string }) {
   // devuelve al aviso (éxito o error del servidor), nunca se pierde (QA v3).
   useEffect(() => {
     if (state?.status === "success") successRef.current?.focus();
-    else if (state?.status === "error" && (state.reason === "config" || state.reason === "send"))
-      errorRef.current?.focus();
+    else if (state?.status === "error" && state.reason !== "invalid") errorRef.current?.focus();
   }, [state]);
 
   // Con JS se despacha a mano: un <form action> de React 19 vacía los campos al
@@ -122,6 +131,7 @@ export function ContactForm({ t, email }: { t: Texts; email: string }) {
       return;
     }
     const data = new FormData(form);
+    data.set(ELAPSED_FIELD, String(Math.round(performance.now() - mountedAt.current)));
     sentFrom.current = state;
     setPhase("sending");
     travel(WAIT_AT, 420, EASE_IO);
@@ -169,12 +179,15 @@ export function ContactForm({ t, email }: { t: Texts; email: string }) {
     );
   }
 
-  const serverFailed = state?.status === "error" && (state.reason === "config" || state.reason === "send");
+  const serverFailed = state?.status === "error" && state.reason !== "invalid";
   const errMsg: Record<Field, string> = { name: t.errName, email: t.errEmail, message: t.errMessage };
+  const errText = (k: Field) =>
+    errors[k] === "long" ? t.errTooLong.replace("{max}", String(CONTACT_MAX[k])) : errMsg[k];
   const fieldProps = (k: Field) => ({
     id: `f-${k}`,
     name: k,
     className: "input",
+    maxLength: CONTACT_MAX[k],
     "aria-invalid": errors[k] ? (true as const) : undefined,
     "aria-describedby": errors[k] ? `f-${k}-err` : undefined,
     onInput: () => errors[k] && setErrors((prev) => ({ ...prev, [k]: undefined })),
@@ -182,7 +195,7 @@ export function ContactForm({ t, email }: { t: Texts; email: string }) {
   const err = (k: Field) =>
     errors[k] ? (
       <p id={`f-${k}-err`} className="field__error">
-        {errMsg[k]}
+        {errText(k)}
       </p>
     ) : null;
 
@@ -192,16 +205,19 @@ export function ContactForm({ t, email }: { t: Texts; email: string }) {
       {serverFailed && (
         <div ref={errorRef} className="notice notice--error" role="alert" tabIndex={-1}>
           <p>
-            {t.errorSend} <a className="link" href={`mailto:${email}`}>{email}</a>
+            {state?.reason === "rate" ? t.errRate : t.errorSend}{" "}
+            <a className="link" href={`mailto:${email}`}>{email}</a>
           </p>
           <p>
             <CopyEmail email={email} copy={t.copy} copied={t.copied} />
           </p>
         </div>
       )}
-      <div className="hp" aria-hidden="true">
-        <label htmlFor="f-company">Company</label>
-        <input id="f-company" type="text" name="company" tabIndex={-1} autoComplete="off" />
+      {/* Campo trampa: fuera del árbol de accesibilidad (aria-hidden + inert), fuera
+          del orden de foco y sin autocompletado; solo un bot lo llena. */}
+      <div className="hp" aria-hidden="true" inert>
+        <label htmlFor="f-hp">No completes este campo</label>
+        <input id="f-hp" type="text" name={HONEYPOT_FIELD} tabIndex={-1} autoComplete="off" />
       </div>
       <div className="field">
         <label htmlFor="f-name">{t.name}</label>
