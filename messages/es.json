@@ -1464,7 +1464,7 @@
     },
     "impact": [
       "Todo lo que corría en el VPS quedó fuera de servicio: el pipeline de automatización, n8n, el panel de control y los sitios demo.",
-      "Ningún sitio en producción resultó afectado.",
+      "Lo que corre fuera del VPS no se vio afectado.",
       "Sin pérdida de datos en n8n: la base se rescató íntegra.",
       "Dos despliegues personales que solo existían como build copiado al servidor no se pudieron rescatar."
     ],

@@ -1465,7 +1465,7 @@
     },
     "impact": [
       "Everything on the VPS went down: the automation pipeline, n8n, the control panel and the demo sites.",
-      "No production site was affected.",
+      "Nothing running outside the VPS was affected.",
       "No n8n data loss: its database was rescued intact.",
       "Two personal deployments that existed only as builds copied to the server could not be rescued."
     ],
