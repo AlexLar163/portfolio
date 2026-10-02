@@ -153,7 +153,7 @@
         },
         "rebuild": {
           "title": "Rebuild from scratch",
-          "text": "The server was brought back up with the provisioning script."
+          "text": "The server was rebuilt from scratch with the same hardening applied."
         },
         "harden": {
           "title": "Hardening and credential rotation",
@@ -271,7 +271,7 @@
             "data": "6 flows"
           },
           {
-            "text": "In the AI agent pipeline: human approval with Wait + webhook, state in Postgres and rate limiting"
+            "text": "In the Turnia bot: state in Postgres and three-layer rate limiting. In the AI agent pipeline: human approval with Telegram buttons and a completion webhook"
           },
           {
             "text": "Express service that runs Claude Code headless in Docker, with an idle watchdog and Chromium for screenshots"
@@ -647,12 +647,12 @@
         "label": "n8n · 6 flows",
         "sub": [
           "webhooks",
-          "state in Postgres"
+          "SQLite"
         ],
-        "detail": "Six flows in production: sign-ups, bookings, bots, reminders and the weekly status. Human approval with Wait + webhook and rate limiting.",
+        "detail": "Six portfolio flows in production: sign-ups, waitlist, bookings, booking bot, reminders and the weekly status, with a 60-messages-per-minute cap on the Turnia bot. Also the AI agent pipeline's flow, with approval through Telegram buttons and a completion webhook. n8n runs on SQLite.",
         "facts": [
           "6 flows",
-          "Wait + webhook",
+          "buttons + completion webhook",
           "rate limiting"
         ]
       },
@@ -766,10 +766,10 @@
         }
       },
       "vera": {
-        "summary": "AI WhatsApp receptionist: chat mockup + n8n flows, in four industries.",
+        "summary": "WhatsApp receptionist: n8n flows ready to plug into an AI agent, with the chat mockup in four industries.",
         "highlights": [
           "Chat and dashboard mockup",
-          "n8n flows with AI",
+          "n8n flows ready for an AI agent",
           "Barbershop, diner, dental clinic and auto shop"
         ],
         "variants": {
@@ -781,7 +781,7 @@
         "steps": {
           "receptionist": {
             "title": "The receptionist",
-            "text": "Chat mockup + n8n flows with AI."
+            "text": "Chat mockup + n8n flows ready to plug into an AI agent."
           },
           "industries": {
             "title": "Four industries",
@@ -793,18 +793,18 @@
         "name": "Automation pipeline with AI agents",
         "summary": "n8n orchestrates an AI agent running in Docker; nothing goes out without human approval over chat.",
         "highlights": [
-          "6 n8n flows in production",
-          "Human approval with Wait + webhook",
-          "3 Telegram bots, Gmail and state in Postgres"
+          "AI agent in Docker, no public ports",
+          "Human approval with Telegram buttons",
+          "Persistent queue: one job at a time"
         ],
         "steps": {
           "flows": {
-            "title": "The flows",
-            "text": "6 n8n flows in production, 3 Telegram bots, Gmail and state in Postgres."
+            "title": "The flow",
+            "text": "One 37-node n8n flow, a private Telegram bot and a Docker runner with an on-disk queue."
           },
           "approval": {
             "title": "Human approval",
-            "text": "n8n orchestrates an AI agent in Docker; nothing goes out without approval over chat (Wait + webhook)."
+            "text": "n8n orchestrates an AI agent in Docker; nothing starts without approval through Telegram buttons, and a webhook reports back when done."
           }
         }
       },

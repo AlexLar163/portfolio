@@ -152,7 +152,7 @@
         },
         "rebuild": {
           "title": "Reconstrucción desde cero",
-          "text": "El servidor se volvió a levantar con el script de aprovisionamiento."
+          "text": "El servidor se reconstruyó desde cero aplicando el mismo hardening."
         },
         "harden": {
           "title": "Hardening y rotación de credenciales",
@@ -270,7 +270,7 @@
             "data": "6 flujos"
           },
           {
-            "text": "En el pipeline de agentes IA: aprobación humana con Wait + webhook, estado en Postgres y rate limiting"
+            "text": "En el bot de Turnia: estado en Postgres y rate limiting en tres capas. En el pipeline de agentes IA: aprobación humana con botones de Telegram y webhook de cierre"
           },
           {
             "text": "Servicio Express que corre Claude Code headless en Docker, con watchdog de inactividad y Chromium para capturas"
@@ -646,12 +646,12 @@
         "label": "n8n · 6 flujos",
         "sub": [
           "webhooks",
-          "estado en Postgres"
+          "SQLite"
         ],
-        "detail": "Seis flujos en producción: inscripciones, reservas, bots, recordatorios y el estado semanal. Aprobación humana con Wait + webhook y rate limiting.",
+        "detail": "Seis flujos del portafolio en producción: inscripciones, lista de espera, reservas, bot de turnos, recordatorios y el estado semanal, con tope de 60 mensajes por minuto en el bot de Turnia. También el flujo del pipeline de agentes IA, con aprobación por botones de Telegram y webhook de cierre. n8n corre sobre SQLite.",
         "facts": [
           "6 flujos",
-          "Wait + webhook",
+          "botones + webhook de cierre",
           "rate limiting"
         ]
       },
@@ -765,10 +765,10 @@
         }
       },
       "vera": {
-        "summary": "Recepcionista de WhatsApp con IA: maqueta del chat + flujos de n8n, en cuatro rubros.",
+        "summary": "Recepcionista de WhatsApp: flujos n8n listos para conectar a un agente de IA, con la maqueta del chat en cuatro rubros.",
         "highlights": [
           "Mockup del chat y del panel",
-          "Flujos de n8n con IA",
+          "Flujos n8n listos para un agente de IA",
           "Barbería, cantina, odontología y taller"
         ],
         "variants": {
@@ -780,7 +780,7 @@
         "steps": {
           "receptionist": {
             "title": "La recepcionista",
-            "text": "Maqueta del chat + flujos de n8n con IA."
+            "text": "Maqueta del chat + flujos n8n listos para conectar a un agente de IA."
           },
           "industries": {
             "title": "Cuatro rubros",
@@ -792,18 +792,18 @@
         "name": "Pipeline de automatización con agentes IA",
         "summary": "n8n orquesta un agente IA que corre en Docker; nada sale sin aprobación humana por chat.",
         "highlights": [
-          "6 flujos de n8n en producción",
-          "Aprobación humana con Wait + webhook",
-          "3 bots de Telegram, Gmail y estado en Postgres"
+          "Agente IA en Docker, sin puertos públicos",
+          "Aprobación humana con botones de Telegram",
+          "Cola persistente: un trabajo a la vez"
         ],
         "steps": {
           "flows": {
-            "title": "Los flujos",
-            "text": "6 flujos de n8n en producción, 3 bots de Telegram, Gmail y estado en Postgres."
+            "title": "El flujo",
+            "text": "Un flujo de n8n de 37 nodos, un bot de Telegram privado y un runner en Docker con cola en disco."
           },
           "approval": {
             "title": "Aprobación humana",
-            "text": "n8n orquesta un agente IA en Docker; nada sale sin aprobación por chat (Wait + webhook)."
+            "text": "n8n orquesta un agente IA en Docker; nada arranca sin aprobación con botones de Telegram, y un webhook avisa al terminar."
           }
         }
       },

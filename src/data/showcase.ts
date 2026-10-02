@@ -72,7 +72,7 @@ export const showcase: Showcase[] = [
     order: 3,
     size: "half",
     year: "2026",
-    tech: ["n8n", "Docker", "Claude Code", "Postgres", "Telegram"],
+    tech: ["n8n", "Docker", "Claude Code", "Express", "Telegram"],
     status: "internal",
     media: { main: { slug: "pipeline-ia", key: "portada" } },
   },
