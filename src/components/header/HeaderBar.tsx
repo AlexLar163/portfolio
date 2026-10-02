@@ -11,11 +11,13 @@ type Props = {
   availability: { short: string; full: string };
   labels: { home: string; primary: string; menuOpen: string; menuClose: string; lang: string };
   name: string;
+  /** En subpáginas (casos, postmortem): «/es». Las anclas apuntan a la home y la marca vuelve a ella. */
+  base?: string;
 };
 
 const useIsoLayoutEffect = typeof window === "undefined" ? useEffect : useLayoutEffect;
 
-export function HeaderBar({ sections, cv, availability, labels, name }: Props) {
+export function HeaderBar({ sections, cv, availability, labels, name, base = "" }: Props) {
   const headerRef = useRef<HTMLElement>(null);
   const listRef = useRef<HTMLUListElement>(null);
   const menuBtnRef = useRef<HTMLButtonElement>(null);
@@ -93,7 +95,7 @@ export function HeaderBar({ sections, cv, availability, labels, name }: Props) {
       <div className="shell">
         <div className="site-header__bar">
           {/* El LED cae sobre la x de la pista del circuito: la pista «sale» de aquí. */}
-          <a href="#inicio" className="brand" aria-label={labels.home}>
+          <a href={base || "#inicio"} className="brand" aria-label={labels.home}>
             <i className="brand__led" aria-hidden />
             {name}
           </a>
@@ -107,7 +109,7 @@ export function HeaderBar({ sections, cv, availability, labels, name }: Props) {
             <ul ref={listRef}>
               {sections.map((s) => (
                 <li key={s.id}>
-                  <a href={`#${s.id}`} aria-current={active === s.id ? "true" : undefined}>
+                  <a href={`${base}#${s.id}`} aria-current={active === s.id ? "true" : undefined}>
                     {s.label}
                   </a>
                 </li>
@@ -141,7 +143,7 @@ export function HeaderBar({ sections, cv, availability, labels, name }: Props) {
           <ul>
             {sections.map((s) => (
               <li key={s.id}>
-                <a href={`#${s.id}`} onClick={() => setOpen(false)}>
+                <a href={`${base}#${s.id}`} onClick={() => setOpen(false)}>
                   {s.label}
                 </a>
               </li>

@@ -1007,5 +1007,690 @@
     "text": "The address doesn't lead anywhere in the portfolio. The link may be mistyped or the page may have moved.",
     "home": "Back to home",
     "code": "404"
+  },
+  "cases": {
+    "ui": {
+      "breadcrumb": "Breadcrumb",
+      "home": "Home",
+      "cases": "Case studies",
+      "context": "Context",
+      "solution": "Solution",
+      "architecture": "Architecture",
+      "decisions": "Technical decisions",
+      "results": "Results",
+      "stack": "Stack",
+      "links": "Links",
+      "pieces": "Components",
+      "flowLabel": "{n}-step flow",
+      "tradeoff": "Trade-off",
+      "prev": "Previous case",
+      "next": "Next case",
+      "more": "More case studies",
+      "backHome": "Back to home",
+      "viewCase": "View case study",
+      "illustrative": "Illustrative diagram, sample data.",
+      "pauseFlow": "Pause the traffic",
+      "playFlow": "Resume the traffic",
+      "kind": {
+        "client": "Real client",
+        "demo": "Demo project",
+        "own-tool": "In-house tool"
+      },
+      "postmortemLink": "Read the full postmortem"
+    },
+    "items": {
+      "3destiny": {
+        "name": "3Destiny",
+        "title": "3Destiny: a corporate WordPress site, deployed on the client's own cloud",
+        "subtitle": "Custom theme without a page builder, wp-cli migration and a DNS cutover with no visible downtime",
+        "summary": "Corporate site for an Argentine augmented reality, virtual reality and AI agency. A custom WordPress theme, published on 17-Sep-2026 on the client's own AWS infrastructure, with 37 of 37 post-cutover checks passing.",
+        "context": [
+          "The agency needed to replace its previous site with one covering its four verticals (pharma, training, e-commerce, marketing), success stories with metrics, a blog and a contact form. It had to go live on its own AWS server without risking what already worked: 132 URLs from the old site, five subdomains that were out of scope, and the company email, which shares the DNS zone with the site."
+        ],
+        "solution": [
+          "A custom theme on Gutenberg + ACF, with no page builder: success stories as their own content type, one template per vertical, a blog and a form that saves to the dashboard and opens WhatsApp.",
+          "Deployment followed the sequence the client set: first the full site on a test subdomain on the same production server, validated with the final domain forced in the browser; then the client's team moved a single DNS record."
+        ],
+        "pieces": [
+          "Custom WordPress theme (PHP 8.3, Gutenberg + ACF, Rank Math)",
+          "Client's AWS EC2, accessed via SSM (Session Manager)",
+          "Route 53 (DNS) + Let's Encrypt certificate via DNS challenge, auto-renewing",
+          "wp-cli to migrate the database and rewrite the domain",
+          "Outgoing mail through Amazon's mail service"
+        ],
+        "flow": [
+          "Server backup, stored off the server",
+          "File upload with matching checksums at source and destination (230 MB)",
+          "Database import with wp-cli: 2,622 domain replacements",
+          "Validation on the test subdomain with the final domain forced",
+          "The client's team moves a single DNS record",
+          "37 external checks against live DNS: 37/37"
+        ],
+        "decisions": [
+          {
+            "title": "Custom theme, no page builder",
+            "text": "Why: full control over the HTML, which is what makes Accessibility 100 and SEO 100 possible.",
+            "tradeoff": "the team edits within the defined blocks and fields; a new layout needs development work."
+          },
+          {
+            "title": "Deploy on the client's cloud, not on my hosting",
+            "text": "Why: the client keeps ownership of its server, DNS and access; work was done through Session Manager without opening SSH.",
+            "tradeoff": "every access grant and the cutover depend on their ops team."
+          },
+          {
+            "title": "Full rehearsal on a subdomain of the same server",
+            "text": "Why: validation runs on the real machine, and the old site stays live until the minute of the cutover.",
+            "tradeoff": "it leaves temporary settings (a config block, the subdomain's certificate and DNS record) that must be removed afterwards."
+          },
+          {
+            "title": "Scripted checks before and after the cutover",
+            "text": "Why: email is what breaks most silently; MX, SPF, DKIM and DMARC were compared against a baseline taken days earlier.",
+            "tradeoff": "preparation time before the cutover."
+          },
+          {
+            "title": "Migration fixes by script, across all content",
+            "text": "Twelve images failed because of image-size names inherited from the old CMS; the script checks every post, not just the affected ones, and became part of the procedure.",
+            "tradeoff": "slower than hand-fixing the three visible posts."
+          }
+        ],
+        "results": [
+          "Live since 17-Sep-2026",
+          "37/37 checks against live DNS after cutover",
+          "132/132 old URLs redirect per the map",
+          "131/131 post images loading",
+          "22/22 real-browser tests (11 routes, mobile and desktop), no third-party requests",
+          "Email DNS records identical to baseline",
+          "Lighthouse: SEO 100 · Accessibility 100 · Best Practices 100",
+          "155 test functions in the theme's suite"
+        ],
+        "stack": [
+          "WordPress",
+          "PHP 8.3",
+          "Gutenberg + ACF",
+          "Rank Math",
+          "Vanilla JavaScript",
+          "AWS EC2 + SSM",
+          "Route 53",
+          "Let's Encrypt",
+          "wp-cli"
+        ],
+        "links": [
+          {
+            "label": "Visit the live site",
+            "href": "https://3destinyra.com"
+          }
+        ],
+        "figures": {
+          "portada": "3Destiny site home page",
+          "galeria-01": "A vertical's page",
+          "galeria-02": "Success stories with metrics",
+          "galeria-03": "The site on three phones"
+        },
+        "og": [
+          "Backup",
+          "wp-cli",
+          "DNS",
+          "37/37"
+        ]
+      },
+      "turnia": {
+        "name": "Turnia",
+        "title": "Turnia: a booking SaaS for barbershops, in three parts",
+        "subtitle": "Landing page, management app and Telegram bot on one database",
+        "summary": "A fictional portfolio product with real code and deployment: a Next.js landing page, a drag-and-drop calendar with ⌘K on Postgres, and a Telegram bot that books and reminds. Everything is live; demo data resets every night.",
+        "context": [
+          "A barbershop runs on its calendar: overlapping bookings, clients who don't confirm, last-minute changes and the day's till. Turnia is the exercise of solving that as a complete product —sell, operate and serve by chat— without duplicating business rules in three places, and with a public bot anyone can message without taking the server down."
+        ],
+        "solution": [
+          "One Next.js 16 app with Drizzle on Postgres (Neon) does all the work: per-staff calendar (create in a free slot, drag, resize, ⌘K that creates bookings from text, undo), clients, memberships and the daily till; a public booking link with real availability.",
+          "The bot is a pure state machine inside the app; n8n is only the channel between Telegram and the API."
+        ],
+        "pieces": [
+          "Next.js 16 on Vercel: landing, /app/* app, public booking and /api/bot/* API",
+          "Postgres on Neon with Drizzle ORM (serverless driver in production)",
+          "n8n: bot, reminders, public booking and waitlist flows",
+          "Caddy in front of n8n, filtering Telegram's subnets",
+          "Vercel cron to reset the demo"
+        ],
+        "flowTitle": "A booking by chat",
+        "flow": [
+          "The client messages the bot on Telegram",
+          "Caddy only lets through Telegram's subnets and bodies up to 64 KB",
+          "n8n normalizes the update (global cap of 60 per minute) and forwards it to the API with a key",
+          "The app runs the state machine and replies with text and buttons (30 per chat per hour)",
+          "The booking is saved in Postgres and shows up on the calendar",
+          "An n8n cron fetches the 24 h and 2 h reminders; the 24 h one has “Confirm” / “Change”"
+        ],
+        "decisions": [
+          {
+            "title": "The brain lives in the app; n8n is the channel",
+            "text": "Why: availability, overlap and till rules exist once and are shared by the calendar, the public booking page and the bot; moving from Telegram to WhatsApp means swapping two nodes.",
+            "tradeoff": "the app has to expose and maintain its own key-protected API."
+          },
+          {
+            "title": "Three layers of defense for a public bot",
+            "text": "Edge: Caddy returns 403 outside Telegram's subnets. n8n: a global cap of 60 updates per minute. App: 30 messages per chat per hour and 200 per location per day, answered with 429.",
+            "tradeoff": "if Telegram adds IP ranges, the bot stops answering until the filter is updated."
+          },
+          {
+            "title": "Idempotent reminders",
+            "text": "When listing, the API creates the message as “pending” and never repeats it for the same booking. Why: the cron can run twice without sending duplicates.",
+            "tradeoff": "one more state table in Postgres."
+          },
+          {
+            "title": "A public demo that resets itself",
+            "text": "A daily Vercel cron (07:00 UTC) calls an endpoint with Bearer CRON_SECRET and restores only the demo location to its seed. Why: anyone can log in and edit without leaving it broken.",
+            "tradeoff": "whatever a visitor does is wiped that night."
+          },
+          {
+            "title": "Overlap rules on the server, optimistic UI",
+            "text": "Dragging moves the booking instantly; if the server detects an overlap, the card snaps back with a notice.",
+            "tradeoff": "the client has to maintain the revert logic."
+          }
+        ],
+        "results": [
+          "Landing, app and bot live (HTTP 200 on 2-Oct-2026)",
+          "No layout clipping across 7 widths, 320 to 2560 px",
+          "0 console errors and warnings; 0 external requests",
+          "Green build, clean tsc and eslint",
+          "Automated bot test: 401, 400, full booking, non-duplicated reminder, 409 for a foreign chat, and both limits (31 real calls)"
+        ],
+        "stack": [
+          "Next.js 16",
+          "React 19",
+          "TypeScript",
+          "Tailwind 4",
+          "Drizzle ORM",
+          "Postgres (Neon)",
+          "Server Actions",
+          "n8n",
+          "Telegram Bot API",
+          "Caddy",
+          "Vercel"
+        ],
+        "links": [
+          {
+            "label": "See the landing page",
+            "href": "https://turnia-saas.vercel.app"
+          },
+          {
+            "label": "Open the app",
+            "href": "https://turnia-saas.vercel.app/entrar"
+          },
+          {
+            "label": "Try the bot",
+            "href": "https://t.me/TurniaTurnos_bot"
+          }
+        ],
+        "figures": {
+          "landing-portada": "Turnia landing page",
+          "app-portada": "The app's calendar on desktop",
+          "app-movil": "The app's calendar on a phone",
+          "bot-portada": "Telegram bot panel",
+          "bot-movil": "The bot on a phone"
+        },
+        "solutionParts": {
+          "landing": "Landing",
+          "app": "App",
+          "bot": "Bot"
+        },
+        "og": [
+          "Telegram",
+          "Caddy",
+          "n8n",
+          "Next.js · Postgres"
+        ]
+      },
+      "vera": {
+        "name": "Vera",
+        "title": "Vera: a WhatsApp receptionist for service businesses",
+        "subtitle": "WhatsApp receptionist: n8n flows ready to plug into an AI agent",
+        "summary": "A WhatsApp-style mockup shows how Vera would serve a barbershop, a takeaway kitchen, a dental clinic and a garage, and how each record lands in the business's system. Behind it, four n8n flows that talk to the WhatsApp Cloud API and an AI agent.",
+        "context": [
+          "Service businesses get the same WhatsApp questions all day: prices, hours, bookings, orders, “is my car ready?”. Answering by hand eats into service time; a bot that makes up prices or talks over the staff is worse. Each industry changes what can be done by chat."
+        ],
+        "solution": [
+          "Two pieces. The mockup: a scripted demo (no backend, no language model) that walks through each industry and moves from the chat to the business's screen —calendar, patient record, work-order board or kitchen ticket— with the new record highlighted.",
+          "The n8n flows: the main flow receives Meta's webhook, loads the industry preset, applies an anti-abuse guard, asks the agent and runs at most one tool against the business API; plus a sub-flow that transcribes voice notes, reminders every 15 minutes using approved templates, and status-change notifications."
+        ],
+        "pieces": [
+          "WhatsApp Cloud API (Meta): inbound webhook and templates",
+          "n8n: main flow (53 nodes), audio, reminders, status notifications",
+          "Agent service (tool-calling LLM) behind its own HTTP contract",
+          "Business API: catalog, availability, book, cancel, menu, orders",
+          "Per-industry JSON presets (prompt, tools, copy, templates)"
+        ],
+        "flow": [
+          "A message (text or voice note) arrives via the WhatsApp webhook",
+          "n8n normalizes it, loads the industry preset and runs the anti-abuse guard",
+          "The agent replies, requests a tool, or hands off to a person",
+          "If it requested a tool, n8n calls the business API and returns the result",
+          "The agent writes the final reply and it goes out on WhatsApp",
+          "Every 15 min, reminders go out with “Confirm” / “Change”"
+        ],
+        "decisions": [
+          {
+            "title": "One tool round per message",
+            "text": "If the agent asks for a second tool, it hands off to a person instead of chaining calls. Why: no risk of loops or runaway cost.",
+            "tradeoff": "a two-step request ends up with a human."
+          },
+          {
+            "title": "An industry is a data preset, not another flow",
+            "text": "Prompt, tools, copy and templates live in one JSON per industry, and a validator checks every tool has its branch and the data matches the mockup.",
+            "tradeoff": "after editing a preset it has to be re-embedded into the flows with a script."
+          },
+          {
+            "title": "The agent behind an HTTP contract",
+            "text": "The flow defines request and response; the model can come from any provider.",
+            "tradeoff": "that service has to be hosted separately."
+          },
+          {
+            "title": "The bot steps back when a person takes over",
+            "text": "On hand-off the chat is paused for 4 hours so the bot doesn't compete with staff.",
+            "tradeoff": "during that pause the bot stays silent in that chat even if the person is done."
+          },
+          {
+            "title": "Anti-abuse guard in workflow state, no database",
+            "text": "A per-minute message cap across all chats and a notice to the manager at most once an hour.",
+            "tradeoff": "fine for one instance; with several it would have to move into the API."
+          }
+        ],
+        "results": [
+          "142 layout measurements, 0 failures (16 widths in the chat; 8 widths from 320 to 2560 px on the platform view)",
+          "All 8 walkthroughs (4 industries × 2 branches) complete and the record shows up in the system",
+          "61 contrast pairs, all ≥ 4.9:1",
+          "Site under 330 KB, 0 external requests, 0 console errors",
+          "All 4 flows imported into n8n 2.27.4 and run end to end against mock servers"
+        ],
+        "resultsNote": "It has not been tested against the real Meta API or a real agent.",
+        "stack": [
+          "Dependency-free HTML/CSS/JS",
+          "n8n",
+          "WhatsApp Cloud API",
+          "tool-calling LLM agent (HTTP contract)",
+          "Node.js (validators and tests)",
+          "Playwright"
+        ],
+        "links": [],
+        "linksNote": "No public link: the mockup isn't published; it's shown with screenshots and video.",
+        "variants": {
+          "barberia": "Barbershop",
+          "cantina": "Takeaway kitchen",
+          "odontologia": "Dental clinic",
+          "taller": "Garage"
+        },
+        "og": [
+          "WhatsApp",
+          "n8n",
+          "AI agent",
+          "Business API"
+        ]
+      },
+      "pipeline-ia": {
+        "name": "AI agent automation pipeline",
+        "title": "AI agent automation pipeline",
+        "subtitle": "n8n orchestrates an AI agent in Docker; nothing runs without human approval in chat",
+        "summary": "A system running 24/7 on my VPS: requests come in through chat, an AI agent analyzes them inside a container and returns a summary with buttons. Long-running tasks start only once a person approves.",
+        "context": [
+          "Analyzing each request by hand takes time and judgment varies from day to day. Some actions are also long (research, build, deploy) and shouldn't go out without someone reviewing them. Everything had to fit on a 1 vCPU / 2 GB RAM server, where an AI agent can run out of memory mid-task."
+        ],
+        "solution": [
+          "n8n receives the message and calls an in-house runner (Express) that executes a headless AI agent inside Docker, with the same instructions and tools I use locally. The result goes back to the chat with buttons; approving queues a long task that reports back with a link when done.",
+          "The runner protects the machine: one job at a time, a persistent queue, timeouts, an inactivity watchdog and a switch to a lighter model if the system kills it for memory."
+        ],
+        "pieces": [
+          "Private Telegram bot: the router silently drops any unauthorized chat",
+          "Caddy: automatic TLS, the only public entry point",
+          "n8n: one 37-node flow (router, action switch, runner calls, replies, completion webhook)",
+          "Express runner in Docker, no published ports; requires a secret header",
+          "Headless AI agent + headless Chromium for screenshots + official docs via MCP",
+          "Disk-persisted queue that survives restarts"
+        ],
+        "flow": [
+          "A request reaches the Telegram bot",
+          "n8n validates the chat and picks the action",
+          "n8n calls the runner over Docker's internal network, with a secret header",
+          "The runner queues and runs the AI agent with a timeout and inactivity watchdog",
+          "The analysis returns to the chat with buttons: approve, change or discard",
+          "On approval, the long task is queued in the background (returns 202) and reports progress",
+          "When done, a header-validated webhook posts the link in the chat"
+        ],
+        "decisions": [
+          {
+            "title": "Human in the loop, always",
+            "text": "Nothing goes out or starts without a button press. Why: the agent supports decisions, it doesn't make them.",
+            "tradeoff": "the system isn't fully autonomous and waits for someone to answer."
+          },
+          {
+            "title": "Runner with no public ports",
+            "text": "Only n8n reaches it over Docker's internal network, with a secret header; the completion webhook validates the same header.",
+            "tradeoff": "debugging means exec-ing into the container."
+          },
+          {
+            "title": "One job at a time, persisted queue",
+            "text": "Two agents don't fit in 2 GB; the queue is saved to disk and async tasks resume on their own after a restart.",
+            "tradeoff": "when there's a queue, the wait shows."
+          },
+          {
+            "title": "Inactivity watchdog",
+            "text": "If the agent emits no event for 8 minutes, it's stopped. It came out of three jobs that died at the 25-minute mark waiting on a hung Chromium: the worst case dropped to about 8.",
+            "tradeoff": "a legitimate task that stays silent for more than 8 minutes is also stopped."
+          },
+          {
+            "title": "Model fallback on out-of-memory",
+            "text": "If the system kills the agent without an error (the typical OOM-killer signature on 2 GB), it retries with a lighter model, resuming the partial work.",
+            "tradeoff": "that case completes on a less capable model."
+          }
+        ],
+        "results": [
+          "Runs 24/7 on a 1 vCPU / 2 GB VPS",
+          "Worst case for a hung job: from 25 to ~8 minutes",
+          "221 cases processed and stored as of 8-Sep-2026",
+          "Rotated logs (10 MB × 3) and n8n history capped at 7 days / 5,000 runs",
+          "Restored the same day after the 8-Sep incident, with its database intact"
+        ],
+        "stack": [
+          "n8n",
+          "Node.js 22 + Express",
+          "Docker Compose",
+          "Caddy",
+          "headless AI agent (Claude Code)",
+          "headless Chromium",
+          "Telegram Bot API",
+          "GitHub CLI",
+          "Vercel CLI"
+        ],
+        "links": [],
+        "linksNote": "No public link: it's a private system, shown with screenshots.",
+        "figures": {
+          "portada": "The pipeline in six steps",
+          "galeria-01": "The flow in n8n"
+        },
+        "og": [
+          "Telegram",
+          "n8n",
+          "Runner",
+          "AI agent"
+        ]
+      }
+    }
+  },
+  "postmortem": {
+    "slugTitle": "September 2026 incident postmortem",
+    "eyebrow": "Postmortem",
+    "title": "Incident response: brute-force intrusion on the VPS (8-Sep-2026)",
+    "subtitle": "Blameless format. Times in UTC, taken from the proxy logs and the response session.",
+    "summary": "On 7-Sep-2026 an attacker brute-forced the password of an administrator account on a WordPress staging site running on my VPS, uploaded their own plugins and dropped 21 executables. For about 15 hours they consumed CPU and RAM until the machine became unusable. The intrusion never left the site's container. Data was rescued, the server was rebuilt from scratch on a new machine, the configuration was hardened and the exposed credentials were rotated. Core services were back in under 5 hours from detection.",
+    "metaDescription": "Blameless postmortem of a brute-force intrusion into a WordPress staging site: UTC timeline, root cause, containment, recovery, hardening and preventive actions.",
+    "ui": {
+      "summary": "Summary and impact",
+      "impact": "Impact",
+      "durations": "Duration",
+      "timeline": "Timeline (UTC)",
+      "rootCause": "Detection and root cause",
+      "detection": "Detection",
+      "cause": "Root cause",
+      "factors": "Factors that widened the impact",
+      "containment": "Containment",
+      "recovery": "Recovery",
+      "hardening": "Hardening",
+      "hardeningVerified": "Applied on 8-Sep (verified on the running system, not on the file)",
+      "before": "Before",
+      "after": "After",
+      "appliedLater": "Applied afterwards",
+      "pending": "Pending",
+      "rotation": "Credential rotation (driven by evidence, not reflex)",
+      "rotated": "Rotated",
+      "notRotated": "Not rotated, with reasons",
+      "retro": "Retrospective",
+      "wentWell": "What went well",
+      "wentBad": "What didn't go well",
+      "actions": "Preventive actions",
+      "action": "Action",
+      "status": "Status",
+      "lessons": "Lessons",
+      "statuses": {
+        "done": "Done",
+        "pending": "Pending",
+        "accepted": "Accepted risk"
+      },
+      "phases": {
+        "intrusion": "Intrusion",
+        "detection": "Detection",
+        "containment": "Containment",
+        "recovery": "Recovery",
+        "hardening": "Hardening"
+      },
+      "seeDiagram": "See the infrastructure diagram"
+    },
+    "impact": [
+      "Everything on the VPS went down: the automation pipeline, n8n, the control panel and the demo sites.",
+      "No client production site ran on that machine.",
+      "No n8n data loss: its database was rescued intact.",
+      "Two personal deployments that existed only as builds copied to the server could not be rescued."
+    ],
+    "durations": [
+      {
+        "value": "15 h 42 min",
+        "label": "of undetected intrusion"
+      },
+      {
+        "value": "54 min",
+        "label": "from detection to containment"
+      },
+      {
+        "value": "4 h 52 min",
+        "label": "until n8n was back"
+      },
+      {
+        "value": "6 h 43 min",
+        "label": "until the last service"
+      }
+    ],
+    "timeline": [
+      {
+        "when": "7-Sep 22:55:58 → 22:56:09",
+        "what": "Seven failed attempts on wp-login.php, preceded by automated probing of other routes",
+        "phase": "intrusion"
+      },
+      {
+        "when": "7-Sep 22:56:11",
+        "what": "Access: the password falls in 13 seconds",
+        "phase": "intrusion"
+      },
+      {
+        "when": "7-Sep 22:56:18",
+        "what": "Straight to the plugin upload screen",
+        "phase": "intrusion"
+      },
+      {
+        "when": "7-Sep 22:56 → 8-Sep 12:33",
+        "what": "Three foreign plugins and 21 hidden executables appear in core folders",
+        "phase": "intrusion"
+      },
+      {
+        "when": "8-Sep ~14:38",
+        "what": "Detection: the whole server is reported down",
+        "phase": "detection",
+        "key": true
+      },
+      {
+        "when": "8-Sep 14:39 – 14:49",
+        "what": "A single SSH login manages to measure load of 120 to 157 on 1 vCPU, 53 MB of free RAM and full swap",
+        "phase": "detection"
+      },
+      {
+        "when": "8-Sep ~15:32",
+        "what": "Containment: machine powered off, snapshot kept as evidence",
+        "phase": "containment",
+        "key": true
+      },
+      {
+        "when": "8-Sep 16:38",
+        "what": "Five-question forensic plan, all read-only",
+        "phase": "containment"
+      },
+      {
+        "when": "8-Sep 17:07 – 17:12",
+        "what": "Forensics from the recovery environment, disk mounted and the compromised system never booted: vector, scope and timeline",
+        "phase": "containment"
+      },
+      {
+        "when": "8-Sep 17:20 – 17:22",
+        "what": "n8n database rescued (integrity_check = ok) along with config that wasn't in git",
+        "phase": "recovery"
+      },
+      {
+        "when": "8-Sep ~19:30",
+        "what": "n8n and the pipeline back on a new server",
+        "phase": "recovery",
+        "key": true
+      },
+      {
+        "when": "8-Sep 19:57 – 20:23",
+        "what": "From a temporary copy of the snapshot: clean-check of the other sites and copy of their volumes; the affected site is not restored",
+        "phase": "recovery"
+      },
+      {
+        "when": "8-Sep ~20:55",
+        "what": "The affected site rebuilt from scratch from its repository",
+        "phase": "recovery"
+      },
+      {
+        "when": "8-Sep ~21:10",
+        "what": "Hardening applied and verified",
+        "phase": "hardening"
+      },
+      {
+        "when": "8-Sep 21:21",
+        "what": "Control panel back, now as a container",
+        "phase": "recovery",
+        "key": true
+      }
+    ],
+    "detection": "No alert caught it: the machine sat at 100 % for about 12 hours before anyone noticed. The alert that did exist reported the symptom (service down), not the cause.",
+    "cause": "The staging site's wp-login.php was exposed to the internet with no rate limit on login attempts, and the site had an administrator account with a predictable name and a weak password. Seven attempts were enough. There was no vulnerability in our own code, WordPress core or the project's plugins.",
+    "factors": [
+      "All twelve sites shared a single database user with rights over all twelve databases.",
+      "No container had a memory limit: one site ate the whole machine's RAM and took n8n down with it.",
+      "The staging site was open to the internet and shared a machine with the pipeline."
+    ],
+    "containment": [
+      "Machine powered off and snapshot kept as evidence; the compromised system was never booted again.",
+      "None of the intruder's files were executed, not even to inspect them.",
+      "Scope verified, not assumed: cron, systemd, system users and authorized keys unchanged; no container mounted the Docker socket, so there was no path to the host; the other eleven sites were clean."
+    ],
+    "recovery": [
+      "Data rescue: the n8n database (15.7 MB plus its WAL), proxy and compose config, the sites' themes (251 MB, bind-mounted and outside the volumes) and the pipeline's workspace (77 MB).",
+      "Rebuild from scratch: a new server; n8n restored with its rescued database, its 2 workflows and 2 credentials; certificates issued automatically by Caddy.",
+      "The other ten sites were copied only after passing a clean-check: zero hidden files in core, zero PHP in uploads, zero foreign plugins.",
+      "The affected site was not restored: its database was dropped (with a prior copy stored off the server) and it was rebuilt from its repository."
+    ],
+    "hardening": [
+      {
+        "before": "One database user with rights over all 12 databases",
+        "after": "One user per site, with rights only on its own; the shared one dropped"
+      },
+      {
+        "before": "No memory limit",
+        "after": "384 MB per site and 512 MB for the database"
+      },
+      {
+        "before": "Plugins could be uploaded and installed from the admin",
+        "after": "DISALLOW_FILE_MODS and DISALLOW_FILE_EDIT on; automatic minor core updates"
+      },
+      {
+        "before": "Administrator account with a predictable name",
+        "after": "The rebuilt site has no such account; new 26-character password"
+      }
+    ],
+    "appliedLater": [
+      "Rate limit on wp-login.php",
+      "Load and disk alerts",
+      "After two memory-related outages (13 and 15 September): the panel requires at least 400 MB free and load below 2 before starting a site, with at most 2 running",
+      "The agent runner gained an inactivity watchdog"
+    ],
+    "pending": [
+      "Second factor for WordPress administrators",
+      "Staging behind a password or IP allowlist"
+    ],
+    "rotated": "The database credential the sites shared, assumed read because the attacker had arbitrary PHP in the container; the affected site's passwords.",
+    "notRotated": "SSH keys (only public keys were on the server and they were unchanged); the Telegram bot token (the host's process list wasn't visible from inside the container); the database root password (it was never in the WordPress containers).",
+    "wentWell": [
+      "The compromised system was never booted: forensics ran with the disk mounted from the recovery environment.",
+      "Scope was proven with concrete checks before deciding what to rebuild.",
+      "The n8n database came out intact and the pipeline was back the same day.",
+      "Nothing was copied to the new server without passing the clean-check first."
+    ],
+    "wentBad": [
+      "About 15 hours without detecting the intrusion: there were no load or disk alerts.",
+      "The problem was first attributed to 31-day-old zombie processes, which were a separate, older issue.",
+      "Rotating the Telegram token was requested before checking whether it was exposed; corrected after verifying.",
+      "The first rescue missed the sites' volumes and the bind-mounted themes; they were recovered before the temporary copy was destroyed.",
+      "Starting all ten sites at once pushed the new machine to 1,935 of 1,967 MB and load 21, and n8n restarted: the incident's failure mode, reproduced without an intruder.",
+      "The new server ended up without swap, which explained later outages. It has 2 GB of swap again."
+    ],
+    "actions": [
+      {
+        "text": "One database user per site, with rights only on its own",
+        "status": "done"
+      },
+      {
+        "text": "Memory limit per container",
+        "status": "done"
+      },
+      {
+        "text": "DISALLOW_FILE_MODS on the sites",
+        "status": "done"
+      },
+      {
+        "text": "No administrator account with a predictable name; long, unique passwords",
+        "status": "done",
+        "note": "On the rebuilt site"
+      },
+      {
+        "text": "Start-up gated on memory and load; at most 2 sites at once",
+        "status": "done"
+      },
+      {
+        "text": "Rate limit on wp-login.php",
+        "status": "done"
+      },
+      {
+        "text": "Second factor for WordPress administrators",
+        "status": "pending"
+      },
+      {
+        "text": "Staging behind a password or IP allowlist",
+        "status": "pending"
+      },
+      {
+        "text": "Load and disk alerts",
+        "status": "done"
+      },
+      {
+        "text": "Separate the pipeline from exposed sites",
+        "status": "accepted",
+        "note": "Mitigated with a per-service memory limit and at most 2 demos running"
+      },
+      {
+        "text": "Recreate the 2 GB swap",
+        "status": "done"
+      }
+    ],
+    "lessons": [
+      "A staging site isn't a toy: it runs the same stack as production and deserves the same defenses, or shouldn't be on the open internet.",
+      "If one credential spans twelve systems, one compromised site is worth twelve.",
+      "Without a memory limit, any container can take the whole machine down.",
+      "Alert on the cause (load, memory, disk), not just the symptom.",
+      "Rotate what the evidence says was exposed, and document why the rest wasn't.",
+      "Everything running on a server must be rebuildable from a repository."
+    ],
+    "og": [
+      "Detection",
+      "Containment",
+      "Recovery",
+      "Hardening"
+    ]
   }
 }

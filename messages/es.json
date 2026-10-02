@@ -1006,5 +1006,690 @@
     "text": "La dirección no lleva a ninguna parte del portfolio. Puede que el enlace esté mal escrito o que la página se haya movido.",
     "home": "Volver al inicio",
     "code": "404"
+  },
+  "cases": {
+    "ui": {
+      "breadcrumb": "Ruta de navegación",
+      "home": "Inicio",
+      "cases": "Casos",
+      "context": "Contexto",
+      "solution": "Solución",
+      "architecture": "Arquitectura",
+      "decisions": "Decisiones técnicas",
+      "results": "Resultados",
+      "stack": "Stack",
+      "links": "Enlaces",
+      "pieces": "Piezas",
+      "flowLabel": "Flujo en {n} pasos",
+      "tradeoff": "Trade-off",
+      "prev": "Caso anterior",
+      "next": "Caso siguiente",
+      "more": "Más casos",
+      "backHome": "Volver al inicio",
+      "viewCase": "Ver caso",
+      "illustrative": "Esquema ilustrativo, datos de ejemplo.",
+      "pauseFlow": "Pausar el tráfico",
+      "playFlow": "Reanudar el tráfico",
+      "kind": {
+        "client": "Cliente real",
+        "demo": "Proyecto demo",
+        "own-tool": "Herramienta propia"
+      },
+      "postmortemLink": "Leer el postmortem completo"
+    },
+    "items": {
+      "3destiny": {
+        "name": "3Destiny",
+        "title": "3Destiny: sitio corporativo en WordPress, desplegado en la nube del cliente",
+        "subtitle": "Tema propio sin page builder, migración con wp-cli y un corte de DNS sin tiempo de caída visible",
+        "summary": "Sitio corporativo de una agencia argentina de realidad aumentada, realidad virtual e IA. Tema de WordPress hecho a medida y publicado el 17-sep-2026 en la infraestructura AWS del cliente, con 37 de 37 comprobaciones en verde tras el corte.",
+        "context": [
+          "La agencia necesitaba reemplazar su sitio anterior por uno con sus cuatro verticales (farma, capacitación, e-commerce, marketing), casos de éxito con métricas, blog y formulario de contacto. Tenía que publicarse en su propio servidor de AWS y sin poner en riesgo lo que ya funcionaba: 132 direcciones del sitio viejo, cinco subdominios que no se tocaban y el correo de la empresa, que comparte la zona DNS con el sitio."
+        ],
+        "solution": [
+          "Tema propio sobre Gutenberg + ACF, sin constructores: casos de éxito como tipo de contenido propio, plantilla por vertical, blog y formulario que guarda en el panel y abre WhatsApp.",
+          "El despliegue se hizo con la secuencia que fijó el cliente: primero el sitio entero en un subdominio de prueba del mismo servidor de producción, validado con el dominio definitivo forzado en el navegador; después el equipo del cliente movió un único registro DNS."
+        ],
+        "pieces": [
+          "Tema WordPress propio (PHP 8.3, Gutenberg + ACF, Rank Math)",
+          "AWS EC2 del cliente, con acceso por SSM (Session Manager)",
+          "Route 53 (DNS) + certificado Let's Encrypt con challenge DNS, renovación automática",
+          "wp-cli para migrar la base y reescribir el dominio",
+          "Correo saliente por el servicio de correo de Amazon"
+        ],
+        "flow": [
+          "Copia de seguridad del servidor, guardada fuera de él",
+          "Subida de archivos con sumas de verificación iguales en origen y destino (230 MB)",
+          "Importación de la base con wp-cli: 2622 reemplazos de dominio",
+          "Validación en el subdominio de prueba con el dominio definitivo forzado",
+          "El equipo del cliente mueve un único registro DNS",
+          "37 comprobaciones desde afuera con el DNS real: 37/37"
+        ],
+        "decisions": [
+          {
+            "title": "Tema propio, sin page builder",
+            "text": "Por qué: control total del HTML, que es lo que permite Accesibilidad 100 y SEO 100.",
+            "tradeoff": "el equipo edita dentro de los bloques y campos definidos; un cambio de diseño nuevo necesita desarrollo."
+          },
+          {
+            "title": "Desplegar en la nube del cliente, no en un hosting mío",
+            "text": "Por qué: el cliente queda dueño de su servidor, su DNS y sus accesos; se entró por Session Manager, sin abrir SSH.",
+            "tradeoff": "cada acceso y el corte dependen de su equipo de sistemas."
+          },
+          {
+            "title": "Ensayo completo en un subdominio del mismo servidor",
+            "text": "Por qué: se valida sobre la máquina real, y el sitio anterior sigue publicado hasta el minuto del corte.",
+            "tradeoff": "deja ajustes temporales (bloque de configuración, certificado y registro del subdominio) que hay que desarmar después."
+          },
+          {
+            "title": "Comprobaciones scriptadas antes y después del corte",
+            "text": "Por qué: lo que más se rompe sin que nadie lo vea es el correo; MX, SPF, DKIM y DMARC se compararon con una línea base tomada días antes.",
+            "tradeoff": "tiempo de preparación antes del corte."
+          },
+          {
+            "title": "Correcciones de migración por script, sobre todo el contenido",
+            "text": "Doce imágenes no cargaban por nombres de tamaños heredados del gestor anterior; el script revisa todos los artículos, no solo los afectados, y quedó en el procedimiento.",
+            "tradeoff": "más tiempo que arreglar a mano los tres artículos visibles."
+          }
+        ],
+        "results": [
+          "Publicado el 17-sep-2026",
+          "37/37 comprobaciones con el DNS real tras el corte",
+          "132/132 direcciones del sitio anterior redirigen según el mapa",
+          "131/131 imágenes de artículos cargando",
+          "22/22 pruebas en navegador real (11 rutas, celular y escritorio), sin peticiones a terceros",
+          "Registros de correo idénticos a la línea base",
+          "Lighthouse: SEO 100 · Accesibilidad 100 · Buenas prácticas 100",
+          "155 funciones de prueba en la suite del tema"
+        ],
+        "stack": [
+          "WordPress",
+          "PHP 8.3",
+          "Gutenberg + ACF",
+          "Rank Math",
+          "JavaScript vanilla",
+          "AWS EC2 + SSM",
+          "Route 53",
+          "Let's Encrypt",
+          "wp-cli"
+        ],
+        "links": [
+          {
+            "label": "Ver el sitio en vivo",
+            "href": "https://3destinyra.com"
+          }
+        ],
+        "figures": {
+          "portada": "Portada del sitio de 3Destiny",
+          "galeria-01": "Página de una vertical",
+          "galeria-02": "Casos de éxito con métricas",
+          "galeria-03": "El sitio en tres celulares"
+        },
+        "og": [
+          "Backup",
+          "wp-cli",
+          "DNS",
+          "37/37"
+        ]
+      },
+      "turnia": {
+        "name": "Turnia",
+        "title": "Turnia: SaaS de turnos para barberías, en tres partes",
+        "subtitle": "Landing, app de gestión y bot de Telegram sobre la misma base de datos",
+        "summary": "Producto ficticio de portafolio con código y despliegue reales: landing en Next.js, agenda con drag & drop y ⌘K sobre Postgres, y un bot de Telegram que reserva y recuerda turnos. Todo en vivo; los datos de la demo se reinician cada noche.",
+        "context": [
+          "Una barbería vive de su agenda: turnos que se pisan, clientes que no confirman, cambios de último momento y la caja del día. Turnia es el ejercicio de resolver eso como producto completo —vender, operar y atender por chat— sin duplicar reglas de negocio en tres lugares, y con un bot que cualquiera puede escribir sin tirar abajo el servidor."
+        ],
+        "solution": [
+          "Una sola app Next.js 16 con Drizzle sobre Postgres (Neon) hace todo el trabajo: agenda por profesional (crear en hueco, arrastrar, estirar, ⌘K que crea turnos por texto, deshacer), clientes, membresías y caja del día; link público de reserva con disponibilidad real.",
+          "El bot es una máquina de estados pura dentro de la app; n8n solo es el canal entre Telegram y la API."
+        ],
+        "pieces": [
+          "Next.js 16 en Vercel: landing, app /app/*, reserva pública y API /api/bot/*",
+          "Postgres en Neon con Drizzle ORM (driver serverless en producción)",
+          "n8n: bot, recordatorios, reserva pública y lista de espera",
+          "Caddy delante de n8n, con filtro de subredes de Telegram",
+          "Cron de Vercel para reiniciar la demo"
+        ],
+        "flowTitle": "Una reserva por chat",
+        "flow": [
+          "El cliente escribe al bot en Telegram",
+          "Caddy solo deja pasar las subredes de Telegram y cuerpos de hasta 64 KB",
+          "n8n normaliza el mensaje (tope global de 60 por minuto) y lo manda a la API con clave",
+          "La app corre la máquina de estados y responde con texto y botones (30 por chat y hora)",
+          "El turno se guarda en Postgres y aparece en la agenda",
+          "Un cron de n8n pide los recordatorios de 24 h y 2 h; el de 24 h trae «Confirmo» / «Cambiar»"
+        ],
+        "decisions": [
+          {
+            "title": "El cerebro vive en la app; n8n es el canal",
+            "text": "Por qué: las reglas de disponibilidad, choques y caja existen una sola vez y las usan la agenda, la reserva pública y el bot; pasar de Telegram a WhatsApp es cambiar dos nodos.",
+            "tradeoff": "la app tiene que exponer una API propia, protegida por clave, y mantenerla."
+          },
+          {
+            "title": "Defensa en tres capas para un bot público",
+            "text": "Borde: Caddy responde 403 fuera de las subredes de Telegram. n8n: tope global de 60 updates por minuto. App: 30 mensajes por chat y hora y 200 por local y día, con respuesta 429.",
+            "tradeoff": "si Telegram agrega rangos de IP, el bot deja de responder hasta actualizar el filtro."
+          },
+          {
+            "title": "Recordatorios idempotentes",
+            "text": "Al listar, la API crea el mensaje en estado «pendiente» y no lo repite si ya existe para ese turno. Por qué: el cron puede correr dos veces sin mandar duplicados.",
+            "tradeoff": "una tabla más de estado en Postgres."
+          },
+          {
+            "title": "Demo pública que se reinicia sola",
+            "text": "Un cron de Vercel diario (07:00 UTC) llama a un endpoint con Bearer CRON_SECRET y devuelve al seed solo el local demo. Por qué: cualquiera puede entrar y editar sin dejarla rota.",
+            "tradeoff": "lo que haga un visitante se borra esa noche."
+          },
+          {
+            "title": "Reglas de choque en el servidor, interfaz optimista",
+            "text": "El arrastre mueve el turno al instante; si el servidor detecta un choque, la tarjeta vuelve a su lugar con un aviso.",
+            "tradeoff": "hay que mantener la lógica de revertir en el cliente."
+          }
+        ],
+        "results": [
+          "Landing, app y bot en vivo (HTTP 200 el 2-oct-2026)",
+          "Sin cortes de layout en 7 anchos, de 320 a 2560 px",
+          "0 errores y 0 avisos de consola; 0 peticiones externas",
+          "Build en verde, tsc y eslint limpios",
+          "Prueba automatizada del bot: 401, 400, reserva completa, recordatorio sin duplicar, 409 por chat ajeno y los dos límites (31 llamadas reales)"
+        ],
+        "stack": [
+          "Next.js 16",
+          "React 19",
+          "TypeScript",
+          "Tailwind 4",
+          "Drizzle ORM",
+          "Postgres (Neon)",
+          "Server Actions",
+          "n8n",
+          "Telegram Bot API",
+          "Caddy",
+          "Vercel"
+        ],
+        "links": [
+          {
+            "label": "Ver la landing",
+            "href": "https://turnia-saas.vercel.app"
+          },
+          {
+            "label": "Entrar a la app",
+            "href": "https://turnia-saas.vercel.app/entrar"
+          },
+          {
+            "label": "Probar el bot",
+            "href": "https://t.me/TurniaTurnos_bot"
+          }
+        ],
+        "figures": {
+          "landing-portada": "Landing de Turnia",
+          "app-portada": "Agenda de la app, en escritorio",
+          "app-movil": "Agenda de la app, en el celular",
+          "bot-portada": "Panel del bot de Telegram",
+          "bot-movil": "El bot en el celular"
+        },
+        "solutionParts": {
+          "landing": "Landing",
+          "app": "App",
+          "bot": "Bot"
+        },
+        "og": [
+          "Telegram",
+          "Caddy",
+          "n8n",
+          "Next.js · Postgres"
+        ]
+      },
+      "vera": {
+        "name": "Vera",
+        "title": "Vera: recepcionista de WhatsApp para negocios de servicios",
+        "subtitle": "Recepcionista de WhatsApp: flujos n8n listos para conectar a un agente de IA",
+        "summary": "Una maqueta tipo WhatsApp muestra cómo atendería Vera en una barbería, una cantina, una odontología y un taller, y cómo el registro llega al sistema del negocio. Detrás, cuatro flujos de n8n que hablan con WhatsApp Cloud API y con un agente de IA.",
+        "context": [
+          "Los negocios de servicios reciben por WhatsApp las mismas preguntas todo el día: precios, horarios, turnos, pedidos, «¿está listo mi auto?». Responder a mano roba tiempo de atención; un bot que inventa precios o se pisa con la persona que atiende es peor. Cada rubro cambia qué se puede hacer por chat."
+        ],
+        "solution": [
+          "Dos piezas. La maqueta: una demostración guionada (sin backend ni modelo de lenguaje) que recorre cada rubro y pasa del chat a la pantalla del negocio —agenda, ficha del paciente, tablero de órdenes o comanda— con el registro nuevo marcado.",
+          "Los flujos de n8n: el flujo principal recibe el webhook de Meta, carga el preset del rubro, aplica una guardia anti-abuso, consulta al agente y ejecuta como mucho una herramienta contra la API del negocio; más un subflujo que transcribe notas de voz, recordatorios cada 15 minutos con plantillas aprobadas y avisos por cambio de estado."
+        ],
+        "pieces": [
+          "WhatsApp Cloud API (Meta): webhook entrante y plantillas",
+          "n8n: flujo principal (53 nodos), audio, recordatorios, avisos de estado",
+          "Servicio de agente (LLM con tool-calling) detrás de un contrato HTTP propio",
+          "API del negocio: catálogo, disponibilidad, reservar, cancelar, menú, pedidos",
+          "Presets por rubro en JSON (prompt, herramientas, textos, plantillas)"
+        ],
+        "flow": [
+          "Llega un mensaje (texto o nota de voz) por el webhook de WhatsApp",
+          "n8n normaliza, carga el preset del rubro y pasa la guardia anti-abuso",
+          "El agente responde, pide una herramienta o deriva a una persona",
+          "Si pidió herramienta, n8n llama a la API del negocio y le devuelve el resultado",
+          "El agente redacta la respuesta final y sale por WhatsApp",
+          "Cada 15 min salen los recordatorios con «Confirmo» / «Cambiar»"
+        ],
+        "decisions": [
+          {
+            "title": "Una sola vuelta de herramienta por mensaje",
+            "text": "Si el agente pide una segunda herramienta, se deriva a una persona en vez de encadenar llamadas. Por qué: no hay riesgo de bucle ni de costo descontrolado.",
+            "tradeoff": "una consulta que necesita dos pasos termina en un humano."
+          },
+          {
+            "title": "El rubro es un preset de datos, no otro flujo",
+            "text": "Prompt, herramientas, textos y plantillas viven en un JSON por rubro, y un validador comprueba que cada herramienta tenga su rama y que los datos coincidan con la maqueta.",
+            "tradeoff": "después de editar un preset hay que volver a embeberlo en los flujos con un script."
+          },
+          {
+            "title": "El agente detrás de un contrato HTTP",
+            "text": "El flujo define request y response; el modelo puede ser de cualquier proveedor.",
+            "tradeoff": "ese servicio hay que alojarlo aparte."
+          },
+          {
+            "title": "El bot se calla cuando entra una persona",
+            "text": "Al derivar, el chat queda en pausa 4 horas para que el bot no compita con quien atiende.",
+            "tradeoff": "durante esa pausa el bot no responde en ese chat aunque la persona ya haya terminado."
+          },
+          {
+            "title": "Guardia anti-abuso en el estado del flujo, sin base de datos",
+            "text": "Tope de mensajes por minuto entre todos los chats y aviso al encargado como mucho una vez por hora.",
+            "tradeoff": "alcanza para una instancia; con varias habría que moverla a la API."
+          }
+        ],
+        "results": [
+          "142 mediciones de layout, 0 fallos (16 anchos en el chat; 8 anchos de 320 a 2560 px en la plataforma)",
+          "Los 8 recorridos (4 rubros × 2 ramas) llegan al final y el registro aparece en el sistema",
+          "61 pares de contraste, todos ≥ 4,9:1",
+          "Sitio de menos de 330 KB, 0 peticiones externas, 0 errores de consola",
+          "Los 4 flujos importados en n8n 2.27.4 y corridos de punta a punta con servidores simulados"
+        ],
+        "resultsNote": "No se probó contra Meta real ni contra un agente real.",
+        "stack": [
+          "HTML/CSS/JS sin dependencias",
+          "n8n",
+          "WhatsApp Cloud API",
+          "agente LLM con tool-calling (contrato HTTP)",
+          "Node.js (validadores y pruebas)",
+          "Playwright"
+        ],
+        "links": [],
+        "linksNote": "Sin enlace público: la maqueta no se publica; se muestra con capturas y video.",
+        "variants": {
+          "barberia": "Barbería",
+          "cantina": "Cantina",
+          "odontologia": "Odontología",
+          "taller": "Taller"
+        },
+        "og": [
+          "WhatsApp",
+          "n8n",
+          "Agente IA",
+          "API del negocio"
+        ]
+      },
+      "pipeline-ia": {
+        "name": "Pipeline de automatización con agentes IA",
+        "title": "Pipeline de automatización con agentes IA",
+        "subtitle": "n8n orquesta un agente de IA en Docker; nada se ejecuta sin aprobación humana por chat",
+        "summary": "Un sistema que corre 24/7 en mi VPS: las solicitudes entran por chat, un agente de IA las analiza dentro de un contenedor y devuelve un resumen con botones. Las tareas largas arrancan solo cuando una persona aprueba.",
+        "context": [
+          "Analizar cada solicitud a mano lleva tiempo y el criterio varía según el día. Además, algunas acciones son largas (investigar, construir, desplegar) y no deben salir sin que alguien las revise. Todo tenía que caber en un servidor de 1 vCPU y 2 GB de RAM, donde un agente de IA puede quedarse sin memoria a mitad de trabajo."
+        ],
+        "solution": [
+          "n8n recibe el mensaje y llama a un runner propio (Express) que ejecuta un agente de IA headless dentro de Docker, con las mismas instrucciones y herramientas que uso en local. El resultado vuelve al chat con botones; aprobar encola una tarea larga que avisa con el enlace al terminar.",
+          "El runner protege la máquina: un trabajo a la vez, cola persistente, timeouts, vigilante de inactividad y cambio a un modelo más liviano si el sistema lo mata por memoria."
+        ],
+        "pieces": [
+          "Bot de Telegram privado: el router descarta en silencio cualquier chat no autorizado",
+          "Caddy: TLS automático, única puerta pública",
+          "n8n: un flujo de 37 nodos (router, switch de acciones, llamadas al runner, respuestas, webhook de cierre)",
+          "Runner Express en Docker, sin puertos publicados; exige un header secreto",
+          "Agente de IA headless + Chromium headless para capturas + documentación oficial vía MCP",
+          "Cola persistida en disco, que sobrevive a reinicios"
+        ],
+        "flow": [
+          "Llega una solicitud al bot de Telegram",
+          "n8n valida el chat y decide la acción",
+          "n8n llama al runner por la red interna de Docker, con header secreto",
+          "El runner encola y ejecuta el agente de IA con timeout y vigilante de inactividad",
+          "El análisis vuelve al chat con botones: aprobar, cambiar o descartar",
+          "Al aprobar, la tarea larga se encola en segundo plano (responde 202) y reporta progreso",
+          "Al terminar, un webhook validado por header avisa en el chat con el enlace"
+        ],
+        "decisions": [
+          {
+            "title": "Humano en el bucle, siempre",
+            "text": "Nada sale ni arranca sin un botón. Por qué: el agente da soporte de decisión, no decide.",
+            "tradeoff": "el sistema no es 100 % autónomo y depende de que alguien responda."
+          },
+          {
+            "title": "Runner sin puertos públicos",
+            "text": "Solo n8n lo alcanza por la red interna de Docker, con header secreto; el webhook de cierre valida el mismo header.",
+            "tradeoff": "para depurar hay que entrar al contenedor."
+          },
+          {
+            "title": "Un trabajo a la vez, cola persistida",
+            "text": "En 2 GB no caben dos agentes; la cola se guarda en disco y las tareas asíncronas se reanudan solas tras un reinicio.",
+            "tradeoff": "cuando hay cola, la espera se nota."
+          },
+          {
+            "title": "Vigilante de inactividad",
+            "text": "Si el agente no emite ningún evento en 8 minutos, se corta. Nació de tres trabajos que murieron a los 25 minutos esperando un Chromium colgado: el peor caso bajó a unos 8.",
+            "tradeoff": "una tarea legítima que pase más de 8 minutos en silencio también se corta."
+          },
+          {
+            "title": "Cambio de modelo ante falta de memoria",
+            "text": "Si el sistema mata al agente sin error (señal típica del OOM killer en 2 GB), se reintenta con un modelo más liviano, retomando el trabajo parcial.",
+            "tradeoff": "ese caso sale con un modelo de menor capacidad."
+          }
+        ],
+        "results": [
+          "Corre 24/7 en un VPS de 1 vCPU y 2 GB",
+          "Peor caso de un trabajo colgado: de 25 a ~8 minutos",
+          "221 casos procesados y guardados al 8-sep-2026",
+          "Logs rotados (10 MB × 3) e historial de n8n acotado a 7 días / 5000 ejecuciones",
+          "Recuperado el mismo día tras el incidente del 8-sep, con su base intacta"
+        ],
+        "stack": [
+          "n8n",
+          "Node.js 22 + Express",
+          "Docker Compose",
+          "Caddy",
+          "agente de IA headless (Claude Code)",
+          "Chromium headless",
+          "Telegram Bot API",
+          "GitHub CLI",
+          "Vercel CLI"
+        ],
+        "links": [],
+        "linksNote": "Sin enlace público: es un sistema privado; se muestra con capturas.",
+        "figures": {
+          "portada": "El pipeline en seis pasos",
+          "galeria-01": "El flujo en n8n"
+        },
+        "og": [
+          "Telegram",
+          "n8n",
+          "Runner",
+          "Agente IA"
+        ]
+      }
+    }
+  },
+  "postmortem": {
+    "slugTitle": "Postmortem del incidente de septiembre de 2026",
+    "eyebrow": "Postmortem",
+    "title": "Respuesta a incidente: intrusión por fuerza bruta en el VPS (8-sep-2026)",
+    "subtitle": "Formato sin culpas. Horas en UTC, tomadas de los registros del proxy y de la sesión de respuesta.",
+    "summary": "El 7-sep-2026 un atacante adivinó por fuerza bruta la contraseña de una cuenta de administrador en un sitio de staging de WordPress que corría en mi VPS, subió plugins propios y soltó 21 ejecutables. Durante unas 15 horas consumieron la CPU y la RAM hasta dejar la máquina inutilizable. La intrusión no salió del contenedor del sitio. Se rescataron los datos, se reconstruyó el servidor desde cero en una máquina nueva, se endureció la configuración y se rotaron las credenciales expuestas. Los servicios principales volvieron en menos de 5 horas desde la detección.",
+    "metaDescription": "Postmortem sin culpas de una intrusión por fuerza bruta en un staging de WordPress: línea de tiempo en UTC, causa raíz, contención, recuperación, hardening y acciones preventivas.",
+    "ui": {
+      "summary": "Resumen e impacto",
+      "impact": "Impacto",
+      "durations": "Duración",
+      "timeline": "Línea de tiempo (UTC)",
+      "rootCause": "Detección y causa raíz",
+      "detection": "Detección",
+      "cause": "Causa raíz",
+      "factors": "Factores que agrandaron el impacto",
+      "containment": "Contención",
+      "recovery": "Recuperación",
+      "hardening": "Hardening",
+      "hardeningVerified": "Aplicado el 8-sep (verificado sobre lo que quedó corriendo, no sobre el archivo)",
+      "before": "Antes",
+      "after": "Después",
+      "appliedLater": "Aplicado después",
+      "pending": "Pendiente",
+      "rotation": "Rotación de credenciales (decidida por evidencia, no por reflejo)",
+      "rotated": "Rotadas",
+      "notRotated": "No rotadas, con motivo",
+      "retro": "Retrospectiva",
+      "wentWell": "Qué salió bien",
+      "wentBad": "Qué no salió bien",
+      "actions": "Acciones preventivas",
+      "action": "Acción",
+      "status": "Estado",
+      "lessons": "Lecciones",
+      "statuses": {
+        "done": "Hecho",
+        "pending": "Pendiente",
+        "accepted": "Riesgo aceptado"
+      },
+      "phases": {
+        "intrusion": "Intrusión",
+        "detection": "Detección",
+        "containment": "Contención",
+        "recovery": "Recuperación",
+        "hardening": "Hardening"
+      },
+      "seeDiagram": "Ver el diagrama de la infraestructura"
+    },
+    "impact": [
+      "Todo lo que corría en el VPS quedó fuera de servicio: el pipeline de automatización, n8n, el panel de control y los sitios demo.",
+      "Ningún sitio de cliente en producción corría en esa máquina.",
+      "Sin pérdida de datos en n8n: la base se rescató íntegra.",
+      "Dos despliegues personales que solo existían como build copiado al servidor no se pudieron rescatar."
+    ],
+    "durations": [
+      {
+        "value": "15 h 42 min",
+        "label": "de intrusión sin detectar"
+      },
+      {
+        "value": "54 min",
+        "label": "de la detección a la contención"
+      },
+      {
+        "value": "4 h 52 min",
+        "label": "hasta n8n de vuelta"
+      },
+      {
+        "value": "6 h 43 min",
+        "label": "hasta el último servicio"
+      }
+    ],
+    "timeline": [
+      {
+        "when": "7-sep 22:55:58 → 22:56:09",
+        "what": "Siete intentos fallidos en wp-login.php, precedidos de sondeo automatizado de otras rutas",
+        "phase": "intrusion"
+      },
+      {
+        "when": "7-sep 22:56:11",
+        "what": "Acceso: la contraseña cae en 13 segundos",
+        "phase": "intrusion"
+      },
+      {
+        "when": "7-sep 22:56:18",
+        "what": "Van directo a la pantalla de subir plugins",
+        "phase": "intrusion"
+      },
+      {
+        "when": "7-sep 22:56 → 8-sep 12:33",
+        "what": "Aparecen tres plugins ajenos y 21 ejecutables ocultos en carpetas del núcleo",
+        "phase": "intrusion"
+      },
+      {
+        "when": "8-sep ~14:38",
+        "what": "Detección: se reporta que todo el servidor está caído",
+        "phase": "detection",
+        "key": true
+      },
+      {
+        "when": "8-sep 14:39 – 14:49",
+        "what": "Un solo ingreso por SSH alcanza a medir carga de 120 a 157 con 1 vCPU, 53 MB de RAM libres y el swap lleno",
+        "phase": "detection"
+      },
+      {
+        "when": "8-sep ~15:32",
+        "what": "Contención: máquina apagada y snapshot tomado como evidencia",
+        "phase": "containment",
+        "key": true
+      },
+      {
+        "when": "8-sep 16:38",
+        "what": "Pliego forense de cinco preguntas, todo de solo lectura",
+        "phase": "containment"
+      },
+      {
+        "when": "8-sep 17:07 – 17:12",
+        "what": "Forense desde el entorno de recuperación, con el disco montado y el sistema comprometido sin arrancar: vector, alcance y cronología",
+        "phase": "containment"
+      },
+      {
+        "when": "8-sep 17:20 – 17:22",
+        "what": "Rescate de la base de n8n (integrity_check = ok) y de la configuración que no estaba en git",
+        "phase": "recovery"
+      },
+      {
+        "when": "8-sep ~19:30",
+        "what": "n8n y el pipeline de vuelta en un servidor nuevo",
+        "phase": "recovery",
+        "key": true
+      },
+      {
+        "when": "8-sep 19:57 – 20:23",
+        "what": "Desde una copia temporal del snapshot: verificación de limpieza de los otros sitios y copia de sus volúmenes; el sitio afectado no se restaura",
+        "phase": "recovery"
+      },
+      {
+        "when": "8-sep ~20:55",
+        "what": "El sitio afectado, reconstruido desde cero desde el repositorio",
+        "phase": "recovery"
+      },
+      {
+        "when": "8-sep ~21:10",
+        "what": "Endurecimiento aplicado y verificado",
+        "phase": "hardening"
+      },
+      {
+        "when": "8-sep 21:21",
+        "what": "Panel de control de vuelta, ahora en contenedor",
+        "phase": "recovery",
+        "key": true
+      }
+    ],
+    "detection": "No la hizo una alerta: la máquina estuvo unas 12 horas al 100 % antes de que alguien lo notara. El aviso que sí existía reportó el síntoma (servicio caído), no la causa.",
+    "cause": "El wp-login.php del staging estaba expuesto a internet sin límite de intentos, y el sitio tenía una cuenta de administrador con nombre predecible y contraseña débil. Siete intentos alcanzaron. No hubo vulnerabilidad del código propio, del núcleo de WordPress ni de los plugins del proyecto.",
+    "factors": [
+      "Los doce sitios compartían un solo usuario de base de datos con permisos sobre las doce bases.",
+      "Ningún contenedor tenía límite de memoria: un sitio se comió la RAM de toda la máquina y arrastró a n8n.",
+      "El staging estaba abierto a internet y compartía máquina con el pipeline."
+    ],
+    "containment": [
+      "Máquina apagada y snapshot conservado como evidencia; el sistema comprometido no se volvió a arrancar.",
+      "Ningún archivo del intruso se ejecutó, ni siquiera para inspeccionarlo.",
+      "Alcance verificado, no supuesto: cron, systemd, usuarios del sistema y llaves autorizadas sin cambios; ningún contenedor montaba el socket de Docker, así que no había vía de escape al host; los otros once sitios, limpios."
+    ],
+    "recovery": [
+      "Rescate de datos: la base de n8n (15,7 MB más su WAL), la configuración de proxy y compose, los temas de los sitios (251 MB, montados por bind y fuera de los volúmenes) y el espacio de trabajo del pipeline (77 MB).",
+      "Reconstrucción desde cero: servidor nuevo; n8n restaurado con su base rescatada, sus 2 flujos y sus 2 credenciales; certificados emitidos solos por Caddy.",
+      "Los otros diez sitios se copiaron solo después de comprobar que estaban limpios: cero archivos ocultos en el núcleo, cero PHP en uploads, cero plugins ajenos.",
+      "El sitio afectado no se restauró: su base se borró (con copia previa guardada fuera del servidor) y se rehízo desde el repositorio."
+    ],
+    "hardening": [
+      {
+        "before": "Un usuario de base con permisos sobre las 12 bases",
+        "after": "Un usuario por sitio, con permisos solo sobre la suya; el compartido, borrado"
+      },
+      {
+        "before": "Sin tope de memoria",
+        "after": "384 MB por sitio y 512 MB la base"
+      },
+      {
+        "before": "Se podían subir e instalar plugins desde el panel",
+        "after": "DISALLOW_FILE_MODS y DISALLOW_FILE_EDIT activos; actualizaciones menores del núcleo automáticas"
+      },
+      {
+        "before": "Cuenta de administrador con nombre predecible",
+        "after": "El sitio reconstruido no tiene esa cuenta; contraseña nueva de 26 caracteres"
+      }
+    ],
+    "appliedLater": [
+      "Límite de intentos en wp-login.php",
+      "Alertas de carga y disco",
+      "Tras dos caídas por memoria (13 y 15 de septiembre): el panel exige al menos 400 MB libres y carga menor a 2 antes de encender un sitio, con un máximo de 2 encendidos",
+      "El runner de agentes ganó un vigilante de inactividad"
+    ],
+    "pending": [
+      "Segundo factor para administradores de WordPress",
+      "Staging detrás de contraseña o lista de IP"
+    ],
+    "rotated": "La credencial de base que compartían los sitios, dada por leída porque el atacante tuvo PHP arbitrario en el contenedor; las contraseñas del sitio afectado.",
+    "notRotated": "Las llaves SSH (en el servidor solo había llaves públicas y no se modificaron); el token del bot de Telegram (desde dentro del contenedor no se veía la lista de procesos del host); la contraseña root de la base (nunca estuvo en los contenedores de WordPress).",
+    "wentWell": [
+      "No se arrancó el sistema comprometido: la forense se hizo con el disco montado desde el entorno de recuperación.",
+      "El alcance se probó con comprobaciones concretas antes de decidir qué reconstruir.",
+      "La base de n8n salió íntegra y el pipeline volvió el mismo día.",
+      "Nada se copió al servidor nuevo sin pasar antes la comprobación de limpieza."
+    ],
+    "wentBad": [
+      "Unas 15 horas sin detectar la intrusión: no había alertas de carga ni de disco.",
+      "Al principio se atribuyó el problema a procesos zombi de 31 días, que eran un problema aparte y anterior.",
+      "Se pidió rotar el token de Telegram antes de comprobar que no estaba expuesto; se corrigió tras verificarlo.",
+      "El primer rescate olvidó los volúmenes de los sitios y los temas montados por bind; se recuperaron antes de destruir la copia temporal.",
+      "Encender los diez sitios a la vez llevó la máquina nueva a 1935 de 1967 MB y carga 21, y n8n se reinició: el mismo modo de falla del incidente, sin intruso.",
+      "El servidor nuevo quedó sin swap, y eso explicó caídas posteriores. Hoy vuelve a tener 2 GB de swap."
+    ],
+    "actions": [
+      {
+        "text": "Un usuario de base por sitio, con permisos solo sobre la suya",
+        "status": "done"
+      },
+      {
+        "text": "Tope de memoria por contenedor",
+        "status": "done"
+      },
+      {
+        "text": "DISALLOW_FILE_MODS en los sitios",
+        "status": "done"
+      },
+      {
+        "text": "Ninguna cuenta de administrador con nombre predecible; contraseñas largas y únicas",
+        "status": "done",
+        "note": "En el sitio reconstruido"
+      },
+      {
+        "text": "Encendido condicionado a memoria y carga; máximo 2 sitios a la vez",
+        "status": "done"
+      },
+      {
+        "text": "Límite de intentos en wp-login.php",
+        "status": "done"
+      },
+      {
+        "text": "Segundo factor para administradores de WordPress",
+        "status": "pending"
+      },
+      {
+        "text": "Staging detrás de contraseña o lista de IP",
+        "status": "pending"
+      },
+      {
+        "text": "Alertas de carga y disco",
+        "status": "done"
+      },
+      {
+        "text": "Separar el pipeline de los sitios expuestos",
+        "status": "accepted",
+        "note": "Mitigado con límite de memoria por servicio y máximo 2 demos encendidas"
+      },
+      {
+        "text": "Recrear el swap de 2 GB",
+        "status": "done"
+      }
+    ],
+    "lessons": [
+      "Un staging no es un juguete: tiene el mismo stack que producción y merece las mismas defensas, o no estar abierto a internet.",
+      "Si una credencial comparte doce sistemas, un sitio comprometido vale por doce.",
+      "Sin límite de memoria, cualquier contenedor puede tumbar la máquina entera.",
+      "Alertar sobre la causa (carga, memoria, disco), no solo sobre el síntoma.",
+      "Rotar lo que la evidencia dice que quedó expuesto, y documentar por qué lo demás no.",
+      "Todo lo que corre en un servidor tiene que poder rehacerse desde un repositorio."
+    ],
+    "og": [
+      "Detección",
+      "Contención",
+      "Recuperación",
+      "Hardening"
+    ]
   }
 }
