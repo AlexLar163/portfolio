@@ -56,7 +56,8 @@ async function once(
   method: Method,
   timeoutMs = site.timeoutMs ?? STATUS_TIMEOUT_MS,
 ): Promise<SiteResult & { timedOut?: boolean }> {
-  const signal = AbortSignal.timeout(timeoutMs);
+  // AbortSignal.timeout exige un entero; `left` llega con decimales.
+  const signal = AbortSignal.timeout(Math.max(1, Math.floor(timeoutMs)));
   const t0 = performance.now();
   try {
     let url = new URL(site.url);
