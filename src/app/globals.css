@@ -2175,6 +2175,36 @@ html:not(.js) .live {
   color: var(--danger);
 }
 
+/* Demo del taller apagada: on-demand, no una falla. Aro hueco (la misma
+   gramática que «bajo pedido») y texto neutro. */
+.live__site[data-state="off"] .live__led {
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--ink-3);
+}
+
+/* Demos del taller: un renglón plegado por defecto; el detalle, al abrir. */
+.live__demos {
+  margin-top: var(--s-3);
+}
+
+.live__demos-sum {
+  display: grid;
+}
+
+.live__demos-label {
+  grid-area: 1 / 1;
+  visibility: hidden;
+}
+
+.live__demos-label[data-on] {
+  visibility: visible;
+}
+
+.live__demos-note {
+  max-width: 68ch;
+  margin-bottom: var(--s-3);
+}
+
 /* Midiendo: el LED respira mientras llega la medición (segundos, no un bucle eterno). */
 .motion-lite .live__site[data-state="pending"] .live__led {
   animation: live-wait 900ms var(--ease-io) infinite alternate;
@@ -2986,6 +3016,53 @@ html:not(.js) .live {
   color: var(--ink-3);
 }
 
+/* CTA de una demo del taller (DemoLiveCta): «bajo pedido» y «en vivo» apilados
+   en la misma celda, visible solo el actual. La celda mide lo que el mayor
+   desde el HTML estático: resolver el estado no mueve nada (CLS 0). Cada estado
+   repite la maqueta de su contenedor (pie de tarjeta / columna de estado). */
+.avail {
+  display: grid;
+  min-width: 0;
+}
+
+.avail__state {
+  grid-area: 1 / 1;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--s-2) var(--s-3);
+  min-width: 0;
+  visibility: hidden;
+  opacity: 0;
+}
+
+.avail__state[data-on] {
+  visibility: visible;
+  opacity: 1;
+}
+
+.motion-lite .avail__state {
+  transition:
+    opacity var(--dur-2) var(--ease-out),
+    visibility var(--dur-2);
+}
+
+.demo-card__foot > .avail {
+  flex: 1 1 100%;
+}
+
+/* En la tarjeta, cada estado se apoya en el borde inferior de la celda: queda
+   donde quedaba el pie estático (y donde está el de Bitácora). */
+.avail--card .avail__state {
+  align-self: end;
+}
+
+/* En el índice, centrado: como las filas en vivo estáticas. */
+.avail--row .avail__state {
+  align-self: center;
+  gap: var(--s-1) var(--s-3);
+}
+
 /* Debajo de 44 rem la tarjeta va en fila (media · texto): apiladas medían 500 px cada una. */
 @container shell (max-width: 43.99rem) {
   .demo-card {
@@ -3232,7 +3309,8 @@ html:not(.js) .live {
     display: contents;
   }
 
-  .row__status {
+  .row__status,
+  .avail--row .avail__state {
     flex-direction: column;
     align-items: flex-start;
   }

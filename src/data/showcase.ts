@@ -3,7 +3,11 @@ import type { Showcase } from "./types";
 /**
  * Productos y demos. Textos en messages → `showcase.items.<id>`.
  * Regla: solo las marcas ficticias llevan `label: "demo"` («Proyecto demo»).
- * Los `*.taller.works` son `on-demand`: NUNCA llevan `url` (se piden por contacto).
+ * Los `*.taller.works` son `on-demand` y NUNCA llevan `url`: llevan `liveSlug`
+ * (el sitio en src/data/status.ts, de donde sale la URL). El render estático es
+ * «Bajo pedido · Pedirla»; el enlace «Ver en vivo» solo aparece en el cliente si
+ * /api/status dice que el sitio responde (DemoLiveCta). Bitácora es estática y
+ * siempre en vivo: lleva `url` fija.
  */
 export const showcase: Showcase[] = [
   // ─── Destacados ──────────────────────────────────────────────────────────
@@ -86,6 +90,7 @@ export const showcase: Showcase[] = [
     year: "2026",
     tech: ["WordPress", "PHP", "REST API", "JS"],
     status: "on-demand",
+    liveSlug: "lume",
     media: {
       main: { slug: "lume", key: "portada" },
       video: { slug: "lume", key: "recorrido" },
@@ -101,6 +106,7 @@ export const showcase: Showcase[] = [
     year: "2026",
     tech: ["WooCommerce", "PHP", "JS"],
     status: "on-demand",
+    liveSlug: "recreo",
     media: {
       main: { slug: "recreo", key: "portada" },
       video: { slug: "recreo", key: "recorrido" },
@@ -116,6 +122,7 @@ export const showcase: Showcase[] = [
     year: "2026",
     tech: ["WordPress", "PHP", "JS"],
     status: "on-demand",
+    liveSlug: "solnova",
     media: {
       main: { slug: "solnova", key: "portada" },
       video: { slug: "solnova", key: "recorrido" },
@@ -131,6 +138,7 @@ export const showcase: Showcase[] = [
     year: "2026",
     tech: ["WordPress", "PHP", "JS"],
     status: "on-demand",
+    liveSlug: "meridiano",
     media: {
       // Material 16:10 en un slot 16:9: se recorta abajo, nunca el nav.
       main: { slug: "meridiano", key: "portada", position: "top" },
@@ -177,6 +185,7 @@ export const showcase: Showcase[] = [
       year: "2026",
       tech: [...tech],
       status: "on-demand",
+      liveSlug: id,
       media: { main: { slug, key: "portada" } },
     }),
   ),

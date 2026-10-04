@@ -38,9 +38,16 @@ function hop(url: URL, signal: AbortSignal): Promise<Hop> {
   });
 }
 
-/** Una medición: sigue redirecciones (`redirect: 'follow'`) dentro del mismo corte de 8 s. */
+/**
+ * Una medición: sigue redirecciones (`redirect: 'follow'`) dentro del mismo
+ * corte (8 s las públicas, 5 s las demos).
+ *
+ * Un código ≥ 400 es «degradado» en un sitio público (responde, pero mal) y
+ * «caído» en una demo del taller: el 502 es Caddy diciendo que el contenedor
+ * está apagado, y una demo apagada no se enlaza.
+ */
 async function once(site: StatusSite): Promise<SiteResult & { timedOut?: boolean }> {
-  const signal = AbortSignal.timeout(STATUS_TIMEOUT_MS);
+  const signal = AbortSignal.timeout(site.timeoutMs ?? STATUS_TIMEOUT_MS);
   const t0 = performance.now();
   try {
     let url = new URL(site.url);
@@ -50,14 +57,19 @@ async function once(site: StatusSite): Promise<SiteResult & { timedOut?: boolean
       res = await hop(url, signal);
     }
     const ms = Math.round(performance.now() - t0);
-    const state = res.code >= 400 || ms > STATUS_SLOW_MS ? "degraded" : "ok";
+    const failed = res.code >= 400;
+    const state = failed && site.kind === "demo" ? "down" : failed || ms > STATUS_SLOW_MS ? "degraded" : "ok";
     return { id: site.id, state, ms, code: res.code };
   } catch {
     return { id: site.id, state: "down", ms: null, code: null, timedOut: signal.aborted };
   }
 }
 
-/** Reintento solo ante 5xx o error de red rápido; un timeout no se repite (serían 16 s). */
+/**
+ * Reintento solo ante 5xx o error de red rápido; un timeout no se repite (serían
+ * 16 s). Peor caso de toda la medición, con las 18 en paralelo: un 5xx rápido
+ * de Orthodent + su reintento colgado = 8 s y algo.
+ */
 async function measure(site: StatusSite): Promise<SiteResult> {
   let r = await once(site);
   for (let k = 0; k < (site.retry ?? 0); k++) {

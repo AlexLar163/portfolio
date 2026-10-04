@@ -1,3 +1,5 @@
+import type { DemoId } from "./status";
+
 /**
  * Modelo de datos del portfolio.
  *
@@ -72,6 +74,12 @@ export interface Showcase {
   parts?: { id: "landing" | "app" | "bot"; media: GalleryRef; url: string }[];
   /** Vera: 4 rubros. */
   variants?: { id: string; media: GalleryRef }[];
+  /**
+   * Demo del taller (`on-demand`): id del sitio en /api/status
+   * (src/data/status.ts → TALLER_DEMOS). El CTA se resuelve en el cliente:
+   * «Ver en vivo» si responde, «Bajo pedido · Pedirla» si no o mientras mide.
+   */
+  liveSlug?: DemoId;
 }
 
 export interface Box {

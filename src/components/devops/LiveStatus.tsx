@@ -1,9 +1,9 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { CircleCheck, CircleDashed, CircleMinus, CircleX, TriangleAlert, type LucideIcon } from "lucide-react";
-import { STATUS_REVALIDATE_S, type SiteResult, type StatusPayload } from "@/data/status";
-import { publishStatus } from "@/motion/live";
+import { CircleCheck, CircleDashed, CircleMinus, CirclePower, CircleX, TriangleAlert, type LucideIcon } from "lucide-react";
+import { isUp, STATUS_REVALIDATE_S, type SiteResult, type StatusPayload } from "@/data/status";
+import { afterLoadIdle, loadStatus } from "@/motion/live";
 
 export type LiveText = {
   title: string;
@@ -19,17 +19,30 @@ export type LiveText = {
   /** «medido hace {n} h» */
   ageHour: string;
   states: Record<RowState, string>;
+  /** Grupo plegado de las demos del taller (on-demand). */
+  demos: {
+    /** «Demos del taller: {up} encendidos de {total}» */
+    summary: string;
+    pending: string;
+    noData: string;
+    listLabel: string;
+    note: string;
+  };
 };
 
 export type LiveSite = { id: string; name: string; host: string };
 
-type RowState = "ok" | "degraded" | "down" | "pending" | "nodata";
+type RowState = "ok" | "degraded" | "down" | "off" | "pending" | "nodata";
+/** Rótulos apilados de cada grupo: la columna mide lo que el más largo DEL GRUPO. */
 const ROW_STATES: RowState[] = ["ok", "degraded", "down", "pending", "nodata"];
+/** Una demo que no responde está apagada (on-demand), no caída. */
+const DEMO_STATES: RowState[] = ["ok", "degraded", "off", "pending", "nodata"];
 
 const ICON: Record<RowState, LucideIcon> = {
   ok: CircleCheck,
   degraded: TriangleAlert,
   down: CircleX,
+  off: CirclePower,
   pending: CircleDashed,
   nodata: CircleMinus,
 };
@@ -46,8 +59,22 @@ const fill = (tpl: string, v: Record<string, string | number>) =>
  *
  * El resumen es la única región aria-live: anuncia una vez cada medición
  * nueva, no cada minuto que pasa.
+ *
+ * Las demos del taller van aparte, en un <details> cerrado: una sola fila por
+ * defecto («Demos del taller: 7 encendidos de 11») y el detalle al abrir. Una
+ * demo que no responde dice «Apagado»: es on-demand, no una falla.
  */
-export function LiveStatus({ text, sites, locale }: { text: LiveText; sites: LiveSite[]; locale: string }) {
+export function LiveStatus({
+  text,
+  sites,
+  demos,
+  locale,
+}: {
+  text: LiveText;
+  sites: LiveSite[];
+  demos: LiveSite[];
+  locale: string;
+}) {
   const [data, setData] = useState<StatusPayload | null>(null);
   /** Reloj del servidor − reloj local: «hace X min» no depende de la hora del equipo. */
   const [skew, setSkew] = useState(0);
@@ -57,35 +84,25 @@ export function LiveStatus({ text, sites, locale }: { text: LiveText; sites: Liv
 
   useEffect(() => {
     let alive = true;
-    let idleId: number | undefined;
     const load = async () => {
       lastFetch.current = Date.now();
       try {
-        const res = await fetch("/api/status");
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        const p = (await res.json()) as StatusPayload;
+        // Compartida con el CTA de las demos (src/motion/live.ts): una sola petición.
+        const { payload: p, date } = await loadStatus();
         if (!alive) return;
-        if (!p?.measuredAt || !Array.isArray(p.sites) || !p.sites.length) throw new Error("sin datos");
-        const server = Date.parse(res.headers.get("date") ?? "");
+        const server = Date.parse(date ?? "");
         // El encabezado Date viene truncado al segundo: por debajo de 2 s no es desfase, es redondeo.
         const d = Number.isFinite(server) ? server - Date.now() : 0;
         setSkew(Math.abs(d) > 2000 ? d : 0);
         setData(p);
         setFailed(false);
         setNow(Date.now());
-        publishStatus(p);
       } catch {
         // Si ya había una medición, se conserva (su «hace X min» sigue siendo cierto).
         if (alive) setFailed(true);
       }
     };
-    const start = () => void load();
-    const whenIdle = () => {
-      if (typeof window.requestIdleCallback === "function") idleId = window.requestIdleCallback(start, { timeout: 2000 });
-      else idleId = window.setTimeout(start, 200);
-    };
-    if (document.readyState === "complete") whenIdle();
-    else window.addEventListener("load", whenIdle, { once: true });
+    const cancelStart = afterLoadIdle(() => void load());
 
     const period = STATUS_REVALIDATE_S * 1000;
     const due = () => !document.hidden && lastFetch.current > 0 && Date.now() - lastFetch.current >= period;
@@ -101,11 +118,7 @@ export function LiveStatus({ text, sites, locale }: { text: LiveText; sites: Liv
     document.addEventListener("visibilitychange", onVis);
     return () => {
       alive = false;
-      window.removeEventListener("load", whenIdle);
-      if (idleId !== undefined) {
-        if (typeof window.cancelIdleCallback === "function") window.cancelIdleCallback(idleId);
-        window.clearTimeout(idleId);
-      }
+      cancelStart();
       window.clearInterval(refresh);
       window.clearInterval(tick);
       document.removeEventListener("visibilitychange", onVis);
@@ -116,15 +129,17 @@ export function LiveStatus({ text, sites, locale }: { text: LiveText; sites: Liv
   const byId = new Map<string, SiteResult>((data?.sites ?? []).map((s) => [s.id, s]));
   const noData = !data && failed;
 
-  const rowState = (id: string): RowState => {
+  const rowState = (id: string, demo = false): RowState => {
     if (!data) return noData ? "nodata" : "pending";
-    return byId.get(id)?.state ?? "nodata";
+    const st = byId.get(id)?.state;
+    if (!st) return "nodata";
+    return demo && st === "down" ? "off" : st;
   };
 
   /** Lectura corta (cabe bajo el estado): ms, o el código si el sitio respondió con error. null = sin lectura. */
   const reading = (id: string, st: RowState) => {
     const r = byId.get(id);
-    if (st === "pending" || st === "nodata" || !r || r.ms === null) return null;
+    if (st === "pending" || st === "nodata" || st === "off" || !r || r.ms === null) return null;
     return r.code !== null && r.code >= 400 ? `HTTP ${r.code}` : `${nf.format(r.ms)} ms`;
   };
 
@@ -137,6 +152,44 @@ export function LiveStatus({ text, sites, locale }: { text: LiveText; sites: Liv
     }).length;
     summary = fill(text.summary, { up, total: sites.length });
   }
+
+  /** Misma regla que el CTA de las tarjetas (isUp): encendida = responde sin error. */
+  const demosUp = demos.filter((d) => isUp(byId.get(d.id))).length;
+  /** Las tres versiones del resumen de demos, apiladas: el renglón no cambia de ancho al resolver. */
+  const demoSummary: [string, string][] = [
+    ["pending", text.demos.pending],
+    ["nodata", text.demos.noData],
+    ["ready", fill(text.demos.summary, { up: demosUp, total: demos.length })],
+  ];
+  const demoSummaryOn = data ? "ready" : noData ? "nodata" : "pending";
+
+  const row = (s: LiveSite, labels: RowState[], demo = false) => {
+    const st = rowState(s.id, demo);
+    const value = reading(s.id, st);
+    return (
+      <li key={s.id} className="live__site" data-state={st}>
+        <span className="live__led" aria-hidden />
+        <span className="live__name">{s.name}</span>
+        <span className="live__host t-data">{s.host}</span>
+        {/* Todos los rótulos en la misma celda, visible solo el actual: la
+            columna mide lo que el más largo y la fila no cambia de alto
+            al pasar de «midiendo» a «vivo» (sin CLS). Los ocultos van con
+            visibility:hidden, fuera del árbol de accesibilidad. */}
+        <span className="live__state t-small">
+          {labels.map((k) => {
+            const Icon = ICON[k];
+            return (
+              <span key={k} className="live__label" data-on={k === st ? "" : undefined}>
+                <Icon size={14} strokeWidth={2} aria-hidden />
+                {text.states[k]}
+              </span>
+            );
+          })}
+        </span>
+        <span className="live__ms t-data">{value ?? <span aria-hidden>—</span>}</span>
+      </li>
+    );
+  };
 
   let age = "";
   if (data?.measuredAt && now) {
@@ -161,34 +214,29 @@ export function LiveStatus({ text, sites, locale }: { text: LiveText; sites: Liv
         </p>
       </header>
       <ul className="live__list" aria-label={text.listLabel}>
-        {sites.map((s) => {
-          const st = rowState(s.id);
-          const value = reading(s.id, st);
-          return (
-            <li key={s.id} className="live__site" data-state={st}>
-              <span className="live__led" aria-hidden />
-              <span className="live__name">{s.name}</span>
-              <span className="live__host t-data">{s.host}</span>
-              {/* Todos los rótulos en la misma celda, visible solo el actual: la
-                  columna mide lo que el más largo y la fila no cambia de alto
-                  al pasar de «midiendo» a «vivo» (sin CLS). Los ocultos van con
-                  visibility:hidden, fuera del árbol de accesibilidad. */}
-              <span className="live__state t-small">
-                {ROW_STATES.map((k) => {
-                  const Icon = ICON[k];
-                  return (
-                    <span key={k} className="live__label" data-on={k === st ? "" : undefined}>
-                      <Icon size={14} strokeWidth={2} aria-hidden />
-                      {text.states[k]}
-                    </span>
-                  );
-                })}
-              </span>
-              <span className="live__ms t-data">{value ?? <span aria-hidden>—</span>}</span>
-            </li>
-          );
-        })}
+        {sites.map((site) => row(site, ROW_STATES))}
       </ul>
+      {demos.length > 0 && (
+        <details className="disclosure live__demos">
+          <summary>
+            <span className="live__demos-sum">
+              {demoSummary.map(([k, label]) => (
+                <span key={k} className="live__demos-label" data-on={k === demoSummaryOn ? "" : undefined}>
+                  {label}
+                </span>
+              ))}
+            </span>
+          </summary>
+          <div className="disclosure__body">
+            <div className="disclosure__inner">
+              <p className="t-small ink-3 live__demos-note">{text.demos.note}</p>
+              <ul className="live__list" aria-label={text.demos.listLabel}>
+                {demos.map((d) => row(d, DEMO_STATES, true))}
+              </ul>
+            </div>
+          </div>
+        </details>
+      )}
     </section>
   );
 }

@@ -8,8 +8,9 @@ import { measureAll } from "./probe";
  * cron (el plan Hobby solo da 1/día). Se mide en el build; después, la primera
  * petición pasados 5 min recibe la respuesta guardada al instante y dispara la
  * nueva medición en segundo plano (stale-while-revalidate). Ninguna visita
- * espera las 7 mediciones, y la home ni siquiera la pide en su render: la lee
- * el bloque «Estado en vivo» en el cliente, tras `load`.
+ * espera las 18 mediciones (en paralelo, cada una con su corte: ver probe.ts),
+ * y la home ni siquiera la pide en su render: la leen el bloque «Estado en
+ * vivo» y el CTA de cada demo, en el cliente, tras `load` (src/motion/live.ts).
  *
  * `revalidate` tiene que ser un literal (Next lo analiza estático): 300 =
  * STATUS_REVALIDATE_S.
@@ -17,13 +18,15 @@ import { measureAll } from "./probe";
 export const runtime = "nodejs";
 export const dynamic = "force-static";
 export const revalidate = 300;
+/** Holgura sobre el peor caso de la sonda (~8,5 s); el plan Hobby admite hasta 60. */
+export const maxDuration = 20;
 
 const EMPTY: StatusPayload = { measuredAt: null, sites: [] };
 
 export async function GET() {
   const payload = await measureAll();
   // Si NO responde ninguno (ni este mismo sitio), lo roto es la red de quien
-  // mide, no los 7 sitios: no se publica «todo caído». En el build se emite
+  // mide, no los 18 sitios: no se publica «todo caído». En el build se emite
   // «sin datos»; en una regeneración se lanza, y Next sigue sirviendo la
   // última medición buena hasta el próximo intento.
   if (payload.sites.every((s) => s.state === "down")) {

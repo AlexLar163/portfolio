@@ -218,11 +218,7 @@
             "text": "Fastify + TypeScript: enciende y apaga demos leyendo las labels de Compose, con RAM, disco, carga, uptime y modal de logs"
           },
           {
-            "text": "Tope de demos encendidas a la vez",
-            "data": "MAX_RUNNING=2"
-          },
-          {
-            "text": "Antes de encender exige memoria libre y carga baja: regla sacada de una caída de 12 min",
+            "text": "Enciende demos según capacidad, sin un tope fijo de sitios: antes de encender exige memoria libre y carga baja, regla sacada de una caída de 12 min",
             "data": "≥ 400 MB libres · carga < 2"
           },
           {
@@ -383,7 +379,7 @@
       "container": {
         "title": "Llega a su contenedor",
         "text": "WordPress por perfiles de Compose, con una MariaDB compartida.",
-        "data": "384 MB c/u · máx. 2 encendidos"
+        "data": "384 MB c/u · según capacidad"
       },
       "webhook": {
         "title": "Llega un webhook",
@@ -413,7 +409,7 @@
     "bento": {
       "title": "Qué opero",
       "panelFacts": [
-        "MAX_RUNNING=2",
+        "según capacidad",
         "≥ 400 MB libres · carga < 2",
         "systemd → contenedor"
       ],
@@ -433,7 +429,7 @@
     },
     "live": {
       "title": "Estado en vivo",
-      "lead": "Medición real desde el servidor del portfolio: una petición GET a cada sitio público, renovada como máximo cada 5 minutos. La latencia es hasta el primer byte. La ruta «Petición web» del diagrama corre a la latencia medida de Bitácora, el sitio que sirve este VPS.",
+      "lead": "Medición real desde el servidor del portfolio: una petición GET a cada sitio público y a cada demo del taller, renovada como máximo cada 5 minutos. La latencia es hasta el primer byte. La ruta «Petición web» del diagrama corre a la latencia medida de Bitácora, el sitio que sirve este VPS.",
       "listLabel": "Sitios medidos",
       "summary": "{up} de {total} sitios responden",
       "pending": "Midiendo…",
@@ -445,8 +441,16 @@
         "ok": "Vivo",
         "degraded": "Degradado",
         "down": "Caído",
+        "off": "Apagado",
         "pending": "Midiendo",
         "nodata": "Sin datos"
+      },
+      "demos": {
+        "summary": "Demos del taller: {up} encendidos de {total}",
+        "pending": "Demos del taller: midiendo…",
+        "noData": "Demos del taller: sin datos ahora",
+        "listLabel": "Demos del taller medidas",
+        "note": "Sitios WordPress que enciendo según la capacidad del servidor (≥ 400 MB libres y carga < 2). «Apagado» no es una falla: se encienden bajo pedido."
       },
       "hosts": {
         "vercel": "Vercel",
@@ -584,13 +588,13 @@
         "sub": [
           "perfiles de Compose",
           "384 MB c/u",
-          "máx. 2"
+          "según carga"
         ],
-        "detail": "Cada sitio es un servicio de Compose activado por profile: se enciende cuando alguien lo pide. Caben dos a la vez.",
+        "detail": "Cada sitio es un servicio de Compose activado por profile: se enciende cuando alguien lo pide, si el servidor tiene capacidad (≥ 400 MB libres y carga < 2).",
         "facts": [
           "profiles de Compose",
           "384 MB por sitio",
-          "máx. 2 encendidos"
+          "encendido según capacidad"
         ]
       },
       "mariadb": {
@@ -614,7 +618,7 @@
         ],
         "detail": "Mi panel de control: enciende y apaga demos leyendo las labels de Compose. Antes de encender exige memoria y carga, regla que salió de una caída de 12 min.",
         "facts": [
-          "MAX_RUNNING=2",
+          "encendido según capacidad",
           "≥ 400 MB libres",
           "carga < 2"
         ]
@@ -719,7 +723,7 @@
   "projects": {
     "title": "Productos y demos",
     "lead": "Productos propios y demos que construí para mostrar cómo trabajo. Las marcas de los demos son ficticias; el código y el despliegue son reales.",
-    "note": "Los sitios marcados bajo pedido se encienden en mi servidor cuando alguien los pide: caben dos a la vez. Si quieres verlos en vivo,",
+    "note": "Los sitios bajo pedido se encienden en mi servidor según su capacidad; los que están encendidos ahora muestran «Ver en vivo». Si quieres ver otro,",
     "noteLink": "escríbeme",
     "partsLabel": "Partes de Turnia",
     "variantsLabel": "Rubros de Vera",
@@ -1606,7 +1610,7 @@
     "appliedLater": [
       "Límite de intentos en `wp-login.php`",
       "Alertas de carga y disco",
-      "Tras dos caídas por memoria (13 y 15 de septiembre): el panel exige al menos 400 MB libres y carga menor a 2 antes de encender un sitio, con un máximo de 2 encendidos",
+      "Tras dos caídas por memoria (13 y 15 de septiembre): el panel exige al menos 400 MB libres y carga menor a 2 antes de encender un sitio",
       "El runner de agentes ganó un vigilante de inactividad"
     ],
     "pending": [
@@ -1648,7 +1652,7 @@
         "note": "En el sitio reconstruido"
       },
       {
-        "text": "Encendido condicionado a memoria y carga; máximo 2 sitios a la vez",
+        "text": "Encendido condicionado a memoria y carga (≥ 400 MB libres y carga < 2)",
         "status": "done"
       },
       {
@@ -1670,7 +1674,7 @@
       {
         "text": "Separar el pipeline de los sitios expuestos",
         "status": "accepted",
-        "note": "Mitigado con límite de memoria por servicio y máximo 2 demos encendidas"
+        "note": "Mitigado con límite de memoria por servicio y encendido según capacidad (≥ 400 MB libres y carga < 2)"
       },
       {
         "text": "Recrear el swap de 2 GB",

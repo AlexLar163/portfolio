@@ -55,7 +55,9 @@ export async function DevOps() {
   const locale = await getLocale();
   const cases = await getTranslations("cases.ui");
   const { hosts, ...live } = t.raw("live") as LiveText & { hosts: Record<string, string> };
-  const liveSites = statusSites.map((s) => ({ id: s.id, name: s.name, host: hosts[s.host] }));
+  const toLive = (s: (typeof statusSites)[number]) => ({ id: s.id, name: s.name, host: hosts[s.host] });
+  const liveSites = statusSites.filter((s) => s.kind === "public").map(toLive);
+  const liveDemos = statusSites.filter((s) => s.kind === "demo").map(toLive);
 
   const nodeText = Object.fromEntries(
     nodes
@@ -147,8 +149,8 @@ export async function DevOps() {
           </div>
         </details>
 
-        {/* Estado en vivo: medición real de los sitios públicos (/api/status). */}
-        <LiveStatus text={live} sites={liveSites} locale={locale} />
+        {/* Estado en vivo: medición real de los sitios públicos y de las demos del taller (/api/status). */}
+        <LiveStatus text={live} sites={liveSites} demos={liveDemos} locale={locale} />
 
         {/* Respuesta a incidente: sin nombre de cliente */}
         <article className="grid incident" aria-labelledby="incident-title">

@@ -10,6 +10,7 @@ import { MediaFrame } from "@/components/media/MediaFrame";
 import { slideFrom } from "@/components/media/build";
 import { mediaText } from "@/components/media/text";
 import { DemoRequestLink } from "./DemoRequestLink";
+import { DemoLiveCta, type DemoCtaText } from "./DemoLiveCta";
 import { FEATURED_IDS } from "./Featured";
 import { PauseToggle } from "@/components/ui/PauseToggle";
 
@@ -37,7 +38,22 @@ export async function MoreProjects() {
   const rows = [covers.slice(0, half), covers.slice(half)];
   const STATIC_N = 6;
 
-  /** Acción según el estado: en vivo → enlace; bajo pedido → «Pedirla» (nunca «Ver en vivo»). */
+  /** Textos del CTA dinámico de las demos del taller (DemoLiveCta). */
+  const ctaText = (name: string): DemoCtaText => ({
+    live: s("live"),
+    onDemand: s("on-demand"),
+    viewLive: c("viewLive"),
+    onDemandNote: c("onDemandNote"),
+    requestDemo: c("requestDemo"),
+    prefill: c("requestPrefill", { name }),
+    newTab: m.newTab,
+  });
+
+  /**
+   * Acción según el estado: en vivo → enlace; bajo pedido → «Pedirla» (nunca
+   * «Ver en vivo»). Las demos del taller (`liveSlug`) no pasan por acá: su CTA
+   * se resuelve con el estado real en DemoLiveCta.
+   */
   const action = (p: Showcase, name: string) => {
     if (p.status === "live" && p.url)
       return (
@@ -100,8 +116,14 @@ export async function MoreProjects() {
                     </p>
                     <p className="demo-card__line t-small">{t(`items.${p.id}.summary`)}</p>
                     <div className="demo-card__foot">
-                      {p.status && <StatusBadge status={p.status} label={s(p.status)} />}
-                      {action(p, name)}
+                      {p.liveSlug ? (
+                        <DemoLiveCta id={p.liveSlug} variant="card" text={ctaText(name)} />
+                      ) : (
+                        <>
+                          {p.status && <StatusBadge status={p.status} label={s(p.status)} />}
+                          {action(p, name)}
+                        </>
+                      )}
                     </div>
                   </div>
                 </article>
@@ -180,8 +202,12 @@ export async function MoreProjects() {
                                 <TechList items={p.tech} max={3} />
                               </div>
                               <div className="row__status">
-                                {p.status && <StatusBadge status={p.status} label={s(p.status)} />}
-                                {linked ? (
+                                {p.liveSlug ? (
+                                  <DemoLiveCta id={p.liveSlug} variant="row" text={ctaText(name)} />
+                                ) : (
+                                  p.status && <StatusBadge status={p.status} label={s(p.status)} />
+                                )}
+                                {p.liveSlug ? null : linked ? (
                                   <span className="row__cta t-small">
                                     {c("viewLive")}
                                     <ArrowUpRight className="link__icon" strokeWidth={1.5} aria-hidden />

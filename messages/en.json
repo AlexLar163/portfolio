@@ -219,11 +219,7 @@
             "text": "Fastify + TypeScript: starts and stops demos by reading Compose labels, with RAM, disk, load, uptime and a logs modal"
           },
           {
-            "text": "Cap on demos running at once",
-            "data": "MAX_RUNNING=2"
-          },
-          {
-            "text": "Before starting a site it requires free memory and low load: a rule learned from a 12-minute outage",
+            "text": "Starts demos according to capacity, with no fixed cap on sites: before starting one it requires free memory and low load, a rule learned from a 12-minute outage",
             "data": "≥ 400 MB free · load < 2"
           },
           {
@@ -384,7 +380,7 @@
       "container": {
         "title": "It reaches its container",
         "text": "WordPress via Compose profiles, sharing one MariaDB.",
-        "data": "384 MB each · max. 2 running"
+        "data": "384 MB each · capacity-gated"
       },
       "webhook": {
         "title": "A webhook arrives",
@@ -414,7 +410,7 @@
     "bento": {
       "title": "What I run",
       "panelFacts": [
-        "MAX_RUNNING=2",
+        "capacity-gated",
         "≥ 400 MB free · load < 2",
         "systemd → container"
       ],
@@ -434,7 +430,7 @@
     },
     "live": {
       "title": "Live status",
-      "lead": "Real measurement from the portfolio server: one GET request to each public site, refreshed at most every 5 minutes. Latency is time to first byte. The diagram’s “Web request” route runs at the measured latency of Bitácora, the site this VPS serves.",
+      "lead": "Real measurement from the portfolio server: one GET request to each public site and each workshop demo, refreshed at most every 5 minutes. Latency is time to first byte. The diagram’s “Web request” route runs at the measured latency of Bitácora, the site this VPS serves.",
       "listLabel": "Measured sites",
       "summary": "{up} of {total} sites responding",
       "pending": "Measuring…",
@@ -446,8 +442,16 @@
         "ok": "Up",
         "degraded": "Degraded",
         "down": "Down",
+        "off": "Off",
         "pending": "Measuring",
         "nodata": "No data"
+      },
+      "demos": {
+        "summary": "Workshop demos: {up} of {total} running",
+        "pending": "Workshop demos: measuring…",
+        "noData": "Workshop demos: no data right now",
+        "listLabel": "Measured workshop demos",
+        "note": "WordPress sites I start according to server capacity (≥ 400 MB free and load < 2). “Off” is not a failure: they start on request."
       },
       "hosts": {
         "vercel": "Vercel",
@@ -585,13 +589,13 @@
         "sub": [
           "Compose profiles",
           "384 MB each",
-          "max. 2"
+          "load-gated"
         ],
-        "detail": "Each site is a Compose service enabled by profile: it starts when someone asks for it. Two fit at a time.",
+        "detail": "Each site is a Compose service enabled by profile: it starts when someone asks for it, if the server has capacity (≥ 400 MB free and load < 2).",
         "facts": [
           "Compose profiles",
           "384 MB per site",
-          "max. 2 running"
+          "capacity-gated start-up"
         ]
       },
       "mariadb": {
@@ -615,7 +619,7 @@
         ],
         "detail": "My control panel: it starts and stops demos by reading Compose labels. Before starting one it checks memory and load, a rule that came from a 12-minute outage.",
         "facts": [
-          "MAX_RUNNING=2",
+          "capacity-gated start-up",
           "≥ 400 MB free",
           "load < 2"
         ]
@@ -720,7 +724,7 @@
   "projects": {
     "title": "Products and demos",
     "lead": "My own products and demos built to show how I work. Demo brands are fictional; the code and the deployment are real.",
-    "note": "Sites marked on request are started on my server when someone asks: two fit at a time. If you want to see one live,",
+    "note": "On-request sites run on my server as capacity allows; the ones running right now show “View live”. If you want to see another one,",
     "noteLink": "write to me",
     "partsLabel": "Turnia parts",
     "variantsLabel": "Vera industries",
@@ -1607,7 +1611,7 @@
     "appliedLater": [
       "Rate limit on `wp-login.php`",
       "Load and disk alerts",
-      "After two memory-related outages (13 and 15 September): the panel requires at least 400 MB free and load below 2 before starting a site, with at most 2 running",
+      "After two memory-related outages (13 and 15 September): the panel requires at least 400 MB free and load below 2 before starting a site",
       "The agent runner gained an inactivity watchdog"
     ],
     "pending": [
@@ -1649,7 +1653,7 @@
         "note": "On the rebuilt site"
       },
       {
-        "text": "Start-up gated on memory and load; at most 2 sites at once",
+        "text": "Start-up gated on memory and load (≥ 400 MB free and load < 2)",
         "status": "done"
       },
       {
@@ -1671,7 +1675,7 @@
       {
         "text": "Separate the pipeline from exposed sites",
         "status": "accepted",
-        "note": "Mitigated with a per-service memory limit and at most 2 demos running"
+        "note": "Mitigated with a per-service memory limit and capacity-gated start-up (≥ 400 MB free and load < 2)"
       },
       {
         "text": "Recreate the 2 GB swap",
