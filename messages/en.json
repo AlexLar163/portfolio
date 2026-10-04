@@ -28,6 +28,8 @@
     "requestDemo": "Request it",
     "onDemandNote": "Live demo on request",
     "requestPrefill": "Hi Alex, I'd like to see the {name} demo live.",
+    "requestInfo": "Ask about it",
+    "requestInfoPrefill": "Hi Alex, I'd like to know more about the {name} demo.",
     "gallery": "{name} views",
     "view": "View {n} of {name}",
     "viewLive": "View live",
@@ -45,6 +47,7 @@
     "in-progress": "In progress",
     "on-demand": "On request",
     "captures-only": "Captures only",
+    "unavailable": "Unavailable",
     "internal": "Internal use"
   },
   "labels": {
@@ -443,6 +446,7 @@
         "degraded": "Degraded",
         "down": "Down",
         "off": "Off",
+        "unavailable": "Unavailable",
         "pending": "Measuring",
         "nodata": "No data"
       },
@@ -451,7 +455,7 @@
         "pending": "Workshop demos: measuring…",
         "noData": "Workshop demos: no data right now",
         "listLabel": "Measured workshop demos",
-        "note": "WordPress sites I start according to server capacity (≥ 400 MB free and load < 2). “Off” is not a failure: they start on request."
+        "note": "WordPress sites I start according to server capacity (≥ 400 MB free and load < 2). “Off” is not a failure: they start on request. “Unavailable” means the site isn't answering right now (not even with a 502)."
       },
       "hosts": {
         "vercel": "Vercel",

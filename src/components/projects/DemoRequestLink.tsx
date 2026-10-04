@@ -3,7 +3,7 @@
 export const DEMO_REQUEST_EVENT = "portfolio:demo-request";
 
 /** «Pedirla»: va a #contacto y precarga el mensaje si el campo está vacío (DISENO §6.7). */
-export function DemoRequestLink({ label, message }: { label: string; message: string }) {
+export function DemoRequestLink({ label, message, name }: { label: string; message: string; name?: string }) {
   return (
     <a
       href="#contacto"
@@ -13,6 +13,8 @@ export function DemoRequestLink({ label, message }: { label: string; message: st
       }}
     >
       {label}
+      {/* Nombre accesible con el sitio: «Pedirla: Lume…», no once «Pedirla» iguales. */}
+      {name && <span className="sr-only">: {name}</span>}
     </a>
   );
 }

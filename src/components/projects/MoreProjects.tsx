@@ -40,12 +40,16 @@ export async function MoreProjects() {
 
   /** Textos del CTA dinámico de las demos del taller (DemoLiveCta). */
   const ctaText = (name: string): DemoCtaText => ({
+    name,
     live: s("live"),
     onDemand: s("on-demand"),
+    unavailable: s("unavailable"),
     viewLive: c("viewLive"),
     onDemandNote: c("onDemandNote"),
     requestDemo: c("requestDemo"),
     prefill: c("requestPrefill", { name }),
+    requestInfo: c("requestInfo"),
+    infoPrefill: c("requestInfoPrefill", { name }),
     newTab: m.newTab,
   });
 
@@ -59,13 +63,14 @@ export async function MoreProjects() {
       return (
         <TextLink href={p.url} external newTabLabel={m.newTab}>
           {c("viewLive")}
+          <span className="sr-only">: {name}</span>
         </TextLink>
       );
     if (p.status === "on-demand")
       return (
         <span className="on-demand t-small">
           {c("onDemandNote")}
-          <DemoRequestLink label={c("requestDemo")} message={c("requestPrefill", { name })} />
+          <DemoRequestLink label={c("requestDemo")} message={c("requestPrefill", { name })} name={name} />
         </span>
       );
     return null;

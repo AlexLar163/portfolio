@@ -14,7 +14,9 @@ export type Status =
   | "in-progress"
   | "on-demand"
   | "captures-only"
-  | "internal";
+  | "internal"
+  /** Demo del taller que no responde ni con 502 (sin certificado, red): no se promete encenderla. */
+  | "unavailable";
 
 export type ShowcaseLabel = "demo" | "own-tool" | "personal" | "previous";
 

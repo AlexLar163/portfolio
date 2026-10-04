@@ -28,6 +28,8 @@
     "requestDemo": "Pedirla",
     "onDemandNote": "Demo en vivo bajo pedido",
     "requestPrefill": "Hola Alex, me gustaría ver la demo de {name} en vivo.",
+    "requestInfo": "Pedir info",
+    "requestInfoPrefill": "Hola Alex, me gustaría saber más de la demo de {name}.",
     "gallery": "Vistas de {name}",
     "view": "Vista {n} de {name}",
     "viewLive": "Ver en vivo",
@@ -45,6 +47,7 @@
     "in-progress": "En curso",
     "on-demand": "Bajo pedido",
     "captures-only": "Solo capturas",
+    "unavailable": "No disponible",
     "internal": "Uso interno"
   },
   "labels": {
@@ -442,6 +445,7 @@
         "degraded": "Degradado",
         "down": "Caído",
         "off": "Apagado",
+        "unavailable": "No disponible",
         "pending": "Midiendo",
         "nodata": "Sin datos"
       },
@@ -450,7 +454,7 @@
         "pending": "Demos del taller: midiendo…",
         "noData": "Demos del taller: sin datos ahora",
         "listLabel": "Demos del taller medidas",
-        "note": "Sitios WordPress que enciendo según la capacidad del servidor (≥ 400 MB libres y carga < 2). «Apagado» no es una falla: se encienden bajo pedido."
+        "note": "Sitios WordPress que enciendo según la capacidad del servidor (≥ 400 MB libres y carga < 2). «Apagado» no es una falla: se encienden bajo pedido. «No disponible» es que el sitio no responde ahora (ni con 502)."
       },
       "hosts": {
         "vercel": "Vercel",

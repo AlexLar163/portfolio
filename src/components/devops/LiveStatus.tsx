@@ -1,8 +1,17 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { CircleCheck, CircleDashed, CircleMinus, CirclePower, CircleX, TriangleAlert, type LucideIcon } from "lucide-react";
-import { isUp, STATUS_REVALIDATE_S, type SiteResult, type StatusPayload } from "@/data/status";
+import {
+  CircleCheck,
+  CircleDashed,
+  CircleMinus,
+  CirclePower,
+  CircleSlash2,
+  CircleX,
+  TriangleAlert,
+  type LucideIcon,
+} from "lucide-react";
+import { demoAvailability, isUp, STATUS_REVALIDATE_S, type SiteResult, type StatusPayload } from "@/data/status";
 import { afterLoadIdle, loadStatus } from "@/motion/live";
 
 export type LiveText = {
@@ -32,17 +41,21 @@ export type LiveText = {
 
 export type LiveSite = { id: string; name: string; host: string };
 
-type RowState = "ok" | "degraded" | "down" | "off" | "pending" | "nodata";
+type RowState = "ok" | "degraded" | "down" | "off" | "unavailable" | "pending" | "nodata";
 /** Rótulos apilados de cada grupo: la columna mide lo que el más largo DEL GRUPO. */
 const ROW_STATES: RowState[] = ["ok", "degraded", "down", "pending", "nodata"];
-/** Una demo que no responde está apagada (on-demand), no caída. */
-const DEMO_STATES: RowState[] = ["ok", "degraded", "off", "pending", "nodata"];
+/**
+ * Demo con 502: apagada (on-demand), no caída. Sin respuesta (TLS, red): no
+ * disponible, y no se promete encenderla.
+ */
+const DEMO_STATES: RowState[] = ["ok", "degraded", "off", "unavailable", "pending", "nodata"];
 
 const ICON: Record<RowState, LucideIcon> = {
   ok: CircleCheck,
   degraded: TriangleAlert,
   down: CircleX,
   off: CirclePower,
+  unavailable: CircleSlash2,
   pending: CircleDashed,
   nodata: CircleMinus,
 };
@@ -131,15 +144,16 @@ export function LiveStatus({
 
   const rowState = (id: string, demo = false): RowState => {
     if (!data) return noData ? "nodata" : "pending";
-    const st = byId.get(id)?.state;
-    if (!st) return "nodata";
-    return demo && st === "down" ? "off" : st;
+    const r = byId.get(id);
+    if (!r) return "nodata";
+    if (demo && r.state === "down") return demoAvailability(r) === "off" ? "off" : "unavailable";
+    return r.state;
   };
 
   /** Lectura corta (cabe bajo el estado): ms, o el código si el sitio respondió con error. null = sin lectura. */
   const reading = (id: string, st: RowState) => {
     const r = byId.get(id);
-    if (st === "pending" || st === "nodata" || st === "off" || !r || r.ms === null) return null;
+    if (st === "pending" || st === "nodata" || st === "off" || st === "unavailable" || !r || r.ms === null) return null;
     return r.code !== null && r.code >= 400 ? `HTTP ${r.code}` : `${nf.format(r.ms)} ms`;
   };
 

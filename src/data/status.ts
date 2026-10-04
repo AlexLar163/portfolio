@@ -80,6 +80,7 @@ export const statusSites: StatusSite[] = [
       host: "vps",
       kind: "demo",
       timeoutMs: DEMO_TIMEOUT_MS,
+      retry: 1,
     }),
   ),
 ];
@@ -93,6 +94,15 @@ export function demoUrl(id: DemoId) {
 export const STATUS_TIMEOUT_MS = 8000;
 /** Respuesta correcta pero más lenta que esto = degradado. */
 export const STATUS_SLOW_MS = 3000;
+/**
+ * Sitios del VPS propio (Bitácora + demos), medidos de a VPS_CONCURRENCY con
+ * HEAD: así responden en 0,3–0,8 s (medido el 3-oct-2026), y más de VPS_SLOW_MS
+ * ya es un VPS en apuros. VPS_BUDGET_MS acota la cola: con los externos en
+ * paralelo (≤ 8,5 s), la medición entera queda < 15 s (maxDuration = 20).
+ */
+export const VPS_CONCURRENCY = 2;
+export const VPS_SLOW_MS = 2000;
+export const VPS_BUDGET_MS = 12_000;
 /** Cada cuánto se renueva la medición (s). Tiene que coincidir con `revalidate` de la ruta. */
 export const STATUS_REVALIDATE_S = 300;
 
@@ -115,6 +125,22 @@ export type SiteResult = {
  */
 export const isUp = (r: SiteResult | undefined) =>
   !!r && r.state !== "down" && r.code !== null && r.code < 400;
+
+/**
+ * Disponibilidad de una demo del taller:
+ *   up          → responde: se enlaza («Ver en vivo»)
+ *   off         → 502/503/504: Caddy está y el contenedor no; se enciende bajo
+ *                 pedido («Apagado», «Pedirla»)
+ *   unavailable → error de red o de TLS, u otro código: no hay a qué encender
+ *                 («No disponible», «Pedir info»; nunca promete encenderla)
+ * null = sin medición (render estático: «Bajo pedido»).
+ */
+export type DemoAvailability = "up" | "off" | "unavailable";
+export function demoAvailability(r: SiteResult | undefined): DemoAvailability | null {
+  if (!r) return null;
+  if (isUp(r)) return "up";
+  return r.code === 502 || r.code === 503 || r.code === 504 ? "off" : "unavailable";
+}
 
 export type StatusPayload = {
   /** ISO 8601. null = no hay medición válida («sin datos ahora»). */
