@@ -387,16 +387,16 @@
   "meridiano": {
     "portada": {
       "src": "/media/meridiano/portada.webp",
+      "avif": "/media/meridiano/portada.avif",
       "w": 1440,
       "h": 900,
       "webpQ": 80,
-      "kb": 44,
-      "avif": "/media/meridiano/portada.avif",
-      "avifKb": 26,
+      "kb": 68,
+      "avifKb": 41,
       "fit": "cover",
       "position": "top",
       "from": "live:meridiano.taller.works 2026-10-04",
-      "note": "1440x900 (16:10) above the fold; en slot 16:9 va cover+top. El hero del sitio muestra su caso Recreo por diseño."
+      "note": "Sección Casos (10 sitios en uso) a 1440x900, no el hero: el hero muestra Recreo y se confundía con la tarjeta vecina."
     },
     "galeria-01": {
       "src": "/media/meridiano/galeria-01.webp",
