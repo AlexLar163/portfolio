@@ -842,7 +842,7 @@
       "meridiano": {
         "summary": "Estudio B2B de diseño y desarrollo web con casos de estudio.",
         "highlights": [
-          "Casos de estudio con filtro por rubro",
+          "Carrusel de casos con métricas y rubros desplegables",
           "CRM de consultas por pipeline"
         ]
       },
